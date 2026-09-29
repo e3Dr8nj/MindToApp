@@ -1,4 +1,5 @@
 // Загрузка реестра модулей
+   const REGISTRY_URL = 'https://e3dr8nj.github.io/NexusAl/registry/registry.json';
 async function loadRegistry() {
   try {
     const response = await fetch(REGISTRY_URL);
