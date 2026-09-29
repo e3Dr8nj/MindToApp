@@ -1,0 +1,7 @@
+{
+  "id": "notes",
+  "name": "Блокнот",
+  "icon": "📝",
+  "description": "Простые заметки с автосохранением",
+  "entry": "index.html"
+}
