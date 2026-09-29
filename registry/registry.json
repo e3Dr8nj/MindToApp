@@ -1,27 +1,13 @@
 {
   "modules": [
     {
-      "id": "pomodoro",
-      "name": "Таймер Помодоро",
-      "icon": "🍅",
-      "description": "Фокусировка на задачах по методу Помодоро",
-      "url": "https://e3Dr8nj.github.io/NexusAl/modules/pomodoro/"
-     
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/pomodoro.html"
     },
     {
-      "id": "notes",
-      "name": "Блокнот",
-      "icon": "📝",
-      "description": "Простые заметки с автосохранением",
-      "url": "https://e3Dr8nj.github.io/NexusAl/modules/notes/"
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/notes.html"
     },
     {
-      "id": "calculator",
-      "name": "Калькулятор",
-      "icon": "🧮",
-      "description": "Быстрые математические вычисления",
-      "url": "https://e3Dr8nj.github.io/NexusAl/modules/calculator/"
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/calculator.html"
     }
   ]
-  
 }
