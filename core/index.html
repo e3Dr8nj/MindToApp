@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Apps Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+</head>
+<body>
+  <!-- Экран 1: Рабочий стол -->
+  <div id="home-screen" class="screen active">
+    <header>
+      <h1>🏠 Мои приложения</h1>
+      <button id="open-store-btn" class="btn">🛒 Магазин</button>
+    </header>
+    <div id="installed-apps" class="app-grid">
+      <!-- Сюда динамически добавляются установленные модули -->
+    </div>
+    <div id="empty-state" class="empty-state" style="display: none;">
+      <p>У вас пока нет установленных приложений</p>
+      <button id="go-to-store-btn" class="btn btn-primary">Перейти в магазин</button>
+    </div>
+  </div>
+
+  <!-- Экран 2: Магазин -->
+  <div id="store-screen" class="screen">
+    <header>
+      <button id="back-to-home-btn" class="btn">← Назад</button>
+      <h1>🛒 Магазин модулей</h1>
+    </header>
+    <div id="all-apps" class="app-grid">
+      <!-- Сюда динамически добавляются все модули из registry -->
+    </div>
+  </div>
+
+  <!-- Экран 3: Запущенное приложение (iframe) -->
+  <div id="app-screen" class="screen">
+    <header>
+      <button id="close-app-btn" class="btn">← Закрыть</button>
+      <h1 id="current-app-name">Приложение</h1>
+    </header>
+    <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
