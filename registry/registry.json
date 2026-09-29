@@ -1,13 +1,13 @@
 {
   "modules": [
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/pomodoro.html"
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/pomodoro/"
     },
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/notes.html"
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/notes/"
     },
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/calculator.html"
+      "url": "https://e3dr8nj.github.io/NexusAl/modules/calculator/"
     }
   ]
 }
