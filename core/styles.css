@@ -426,3 +426,22 @@ h1 {
     height: calc(100vh - 55px);
   }
 }
+/* Предупреждение для вкладки "Папка" */
+.folder-warning {
+  margin-top: 15px;
+  padding: 10px;
+  background: #fff3cd;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #856404;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Адаптация переключателя вкладок под 3 кнопки */
+@media (max-width: 500px) {
+  .tab-btn {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+}

@@ -63,10 +63,10 @@
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
 
-        <!-- Вкладка 2: Локальный файл -->
+        <!-- Вкладка 2: Один локальный файл -->
         <div class="tab" data-tab="local" style="display: none;">
           <p class="modal-description">
-            Выберите файл <b>.html</b> с вашего компьютера.<br>
+            Выберите <b>один файл .html</b> с вашего компьютера.<br>
             <i>(Модуль должен быть одним файлом со встроенными стилями и скриптами)</i>
           </p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
@@ -76,10 +76,27 @@
           <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
         </div>
 
+        <!-- Вкладка 3: Целая папка -->
+        <div class="tab" data-tab="folder" style="display: none;">
+          <p class="modal-description">
+            Выберите <b>папку</b> с модулем на вашем компьютере.<br>
+            <i>В папке должен быть файл <code>index.html</code> и любые сопутствующие файлы (картинки, CSS, JS)</i>
+          </p>
+          <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
+          <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">
+            📁 Выбрать папку
+          </button>
+          <div id="selected-folder-info" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
+          <div class="folder-warning">
+            ⚠️ Работает в Chrome, Edge, Firefox. Не работает в Safari.
+          </div>
+        </div>
+
         <!-- Переключатель вкладок -->
         <div class="tab-switcher">
-          <button class="tab-btn active" data-target="url">🔗 По ссылке</button>
-          <button class="tab-btn" data-target="local">💻 С компьютера</button>
+          <button class="tab-btn active" data-target="url">🔗 Ссылка</button>
+          <button class="tab-btn" data-target="local">📄 Файл</button>
+          <button class="tab-btn" data-target="folder">📁 Папка</button>
         </div>
 
         <div id="modal-status" class="modal-status"></div>
@@ -91,6 +108,7 @@
     </div>
   </div>
 
+  <script src="db.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
