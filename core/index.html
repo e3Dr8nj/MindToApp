@@ -7,13 +7,17 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#667eea">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
 </head>
 <body>
   <!-- Экран 1: Рабочий стол -->
   <div id="home-screen" class="screen active">
     <header>
       <h1>🏠 Мои приложения</h1>
-      <button id="open-store-btn" class="btn">🛒 Магазин</button>
+      <div class="header-buttons">
+        <button id="add-custom-btn" class="btn">➕ Добавить</button>
+        <button id="open-store-btn" class="btn">🛒 Магазин</button>
+      </div>
     </header>
     <div id="installed-apps" class="app-grid">
       <!-- Сюда динамически добавляются установленные модули -->
@@ -29,6 +33,7 @@
     <header>
       <button id="back-to-home-btn" class="btn">← Назад</button>
       <h1>🛒 Магазин модулей</h1>
+      <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
     </header>
     <div id="all-apps" class="app-grid">
       <!-- Сюда динамически добавляются все модули из registry -->
@@ -41,7 +46,34 @@
       <button id="close-app-btn" class="btn">← Закрыть</button>
       <h1 id="current-app-name">Приложение</h1>
     </header>
-    <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+    <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms" title="App"></iframe>
+  </div>
+
+  <!-- Модальное окно для добавления модуля по URL -->
+  <div id="add-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ Добавить модуль</h2>
+        <button class="modal-close" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-description">
+          Вставьте ссылку на HTML-файл модуля или папку с модулем.<br>
+          Пример: <code>https://username.github.io/my-module/</code>
+        </p>
+        <input 
+          type="url" 
+          id="module-url-input" 
+          placeholder="https://example.com/module/" 
+          class="url-input"
+        >
+        <div id="modal-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-modal-btn" class="btn btn-secondary">Отмена</button>
+        <button id="confirm-add-btn" class="btn btn-primary">Добавить</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
