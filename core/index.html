@@ -19,9 +19,7 @@
         <button id="open-store-btn" class="btn">🛒 Магазин</button>
       </div>
     </header>
-    <div id="installed-apps" class="app-grid">
-      <!-- Сюда динамически добавляются установленные модули -->
-    </div>
+    <div id="installed-apps" class="app-grid"></div>
     <div id="empty-state" class="empty-state" style="display: none;">
       <p>У вас пока нет установленных приложений</p>
       <button id="go-to-store-btn" class="btn btn-primary">Перейти в магазин</button>
@@ -35,12 +33,10 @@
       <h1>🛒 Магазин модулей</h1>
       <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
     </header>
-    <div id="all-apps" class="app-grid">
-      <!-- Сюда динамически добавляются все модули из registry -->
-    </div>
+    <div id="all-apps" class="app-grid"></div>
   </div>
 
-  <!-- Экран 3: Запущенное приложение (iframe) -->
+  <!-- Экран 3: Запущенное приложение -->
   <div id="app-screen" class="screen">
     <header>
       <button id="close-app-btn" class="btn">← Закрыть</button>
@@ -49,7 +45,7 @@
     <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms" title="App"></iframe>
   </div>
 
-  <!-- Модальное окно для добавления модуля по URL -->
+  <!-- Модальное окно для добавления модуля -->
   <div id="add-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -57,16 +53,35 @@
         <button class="modal-close" id="close-modal-btn">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="modal-description">
-          Вставьте ссылку на HTML-файл модуля или папку с модулем.<br>
-          Пример: <code>https://username.github.io/my-module/</code>
-        </p>
-        <input 
-          type="url" 
-          id="module-url-input" 
-          placeholder="https://example.com/module/" 
-          class="url-input"
-        >
+        
+        <!-- Вкладка 1: По URL -->
+        <div class="tab" data-tab="url">
+          <p class="modal-description">
+            Вставьте ссылку на HTML-файл или папку с модулем.<br>
+            Пример: <code>https://username.github.io/my-module/</code>
+          </p>
+          <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
+        </div>
+
+        <!-- Вкладка 2: Локальный файл -->
+        <div class="tab" data-tab="local" style="display: none;">
+          <p class="modal-description">
+            Выберите файл <b>.html</b> с вашего компьютера.<br>
+            <i>(Модуль должен быть одним файлом со встроенными стилями и скриптами)</i>
+          </p>
+          <input type="file" id="local-file-input" accept=".html" style="display: none;">
+          <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">
+            📂 Выбрать файл .html
+          </button>
+          <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
+        </div>
+
+        <!-- Переключатель вкладок -->
+        <div class="tab-switcher">
+          <button class="tab-btn active" data-target="url">🔗 По ссылке</button>
+          <button class="tab-btn" data-target="local">💻 С компьютера</button>
+        </div>
+
         <div id="modal-status" class="modal-status"></div>
       </div>
       <div class="modal-footer">
