@@ -35,6 +35,7 @@ const BASE_PROMPT = `Создай одностраничное веб-прило
 
 Требования:
 - Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
+- ВАЖНО: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности.
 - CSS в <style>, JS в <script>, без внешних библиотек
 - Адаптивный дизайн: работает на десктопе и мобильных
 - body { min-height: calc(100vh - 60px); margin: 0; }
