@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>CYBER//TIMER</title>
+<script type="application/json" id="manifest">{"id":"cyber-timer-738421","name":"Cyber Timer","icon":"⏱️","description":"Киберпанк-таймер: импульс каждые 4 секунды, работает в фоне"}</script>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    min-height: calc(100vh - 60px);
+    margin: 0;
+    padding: 18px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #cdeeff;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,0,200,.16), transparent 55%),
+      radial-gradient(circle at 88% 100%, rgba(0,240,255,.16), transparent 55%),
+      #05060a;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── фоновая сетка ── */
+  .grid-overlay{
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,240,255,.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,.075) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 15%, transparent 78%);
+    mask-image: radial-gradient(circle at 50% 45%, #000 15%, transparent 78%);
+  }
+
+  /* ── сканлайны ── */
+  .scanlines{
+    position: fixed; inset: 0; pointer-events: none; z-index: 60;
+    background: repeating-linear-gradient(to bottom,
+      rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
+    opacity: .5;
+  }
+
+  /* ── вспышка при импульсе ── */
+  body.flash::after{
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 55;
+    background: radial-gradient(circle at 50% 50%, rgba(0,240,255,.30), transparent 62%);
+    animation: flashOut .3s ease-out forwards;
+  }
+  @keyframes flashOut{ from{opacity:1} to{opacity:0} }
+
+  /* ── контейнер ── */
+  .app{
+    position: relative; z-index: 1;
+    width: 100%; max-width: 520px;
+    display: flex; flex-direction: column;
+    gap: 16px; align-items: center;
+  }
+
+  /* ── заголовок ── */
+  .title{
+    position: relative;
+    margin: 0;
+    font-size: clamp(19px, 5.6vw, 30px);
+    letter-spacing: .22em;
+    font-weight: 700;
+    color: #00f0ff;
+    text-align: center;
+    text-shadow: 0 0 8px rgba(0,240,255,.9), 0 0 24px rgba(0,240,255,.45);
+    animation: titlePulse 3.4s ease-in-out infinite;
+  }
+  @keyframes titlePulse{
+    0%,100%{ text-shadow: 0 0 8px rgba(0,240,255,.9), 0 0 24px rgba(0,240,255,.45); }
+    50%    { text-shadow: 0 0 12px rgba(0,240,255,1), 0 0 38px rgba(255,0,200,.55); }
+  }
+  .title::before,.title::after{
+    content: attr(data-text);
+    position: absolute; left: 0; top: 0; width: 100%;
+    pointer-events: none;
+  }
+  .title::before{
+    color: #ff00c8; clip-path: inset(0 0 56% 0);
+    animation: glitchA 3.2s steps(1) infinite;
+  }
+  .title::after{
+    color: #00ff9d; clip-path: inset(54% 0 0 0);
+    animation: glitchB 2.7s steps(1) infinite;
+  }
+  @keyframes glitchA{
+    0%,90%{ transform: translate(0,0); opacity: 0; }
+    91%{ transform: translate(-3px,-2px); opacity: .85; }
+    95%{ transform: translate(2px,1px); opacity: .85; }
+    99%,100%{ opacity: 0; }
+  }
+  @keyframes glitchB{
+    0%,87%{ transform: translate(0,0); opacity: 0; }
+    88%{ transform: translate(3px,2px); opacity: .8; }
+    93%{ transform: translate(-2px,-1px); opacity: .8; }
+    98%,100%{ opacity: 0; }
+  }
+
+  /* ── панель ── */
+  .panel{
+    width: 100%;
+    position: relative;
+    padding: 22px 18px 16px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 18px;
+    border: 1px solid rgba(0,240,255,.35);
+    border-radius: 14px;
+    background: linear-gradient(160deg, rgba(0,240,255,.07), rgba(255,0,200,.05) 60%, rgba(10,12,20,.4));
+    box-shadow:
+      inset 0 0 26px rgba(0,240,255,.07),
+      0 0 30px rgba(0,240,255,.12),
+      0 0 70px rgba(255,0,200,.07);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: box-shadow .18s ease, border-color .18s ease;
+  }
+  body.flash .panel{
+    border-color: rgba(0,240,255,.95);
+    box-shadow:
+      inset 0 0 40px rgba(0,240,255,.22),
+      0 0 46px rgba(0,240,255,.55),
+      0 0 90px rgba(255,0,200,.25);
+  }
+  .panel::before,.panel::after{
+    content: ""; position: absolute; width: 16px; height: 16px;
+    border: 2px solid rgba(255,0,200,.75); pointer-events: none;
+  }
+  .panel::before{ top: -1px; left: -1px; border-right: 0; border-bottom: 0; border-radius: 14px 0 0 0; }
+  .panel::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-radius: 0 0 14px 0; }
+
+  /* ── кольцо + время ── */
+  .ring-wrap{
+    position: relative;
+    width: min(66vw, 224px);
+    aspect-ratio: 1 / 1;
+    display: grid; place-items: center;
+  }
+  .ring{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    transform: rotate(-90deg);
+    overflow: visible;
+  }
+  .ring circle{
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .ring-bg{ stroke: rgba(0,240,255,.13); }
+  .ring-fg{
+    stroke: url(#ringGrad);
+    filter: drop-shadow(0 0 6px rgba(0,240,255,.75));
+  }
+
+  .time{
+    position: relative; z-index: 2;
+    text-align: center; line-height: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .display{
+    font-size: clamp(25px, 7.6vw, 40px);
+    font-weight: 700;
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+    color: #eafcff;
+    text-shadow: 0 0 10px rgba(0,240,255,.85), 0 0 28px rgba(0,240,255,.35);
+  }
+  .ms{
+    font-size: clamp(11px, 3vw, 14px);
+    letter-spacing: .18em;
+    color: rgba(255,0,200,.95);
+    text-shadow: 0 0 8px rgba(255,0,200,.7);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── статистика ── */
+  .stats{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+  }
+  .stat{
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    padding: 9px 4px;
+    border: 1px solid rgba(0,240,255,.18);
+    border-radius: 9px;
+    background: rgba(0,240,255,.045);
+    overflow: hidden;
+  }
+  .lbl{
+    font-size: clamp(8px, 2.2vw, 10px);
+    letter-spacing: .12em;
+    color: rgba(0,240,255,.62);
+    white-space: nowrap;
+  }
+  .val{
+    font-size: clamp(12px, 3.6vw, 16px);
+    font-weight: 700;
+    letter-spacing: .05em;
+    color: #ff00c8;
+    text-shadow: 0 0 9px rgba(255,0,200,.75);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .val.cyan{ color:#00f0ff; text-shadow:0 0 9px rgba(0,240,255,.8); }
+
+  /* ── кнопки ── */
+  .controls{
+    width: 100%;
+    display: flex; gap: 10px;
+  }
+  .btn{
+    flex: 1 1 0; min-width: 0;
+    padding: 13px 8px;
+    font-family: inherit;
+    font-size: clamp(11px, 3vw, 13px);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #00f0ff;
+    background: rgba(0,240,255,.06);
+    border: 1px solid rgba(0,240,255,.5);
+    border-radius: 9px;
+    cursor: pointer;
+    text-shadow: 0 0 8px rgba(0,240,255,.6);
+    transition: transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
+    user-select: none;
+  }
+  .btn:hover{ background: rgba(0,240,255,.14); box-shadow: 0 0 18px rgba(0,240,255,.35); }
+  .btn:active{ transform: scale(.97); }
+  .btn:focus-visible{ outline: 2px solid rgba(255,0,200,.8); outline-offset: 2px; }
+
+  .btn.primary{
+    color: #d8ffff;
+    border-color: #00f0ff;
+    background: linear-gradient(100deg, rgba(0,240,255,.22), rgba(255,0,200,.20));
+    box-shadow: 0 0 20px rgba(0,240,255,.35), inset 0 0 18px rgba(0,240,255,.12);
+  }
+  .btn.primary.on{
+    color: #fff0fb;
+    border-color: #ff00c8;
+    background: linear-gradient(100deg, rgba(255,0,200,.28), rgba(0,240,255,.18));
+    box-shadow: 0 0 22px rgba(255,0,200,.45), inset 0 0 18px rgba(255,0,200,.15);
+    text-shadow: 0 0 9px rgba(255,0,200,.8);
+  }
+
+  .hint{
+    margin: 0;
+    font-size: clamp(9px, 2.4vw, 11px);
+    letter-spacing: .1em;
+    color: rgba(0,240,255,.42);
+    text-align: center;
+  }
+
+  @media (max-width: 360px){
+    .panel{ padding: 16px 12px 12px; gap: 14px; }
+    .stats{ gap: 6px; }
+  }
+  @media (min-width: 720px){
+    .app{ max-width: 560px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-overlay"></div>
+<div class="scanlines"></div>
+
+<div class="app">
+  <h1 class="title" data-text="CYBER//TIMER">CYBER//TIMER</h1>
+
+  <div class="panel">
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#00f0ff"/>
+            <stop offset="55%"  stop-color="#7a5cff"/>
+            <stop offset="100%" stop-color="#ff00c8"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="100" cy="100" r="88"/>
+        <circle class="ring-fg" id="ringFg" cx="100" cy="100" r="88"/>
+      </svg>
+      <div class="time">
+        <div class="display" id="display">00:00:00</div>
+        <div class="ms" id="ms">.00</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="lbl">ИМПУЛЬСЫ</span>
+        <span class="val" id="beeps">0</span>
+      </div>
+      <div class="stat">
+        <span class="lbl">ДО СИГНАЛА</span>
+        <span class="val cyan" id="next">4.0s</span>
+      </div>
+      <div class="stat">
+        <span class="lbl">СТАТУС</span>
+        <span class="val cyan" id="status">ОЖИДАНИЕ</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="startBtn" type="button">ЗАПУСК</button>
+      <button class="btn" id="resetBtn" type="button">СБРОС</button>
+    </div>
+
+    <p class="hint">SPACE — пуск / пауза &nbsp;·&nbsp; R — сброс</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════ КОНФИГУРАЦИЯ ══════════════ */
+  var BEEP_INTERVAL = 4;      // секунды между импульсами
+  var LOOKAHEAD     = 5.0;    // на сколько секунд вперёд планируем звук
+  var TICK_MS       = 400;    // период планировщика
+  var UI_MS         = 80;     // период обновления интерфейса
+
+  /* Тихий WAV (1 сэмпл, 8-bit mono 8kHz) — держит вкладку «активной» в фоне */
+  var SILENT_WAV = 'data:audio/wav;base64,UklGRiUAAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQEAAAIA';
+
+  /* ══════════════ DOM ══════════════ */
+  var displayEl = document.getElementById('display');
+  var msEl      = document.getElementById('ms');
+  var beepsEl   = document.getElementById('beeps');
+  var nextEl    = document.getElementById('next');
+  var statusEl  = document.getElementById('status');
+  var startBtn  = document.getElementById('startBtn');
+  var resetBtn  = document.getElementById('resetBtn');
+  var ringFg    = document.getElementById('ringFg');
+
+  var CIRC = 2 * Math.PI * 88;
+  ringFg.style.strokeDasharray = String(CIRC);
+  ringFg.style.strokeDashoffset = String(CIRC);
+
+  /* ══════════════ СОСТОЯНИЕ ══════════════ */
+  var ctx          = null;
+  var silentEl     = null;
+  var running      = false;
+  var accum        = 0;     // накопленные секунды (пауза)
+  var startCtx     = 0;     // ctx.currentTime на момент старта
+  var nextBeepAt   = 0;     // время (ctx) следующего незапланированного бипа
+  var queue        = [];    // времена запланированных бипов (для визуала)
+  var beepCount    = 0;
+  var activeNodes  = [];
+  var mainTimer    = null;
+  var worker       = null;
+  var workerUrl    = null;
+  var flashTimer   = null;
+  var uiTimer      = null;
+
+  /* ══════════════ УТИЛИТЫ ══════════════ */
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function elapsed() {
+    if (!running || !ctx) return accum;
+    var d = ctx.currentTime - startCtx;
+    if (d < 0) d = 0;
+    return accum + d;
+  }
+
+  /* ══════════════ АУДИО ══════════════ */
+  function initAudio() {
+    if (!ctx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) {
+        try { ctx = new AC(); } catch (e) { ctx = null; }
+      }
+    }
+    if (ctx && ctx.state === 'suspended') {
+      try { ctx.resume(); } catch (e) {}
+    }
+    if (!silentEl) {
+      silentEl = new Audio();
+      silentEl.src = SILENT_WAV;
+      silentEl.loop = true;
+      silentEl.volume = 0.05;
+      silentEl.setAttribute('playsinline', '');
+      silentEl.setAttribute('aria-hidden', 'true');
+    }
+    if (silentEl.paused) {
+      var p = silentEl.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+    /* разблокировка контекста нулевым буфером */
+    if (ctx && ctx.state === 'running') {
+      try {
+        var b = ctx.createBuffer(1, 1, 22050);
+        var s = ctx.createBufferSource();
+        s.buffer = b;
+        s.connect(ctx.destination);
+        s.start(0);
+      } catch (e) {}
+    }
+  }
+
+  function scheduleBeep(t) {
+    if (!ctx) return;
+
+    var master = ctx.createGain();
+    master.connect(ctx.destination);
+
+    master.gain.setValueAtTime(0.0001, t);
+    master.gain.exponentialRampToValueAtTime(0.34, t + 0.008);
+    master.gain.exponentialRampToValueAtTime(0.14, t + 0.07);
+    master.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+
+    /* основной «блип» */
+    var o1 = ctx.createOscillator();
+    o1.type = 'square';
+    o1.frequency.setValueAtTime(1180, t);
+    o1.frequency.exponentialRampToValueAtTime(560, t + 0.18);
+    o1.connect(master);
+    o1.start(t);
+    o1.stop(t + 0.26);
+
+    /* суб-слой */
+    var o2 = ctx.createOscillator();
+    o2.type = 'sawtooth';
+    o2.frequency.setValueAtTime(300, t);
+    o2.frequency.exponentialRampToValueAtTime(140, t + 0.2);
+    var g2 = ctx.createGain();
+    g2.gain.value = 0.32;
+    o2.connect(g2);
+    g2.connect(master);
+    o2.start(t);
+    o2.stop(t + 0.26);
+
+    activeNodes.push(o1, o2);
+
+    o1.onended = function () { activeNodes = activeNodes.filter(function (n) { return n !== o1; }); };
+    o2.onended = function () { activeNodes = activeNodes.filter(function (n) { return n !== o2; }); };
+  }
+
+  function stopAllNodes() {
+    for (var i = 0; i < activeNodes.length; i++) {
+      try { activeNodes[i].stop(0); } catch (e) {}
+    }
+    activeNodes = [];
+  }
+
+  /* ══════════════ ПЛАНИРОВЩИК ══════════════ */
+  function scheduler() {
+    if (!running || !ctx) return;
+
+    var now = ctx.currentTime;
+
+    /* если сильно отстали (вкладка «спала») — пересинхронизируемся по сетке */
+    if (nextBeepAt < now - 0.5) {
+      var e = elapsed();
+      var nxt = (Math.floor(e / BEEP_INTERVAL) + 1) * BEEP_INTERVAL;
+      nextBeepAt = now + Math.max(0.05, nxt - e);
+    }
+
+    var guard = 0;
+    while (nextBeepAt < now + LOOKAHEAD && guard++ < 40) {
+      scheduleBeep(nextBeepAt);
+      queue.push(nextBeepAt);
+      nextBeepAt += BEEP_INTERVAL;
+    }
+  }
+
+  function startTicker() {
+    if (mainTimer === null) {
+      mainTimer = setInterval(function () { scheduler(); }, TICK_MS);
+    }
+    if (worker === null) {
+      try {
+        var src = 'var t=setInterval(function(){postMessage(1);},' + TICK_MS + ');';
+        var blob = new Blob([src], { type: 'application/javascript' });
+        workerUrl = URL.createObjectURL(blob);
+        worker = new Worker(workerUrl);
+        worker.onmessage = function () { scheduler(); };
+      } catch (e) {
+        worker = null;
+      }
+    }
+  }
+
+  /* ══════════════ ВИЗУАЛ ══════════════ */
+  function flash() {
+    document.body.classList.remove('flash');
+    /* принудительный reflow, чтобы анимация перезапустилась */
+    void document.body.offsetWidth;
+    document.body.classList.add('flash');
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () {
+      document.body.classList.remove('flash');
+    }, 320);
+  }
+
+  function updateUI() {
+    var e = elapsed();
+
+    var h  = Math.floor(e / 3600);
+    var m  = Math.floor((e % 3600) / 60);
+    var s  = Math.floor(e % 60);
+    var cs = Math.floor((e * 100) % 100);
+
+    displayEl.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+    msEl.textContent = '.' + pad(cs);
+
+    var frac = (e % BEEP_INTERVAL) / BEEP_INTERVAL;
+    ringFg.style.strokeDashoffset = String(CIRC * (1 - frac));
+
+    var left = BEEP_INTERVAL - (e % BEEP_INTERVAL);
+    nextEl.textContent = left.toFixed(1) + 's';
+
+    /* обработка «созревших» импульсов */
+    if (ctx) {
+      var t = ctx.currentTime;
+      var guard = 0;
+      while (queue.length && queue[0] <= t && guard++ < 20) {
+        var bt = queue.shift();
+        beepCount++;
+        beepsEl.textContent = String(beepCount);
+        if (t - bt < 1.0) flash();
+      }
+    }
+  }
+
+  /* ══════════════ УПРАВЛЕНИЕ ══════════════ */
+  function start() {
+    initAudio();
+    if (running) return;
+    if (!ctx) return;
+
+    running  = true;
+    startCtx = ctx.currentTime;
+
+    var e = accum;
+    var nxt = (Math.floor(e / BEEP_INTERVAL) + 1) * BEEP_INTERVAL;
+    nextBeepAt = startCtx + (nxt - e);
+    queue = [];
+
+    statusEl.textContent = 'РАБОТА';
+    startBtn.textContent = 'ПАУЗА';
+    startBtn.classList.add('on');
+
+    startTicker();
+    scheduler();
+  }
+
+  function pause() {
+    if (!running) return;
+
+    accum += (ctx ? ctx.currentTime - startCtx : 0);
+    running = false;
+
+    stopAllNodes();
+    queue = [];
+
+    statusEl.textContent = 'ПАУЗА';
+    startBtn.textContent = 'ПРОДОЛЖИТЬ';
+    startBtn.classList.remove('on');
+
+    updateUI();
+  }
+
+  function reset() {
+    running = false;
+    stopAllNodes();
+    queue = [];
+    accum = 0;
+    beepCount = 0;
+    beepsEl.textContent = '0';
+    statusEl.textContent = 'ОЖИДАНИЕ';
+    startBtn.textContent = 'ЗАПУСК';
+    startBtn.classList.remove('on');
+    updateUI();
+  }
+
+  function toggle() {
+    if (running) pause(); else start();
+  }
+
+  /* ══════════════ СОБЫТИЯ ══════════════ */
+  startBtn.addEventListener('click', toggle);
+  resetBtn.addEventListener('click', reset);
+
+  document.addEventListener('keydown', function (ev) {
+    var tag = (ev.target && ev.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    if (ev.code === 'Space' || ev.key === ' ') {
+      ev.preventDefault();
+      toggle();
+    } else if (ev.key === 'r' || ev.key === 'R' || ev.key === 'к' || ev.key === 'К') {
+      ev.preventDefault();
+      reset();
+    }
+  });
+
+  /* возврат из фона — «будим» аудио */
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      if (ctx && ctx.state === 'suspended') {
+        try { ctx.resume(); } catch (e) {}
+      }
+      if (silentEl && silentEl.paused && running) {
+        var p = silentEl.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+      if (running) scheduler();
+      updateUI();
+    }
+  });
+
+  window.addEventListener('pageshow', function () {
+    if (ctx && ctx.state === 'suspended') {
+      try { ctx.resume(); } catch (e) {}
+    }
+  });
+
+  /* первый жест пользователя — разблокировка звука */
+  ['pointerdown', 'touchstart', 'keydown'].forEach(function (evName) {
+    window.addEventListener(evName, function once() {
+      initAudio();
+      window.removeEventListener(evName, once);
+    }, { passive: true });
+  });
+
+  /* ══════════════ СТАРТ ══════════════ */
+  uiTimer = setInterval(updateUI, UI_MS);
+  updateUI();
+
+  window.addEventListener('beforeunload', function () {
+    if (uiTimer) clearInterval(uiTimer);
+    if (mainTimer) clearInterval(mainTimer);
+    if (worker) { try { worker.terminate(); } catch (e) {} }
+    if (workerUrl) { try { URL.revokeObjectURL(workerUrl); } catch (e) {} }
+  });
+})();
+</script>
+</body>
+</html>
