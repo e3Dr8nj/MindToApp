@@ -507,7 +507,7 @@ function toggleCodeVisibility() {
 }
 
 // ==========================================
-// НОВЫЙ ПОРЯДОК ПРОМПТА: Код -> Инструкция -> Изменения
+// ОБНОВЛЕННАЯ ГЕНЕРАЦИЯ ПРОМПТА
 // ==========================================
 function generateEditPrompt() {
   if (!currentEditingModule) return '';
@@ -525,7 +525,7 @@ function generateEditPrompt() {
   const platformInstruction = `Ты — эксперт по веб-разработке. Твоя задача — модифицировать предоставленный выше HTML-код одностраничного приложения для платформы MindToApp.
 
 КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:
-1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html. НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>.
+1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (\`\`\`html ... \`\`\`). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.
 2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>.
 3. Уникальный ID: ОБЯЗАТЕЛЬНО измени значение "id" в manifest, добавив 6 случайных цифр к исходному ID (например, было "notes", стало "notes-482915"). Это критично, так как создается новая копия приложения.
 4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.
@@ -542,24 +542,35 @@ ${platformInstruction}
 ${changes}
 === КОНЕЦ ЗАПРОСА ===
 
-ПОЖАЛУЙСТА, ВЕРНИ ТОЛЬКО ПОЛНЫЙ ОБНОВЛЁННЫЙ HTML-КОД. НЕ ДОБАВЛЯЙ ПОЯСНЕНИЙ ТЕКСТОМ.`;
+ПОЖАЛУЙСТА, ВЕРНИ ТОЛЬКО ПОЛНЫЙ ОБНОВЛЁННЫЙ HTML-КОД В ОДНОМ БЛОКЕ. НЕ ДОБАВЛЯЙ ПОЯСНЕНИЙ ТЕКСТОМ.`;
 
   return fullPrompt;
 }
 
 function copyEditPrompt() {
+  // 🛑 ЖЁСТКАЯ ПРОВЕРКА: Если поле изменений пустое, блокируем копирование
+  const changes = editChangesInput?.value.trim();
+  if (!changes) {
+    if (editStatus) {
+      editStatus.textContent = '❌ Сначала опишите, что нужно изменить в поле выше!';
+      editStatus.className = 'modal-status error';
+    }
+    return;
+  }
+
   const prompt = generateEditPrompt();
   const copyBtn = $('copy-edit-prompt-btn');
   
-  // Если это сообщение об ошибке (начинается с ⚠️), показываем его как ошибку
+  // Проверка на ошибку генерации (например, если это не HTML)
   if (!prompt || prompt.startsWith('⚠️')) {
     if (editStatus) {
-      editStatus.textContent = prompt || '❌ Сначала опишите, что нужно изменить';
+      editStatus.textContent = prompt || '❌ Ошибка генерации промпта';
       editStatus.className = 'modal-status error';
     }
     return;
   }
   
+  // Копирование в буфер обмена
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(prompt).then(() => {
       if (copyBtn) {
