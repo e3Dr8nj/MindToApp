@@ -15,7 +15,7 @@
     <header>
       <h1>🏠 Мои приложения</h1>
       <div class="header-buttons">
-        <button id="prompt-btn" class="btn btn-prompt">🤖 Промпт для AI</button>
+        <button id="create-app-btn" class="btn btn-primary">✨ Создать приложение</button>
         <button id="add-custom-btn" class="btn">➕ Добавить</button>
         <button id="open-store-btn" class="btn">🛒 Магазин</button>
       </div>
@@ -46,19 +46,20 @@
     <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
   </div>
 
-  <!-- Модальное окно: Промпт для AI -->
-  <div id="prompt-modal" class="modal">
-    <div class="modal-content modal-prompt">
+  <!-- Модальное окно: Создание приложения через AI -->
+  <div id="create-modal" class="modal">
+    <div class="modal-content modal-create">
       <div class="modal-header">
-        <h2>🤖 Промпт для AI</h2>
-        <button class="modal-close" id="close-prompt-btn">&times;</button>
+        <h2>✨ Создать приложение с AI</h2>
+        <button class="modal-close" id="close-create-btn">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="prompt-explanation">
-          Скопируйте текст ниже и <b>добавьте его в начало вашего промпта</b> при разработке приложения через ChatGPT, Claude или другую AI-модель. После промпта опишите, какое приложение вы хотите создать.
-        </p>
-        <div class="prompt-code-box">
-          <textarea id="prompt-text" readonly>Создай одностраничное веб-приложение в одном файле index.html.
+        
+        <!-- Шаг 1: Промпт -->
+        <div class="step-box">
+          <h3>1. Скопируйте этот промпт:</h3>
+          <div class="prompt-code-box">
+            <textarea id="prompt-text" readonly>Создай одностраничное веб-приложение в одном файле index.html.
 
 Требования:
 - Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
@@ -69,26 +70,43 @@
 - Картинки/звуки только в Base64
 
 Задача: [опиши здесь функционал и дизайн приложения]</textarea>
+          </div>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать промпт</button>
         </div>
-        <div class="prompt-steps">
-          <p><b>Как использовать:</b></p>
-          <ol>
-            <li>Нажмите кнопку «Копировать»</li>
-            <li>Вставьте в чат с AI-моделью</li>
-            <li>Вместо <code>[опиши здесь...]</code> напишите свою идею</li>
-            <li>Сохраните полученный код как файл <code>.html</code></li>
-            <li>Добавьте файл в платформу через кнопку «➕ Добавить»</li>
-          </ol>
+
+        <!-- Шаг 2: Ресурсы -->
+        <div class="step-box">
+          <h3>2. Сгенерируйте код в одном из этих бесплатных AI:</h3>
+          <div class="ai-links">
+            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
+            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+            <a href="https://gemini.google.com" target="_blank" class="ai-link">Gemini</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
+            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
+            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Llama 3, очень быстро)</a>
+            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
+            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
+          </div>
         </div>
+
+        <!-- Шаг 3: Вставка и создание -->
+        <div class="step-box">
+          <h3>3. Вставьте полученный HTML-код сюда:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдал нейросеть..."></textarea>
+          <div id="create-status" class="modal-status"></div>
+        </div>
+
       </div>
       <div class="modal-footer">
-        <button id="copy-prompt-btn" class="btn btn-primary">📋 Копировать</button>
-        <button id="close-prompt-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="cancel-create-btn" class="btn btn-secondary">Отмена</button>
+        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать приложение</button>
       </div>
     </div>
   </div>
 
-  <!-- Модальное окно: Добавить модуль -->
+  <!-- Модальное окно: Добавить модуль (старое, для ссылок/файлов) -->
   <div id="add-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -97,26 +115,17 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">
-            Вставьте ссылку на HTML-файл или папку с модулем.<br>
-            Пример: <code>https://username.github.io/my-module/</code>
-          </p>
+          <p class="modal-description">Вставьте ссылку на HTML-файл или папку.<br>Пример: <code>https://username.github.io/my-module/</code></p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
-          <p class="modal-description">
-            Выберите <b>один файл .html</b> с вашего компьютера.<br>
-            <i>(Модуль должен быть одним файлом со встроенными стилями и скриптами)</i>
-          </p>
+          <p class="modal-description">Выберите <b>один файл .html</b> с вашего компьютера.</p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
           <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Выбрать файл .html</button>
           <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
         </div>
         <div class="tab" data-tab="folder" style="display: none;">
-          <p class="modal-description">
-            Выберите <b>папку</b> с модулем на вашем компьютере.<br>
-            <i>В папке должен быть файл <code>index.html</code> и любые сопутствующие файлы</i>
-          </p>
+          <p class="modal-description">Выберите <b>папку</b> с модулем (должен быть index.html).</p>
           <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
           <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📁 Выбрать папку</button>
           <div id="selected-folder-info" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>

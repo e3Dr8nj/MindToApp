@@ -6,7 +6,6 @@ let customModules = JSON.parse(localStorage.getItem('customModules') || '[]');
 let currentTab = 'url';
 let selectedLocalFile = null;
 let selectedFolderFiles = null;
-let selectedFolderName = '';
 const activeVirtualFS = new Map();
 
 const homeScreen = document.getElementById('home-screen');
@@ -24,7 +23,9 @@ const localFileInput = document.getElementById('local-file-input');
 const selectedFileName = document.getElementById('selected-file-name');
 const folderInput = document.getElementById('folder-input');
 const selectedFolderInfo = document.getElementById('selected-folder-info');
-const promptModal = document.getElementById('prompt-modal');
+const createModal = document.getElementById('create-modal');
+const generatedCodeInput = document.getElementById('generated-code-input');
+const createStatus = document.getElementById('create-status');
 
 async function init() {
   await loadRegistry();
@@ -48,9 +49,7 @@ async function loadRegistry() {
           if (manifestScript) {
             return { ...JSON.parse(manifestScript.textContent), url: module.url, isCustom: false, isLocal: false, isFolder: false };
           }
-        } catch (error) {
-          console.error('Ошибка загрузки модуля:', module.url, error);
-        }
+        } catch (error) { console.error('Ошибка загрузки модуля:', module.url, error); }
         return null;
       })
     );
@@ -186,33 +185,100 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-// --- Промпт модалка ---
-function openPromptModal() {
-  promptModal.classList.add('active');
+// --- ЛОГИКА СОЗДАНИЯ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
+function openCreateModal() {
+  createModal.classList.add('active');
+  generatedCodeInput.value = '';
+  createStatus.textContent = '';
+  createStatus.className = 'modal-status';
 }
 
-function closePromptModal() {
-  promptModal.classList.remove('active');
+function closeCreateModal() {
+  createModal.classList.remove('active');
 }
 
 function copyPrompt() {
   const promptText = document.getElementById('prompt-text');
   const copyBtn = document.getElementById('copy-prompt-btn');
-  
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(promptText.value).then(() => {
       copyBtn.textContent = '✅ Скопировано!';
-      setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+      setTimeout(() => copyBtn.textContent = '📋 Копировать промпт', 2000);
     });
   } else {
     promptText.select();
     document.execCommand('copy');
     copyBtn.textContent = '✅ Скопировано!';
-    setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+    setTimeout(() => copyBtn.textContent = '📋 Копировать промпт', 2000);
   }
 }
 
-// --- Добавить модуль модалка ---
+async function createAppFromText() {
+  const code = generatedCodeInput.value.trim();
+  if (!code) {
+    createStatus.textContent = '❌ Вставьте HTML-код';
+    createStatus.className = 'modal-status error';
+    return;
+  }
+  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
+    createStatus.textContent = '❌ Это не похоже на HTML-код';
+    createStatus.className = 'modal-status error';
+    return;
+  }
+
+  createStatus.textContent = '⏳ Анализ кода...';
+  createStatus.className = 'modal-status loading';
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(code, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    
+    if (!manifestScript) throw new Error('Не найден тег <script id="manifest">');
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('В manifest не хватает полей id, name или icon');
+    if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
+
+    const newModule = {
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || 'Создано через AI',
+      content: code,
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    };
+
+    customModules.push(newModule);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+    
+    if (!installedModules.includes(manifest.id)) {
+      installedModules.push(manifest.id);
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+
+    const blob = new Blob([code], { type: 'text/html' });
+    allModules.push({ ...manifest, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
+
+    createStatus.textContent = '✅ Приложение успешно создано!';
+    createStatus.className = 'modal-status success';
+
+    setTimeout(() => {
+      closeCreateModal();
+      renderInstalledApps();
+      renderAllApps();
+    }, 800);
+
+  } catch (error) {
+    console.error(error);
+    createStatus.textContent = `❌ Ошибка: ${error.message}`;
+    createStatus.className = 'modal-status error';
+  }
+}
+
+// --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
   addModal.classList.add('active');
   moduleUrlInput.value = '';
@@ -220,7 +286,6 @@ function openAddModal() {
   selectedFileName.textContent = '';
   localFileInput.value = '';
   selectedFolderFiles = null;
-  selectedFolderName = '';
   selectedFolderInfo.textContent = '';
   folderInput.value = '';
   modalStatus.textContent = '';
@@ -257,10 +322,7 @@ localFileInput.addEventListener('change', (e) => {
 folderInput.addEventListener('change', (e) => {
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  const indexFile = files.find(f => {
-    const parts = f.webkitRelativePath.split('/');
-    return parts[parts.length - 1].toLowerCase() === 'index.html';
-  });
+  const indexFile = files.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
   if (!indexFile) {
     modalStatus.textContent = '❌ В папке должен быть файл index.html';
     modalStatus.className = 'modal-status error';
@@ -269,7 +331,6 @@ folderInput.addEventListener('change', (e) => {
     return;
   }
   const rootFolder = indexFile.webkitRelativePath.split('/')[0];
-  selectedFolderName = rootFolder;
   selectedFolderFiles = files;
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
   selectedFolderInfo.textContent = `✅ Папка: ${rootFolder} (${files.length} файлов, ${(totalSize / 1048576).toFixed(2)} МБ)`;
@@ -374,14 +435,15 @@ function setupEventListeners() {
   document.getElementById('go-to-store-btn').addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   document.getElementById('close-app-btn').addEventListener('click', closeApp);
 
-  // Промпт модалка
-  document.getElementById('prompt-btn').addEventListener('click', openPromptModal);
-  document.getElementById('close-prompt-btn').addEventListener('click', closePromptModal);
-  document.getElementById('close-prompt-footer-btn').addEventListener('click', closePromptModal);
+  // Создание приложения (НОВОЕ)
+  document.getElementById('create-app-btn').addEventListener('click', openCreateModal);
+  document.getElementById('close-create-btn').addEventListener('click', closeCreateModal);
+  document.getElementById('cancel-create-btn').addEventListener('click', closeCreateModal);
   document.getElementById('copy-prompt-btn').addEventListener('click', copyPrompt);
-  promptModal.addEventListener('click', (e) => { if (e.target === promptModal) closePromptModal(); });
+  document.getElementById('confirm-create-btn').addEventListener('click', createAppFromText);
+  createModal.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
 
-  // Добавить модуль модалка
+  // Добавить модуль (СТАРОЕ)
   document.getElementById('add-custom-btn').addEventListener('click', openAddModal);
   document.getElementById('add-custom-btn-store').addEventListener('click', openAddModal);
   document.getElementById('close-modal-btn').addEventListener('click', closeAddModal);
@@ -395,9 +457,8 @@ function setupEventListeners() {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
 
-  // Escape закрывает любую модалку
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closePromptModal(); closeAddModal(); }
+    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); }
   });
 }
 
