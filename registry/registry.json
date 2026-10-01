@@ -1,16 +1,13 @@
 {
   "modules": [
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/pomodoro/"
+      "url": "https://e3dr8nj.github.io/MindToApp/modules/pomodoro/"
     },
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/notes/"
+      "url": "https://e3dr8nj.github.io/MindToApp/modules/notes/"
     },
     {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/calculator/"
-    },
-    {
-      "url": "https://e3dr8nj.github.io/NexusAl/modules/interval-beeper/"
+      "url": "https://e3dr8nj.github.io/MindToApp/modules/calculator/"
     }
   ]
 }

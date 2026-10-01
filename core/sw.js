@@ -1,11 +1,11 @@
-const CACHE_NAME = 'nexus-ai-v2';
+const CACHE_NAME = 'mind-to-app-v1';
 
 const urlsToCache = [
-  '/NexusAl/core/',
-  '/NexusAl/core/index.html',
-  '/NexusAl/core/styles.css',
-  '/NexusAl/core/app.js',
-  '/NexusAl/core/db.js'
+  '/MindToApp/core/',
+  '/MindToApp/core/index.html',
+  '/MindToApp/core/styles.css',
+  '/MindToApp/core/app.js',
+  '/MindToApp/core/db.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -13,7 +13,8 @@ self.addEventListener('install', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name.startsWith('nexus-ai-') && name !== CACHE_NAME)
+          .filter((name) => name.startsWith('nexus-ai-') || name.startsWith('mind-to-app-'))
+          .filter((name) => name !== CACHE_NAME)
           .map((name) => {
             console.log('[SW] Удаляю старый кэш:', name);
             return caches.delete(name);

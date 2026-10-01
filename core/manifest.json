@@ -1,8 +1,8 @@
 {
-  "name": "NexusAl Platform",
-  "short_name": "NexusAl",
-  "description": "Платформа для AI-микроприложений",
-  "start_url": "/NexusAl/core/index.html?v=2",
+  "name": "MindToApp Platform",
+  "short_name": "MindToApp",
+  "description": "Превращай идеи в приложения за минуту",
+  "start_url": "/MindToApp/core/index.html?v=5",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

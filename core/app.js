@@ -1,4 +1,4 @@
-const REGISTRY_URL = 'https://e3dr8nj.github.io/NexusAl/registry/registry.json';
+const REGISTRY_URL = 'https://e3dr8nj.github.io/MindToApp/registry/registry.json';
 
 let allModules = [];
 let installedModules = JSON.parse(localStorage.getItem('installedModules') || '[]');
@@ -31,7 +31,7 @@ const createStatus = $('create-status');
 const userIdeaInput = $('user-idea-input');
 const promptText = $('prompt-text');
 
-const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html.
+const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
 
 Требования:
 - Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
