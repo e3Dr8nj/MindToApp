@@ -31,7 +31,6 @@ const createStatus = $('create-status');
 const userIdeaInput = $('user-idea-input');
 const promptText = $('prompt-text');
 
-// Элементы модалки редактирования
 const editModal = $('edit-modal');
 const editModalTitle = $('edit-modal-title');
 const editPreviewIcon = $('edit-preview-icon');
@@ -70,10 +69,33 @@ function updatePromptPreview() {
   promptText.value = BASE_PROMPT + userIdea;
 }
 
+// 🆕 Утилита: загрузка HTML-кода с URL
+async function loadContentFromUrl(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.text();
+  } catch (error) {
+    console.error('Ошибка загрузки кода с URL:', url, error);
+    return null;
+  }
+}
+
+// 🆕 Утилита: сохранение content обратно в customModules и localStorage
+function saveContentToCustomModule(moduleId, content) {
+  const idx = customModules.findIndex(m => m.id === moduleId);
+  if (idx !== -1) {
+    customModules[idx].content = content;
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+  }
+}
+
 async function loadRegistry() {
   try {
     const response = await fetch(REGISTRY_URL);
     const data = await response.json();
+    
+    // Загружаем модули из registry и СОХРАНЯЕМ их HTML-код как content
     const registryModules = await Promise.all(
       data.modules.map(async (module) => {
         try {
@@ -84,42 +106,127 @@ async function loadRegistry() {
           const doc = parser.parseFromString(htmlText, 'text/html');
           const manifestScript = doc.getElementById('manifest');
           if (manifestScript) {
-            return { ...JSON.parse(manifestScript.textContent), url: module.url, isCustom: false, isLocal: false, isFolder: false };
+            return { 
+              ...JSON.parse(manifestScript.textContent), 
+              url: module.url, 
+              content: htmlText, // 🆕 сохраняем код
+              isCustom: false, 
+              isLocal: false, 
+              isFolder: false 
+            };
           }
         } catch (error) { console.error('Ошибка загрузки модуля:', module.url, error); }
         return null;
       })
     );
     const validRegistryModules = registryModules.filter(m => m !== null);
-    const restoredLocalModules = customModules.filter(m => m.isLocal && !m.isFolder).map(m => {
-      const blob = new Blob([m.content], { type: 'text/html' });
-      return { id: m.id, name: m.name, icon: m.icon, description: m.description, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false };
-    });
+    
+    // Восстанавливаем одиночные локальные модули
+    const restoredLocalModules = [];
+    for (const m of customModules.filter(m => m.isLocal && !m.isFolder)) {
+      let content = m.content;
+      
+      // 🆕 МИГРАЦИЯ: если content отсутствует, пытаемся загрузить с URL
+      if (!content && m.url) {
+        if (m.url.startsWith('blob:')) {
+          // blob URL не переживёт перезагрузку — пробуем прочитать
+          try {
+            const resp = await fetch(m.url);
+            if (resp.ok) {
+              content = await resp.text();
+              saveContentToCustomModule(m.id, content);
+            }
+          } catch (e) {
+            console.warn(`Модуль ${m.id}: blob URL недоступен, модуль потерян`);
+            continue; // пропускаем битый модуль
+          }
+        } else {
+          // http(s) URL — загружаем с сервера
+          content = await loadContentFromUrl(m.url);
+          if (content) {
+            saveContentToCustomModule(m.id, content);
+          } else {
+            console.warn(`Модуль ${m.id}: не удалось загрузить код с ${m.url}`);
+            continue;
+          }
+        }
+      }
+      
+      if (content) {
+        const blob = new Blob([content], { type: 'text/html' });
+        restoredLocalModules.push({
+          id: m.id,
+          name: m.name,
+          icon: m.icon,
+          description: m.description,
+          content: content,
+          url: URL.createObjectURL(blob),
+          isCustom: true,
+          isLocal: true,
+          isFolder: false
+        });
+      }
+    }
+    
+    // Восстанавливаем папки модулей
     let restoredFolderModules = [];
     try {
       const folderModulesData = await getAllFolderModules();
       restoredFolderModules = folderModulesData.map(folderData => {
         const vfs = createVirtualFS(folderData);
         activeVirtualFS.set(folderData.id, vfs);
-        return { id: folderData.manifest.id, name: folderData.manifest.name, icon: folderData.manifest.icon, description: folderData.manifest.description || 'Папка модуля', url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
+        return {
+          id: folderData.manifest.id,
+          name: folderData.manifest.name,
+          icon: folderData.manifest.icon,
+          description: folderData.manifest.description || 'Папка модуля',
+          content: folderData.mainHtml,
+          url: vfs.url,
+          isCustom: true,
+          isLocal: true,
+          isFolder: true
+        };
       });
     } catch (error) { console.error(error); }
+    
     allModules = [...validRegistryModules, ...restoredLocalModules, ...restoredFolderModules];
+    
+    // 🆕 Удаляем из installedModules те, что не удалось восстановить
+    const validIds = new Set(allModules.map(m => m.id));
+    const brokenIds = installedModules.filter(id => !validIds.has(id));
+    if (brokenIds.length > 0) {
+      console.warn('Удалены битые модули из списка установленных:', brokenIds);
+      installedModules = installedModules.filter(id => validIds.has(id));
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+    
   } catch (error) {
     console.error('Ошибка загрузки реестра:', error);
-    const restoredLocalModules = customModules.filter(m => m.isLocal && !m.isFolder).map(m => {
-      const blob = new Blob([m.content], { type: 'text/html' });
-      return { ...m, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false };
-    });
+    
+    // Fallback: восстанавливаем только локальные модули
+    const restoredLocalModules = [];
+    for (const m of customModules.filter(m => m.isLocal && !m.isFolder)) {
+      let content = m.content;
+      if (!content && m.url && !m.url.startsWith('blob:')) {
+        content = await loadContentFromUrl(m.url);
+        if (content) saveContentToCustomModule(m.id, content);
+      }
+      if (content) {
+        const blob = new Blob([content], { type: 'text/html' });
+        restoredLocalModules.push({ ...m, content, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
+      }
+    }
+    
     let restoredFolderModules = [];
     try {
       const folderModulesData = await getAllFolderModules();
       restoredFolderModules = folderModulesData.map(folderData => {
         const vfs = createVirtualFS(folderData);
         activeVirtualFS.set(folderData.id, vfs);
-        return { ...folderData.manifest, description: folderData.manifest.description || 'Папка модуля', url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
+        return { ...folderData.manifest, description: folderData.manifest.description || 'Папка модуля', content: folderData.mainHtml, url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
       });
     } catch (e) { console.error(e); }
+    
     allModules = [...restoredLocalModules, ...restoredFolderModules];
   }
 }
@@ -170,8 +277,8 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
   }
   
-  // Кнопка редактирования — для пользовательских модулей
-  if (module.isCustom) {
+  // Кнопка редактирования — для всех модулей, у которых есть content
+  if (module.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
     editBtn.textContent = '✏️';
@@ -239,7 +346,7 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-// --- ЛОГИКА СОЗДАНИЯ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
+// --- СОЗДАНИЕ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
 function openCreateModal() {
   if (createModal) {
     createModal.classList.add('active');
@@ -322,7 +429,14 @@ async function createAppFromText() {
     }
 
     const blob = new Blob([code], { type: 'text/html' });
-    allModules.push({ ...manifest, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
+    allModules.push({ 
+      ...manifest, 
+      content: code,
+      url: URL.createObjectURL(blob), 
+      isCustom: true, 
+      isLocal: true, 
+      isFolder: false 
+    });
 
     createStatus.textContent = '✅ Приложение успешно создано!';
     createStatus.className = 'modal-status success';
@@ -340,26 +454,47 @@ async function createAppFromText() {
   }
 }
 
-// --- ЛОГИКА РЕДАКТИРОВАНИЯ ПРИЛОЖЕНИЯ ---
-function openEditModal(module) {
+// --- РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ ---
+async function openEditModal(module) {
   if (!editModal) return;
   currentEditingModule = module;
   
-  // Заполняем превью
   if (editModalTitle) editModalTitle.textContent = `✏️ Редактировать: ${module.name}`;
   if (editPreviewIcon) editPreviewIcon.textContent = module.icon;
   if (editPreviewName) editPreviewName.textContent = module.name;
   if (editPreviewDesc) editPreviewDesc.textContent = module.description || '';
   
-  // Заполняем код
+  let sourceCode = module.content || '';
+  
+  // 🆕 Если content нет в памяти — пытаемся загрузить с URL
+  if (!sourceCode && module.url) {
+    if (editSourceCode) {
+      editSourceCode.value = '⏳ Загрузка кода...';
+      editSourceCode.style.display = 'block';
+    }
+    const toggleBtn = $('toggle-code-btn');
+    if (toggleBtn) toggleBtn.textContent = '⏳ Загрузка...';
+    
+    sourceCode = await loadContentFromUrl(module.url);
+    
+    if (sourceCode) {
+      // Сохраняем в модуль и в localStorage (если это custom модуль)
+      module.content = sourceCode;
+      if (module.isCustom) {
+        saveContentToCustomModule(module.id, sourceCode);
+      }
+    } else {
+      sourceCode = `// ⚠️ Не удалось загрузить код приложения.\n// Возможно, оно было создано в старой версии платформы.\n// Попробуйте создать его заново через "✨ Создать приложение".`;
+    }
+  }
+  
   if (editSourceCode) {
-    editSourceCode.value = module.content || '';
+    editSourceCode.value = sourceCode;
     editSourceCode.style.display = 'none';
     const toggleBtn = $('toggle-code-btn');
     if (toggleBtn) toggleBtn.textContent = '👁 Показать код приложения';
   }
   
-  // Очищаем поля
   if (editChangesInput) editChangesInput.value = '';
   if (editNewCodeInput) editNewCodeInput.value = '';
   if (editStatus) {
@@ -387,7 +522,6 @@ function toggleCodeVisibility() {
   }
 }
 
-// Генерация умного промпта с полной инструкцией платформы
 function generateEditPrompt() {
   if (!currentEditingModule) return '';
   
@@ -396,7 +530,6 @@ function generateEditPrompt() {
   
   if (!changes) return '';
   
-  // Полная инструкция для совместимости с платформой
   const platformInstruction = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
 
 Требования:
@@ -470,7 +603,7 @@ function copyEditPrompt() {
   }
 }
 
-// Создание копии приложения с новым кодом
+// Создание копии приложения с новым кодом — ПОЛНОЦЕННОЕ ОТДЕЛЬНОЕ ПРИЛОЖЕНИЕ
 async function applyEditChanges() {
   if (!currentEditingModule) return;
   if (!editNewCodeInput || !editStatus) return;
@@ -501,56 +634,62 @@ async function applyEditChanges() {
       throw new Error('В manifest не хватает полей id, name или icon');
     }
     
-    // Проверка: ID должен измениться (иначе это не копия)
+    // ID должен отличаться от оригинала (иначе это не копия)
     if (manifest.id === currentEditingModule.id) {
       throw new Error('ID не изменился! Попросите AI сгенерировать новый уникальный ID (добавить 6 случайных цифр).');
     }
     
-    // Проверка на уникальность нового ID
+    // Проверка на уникальность
     if (allModules.some(m => m.id === manifest.id)) {
       throw new Error('Приложение с таким ID уже существует. Попросите AI сгенерировать другой ID.');
     }
     
-    // Создаём копию
+    // 🆕 Создаём ПОЛНОЦЕННОЕ ОТДЕЛЬНОЕ приложение-копию
     const newModule = {
       id: manifest.id,
       name: manifest.name,
       icon: manifest.icon,
       description: manifest.description || `Копия: ${currentEditingModule.name}`,
-      content: newCode,
+      content: newCode, // 🆕 сохраняем полный код
       isCustom: true,
       isLocal: true,
       isFolder: false
     };
     
+    // 🆕 Добавляем в customModules (сохраняется в localStorage навсегда)
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
     
+    // 🆕 Автоматически устанавливаем копию
     if (!installedModules.includes(manifest.id)) {
       installedModules.push(manifest.id);
       localStorage.setItem('installedModules', JSON.stringify(installedModules));
     }
     
+    // 🆕 Создаём отдельный blob URL для копии (независим от оригинала)
     const blob = new Blob([newCode], { type: 'text/html' });
+    const copyUrl = URL.createObjectURL(blob);
+    
     allModules.push({
       id: manifest.id,
       name: manifest.name,
       icon: manifest.icon,
       description: manifest.description || `Копия: ${currentEditingModule.name}`,
-      url: URL.createObjectURL(blob),
+      content: newCode,
+      url: copyUrl,
       isCustom: true,
       isLocal: true,
       isFolder: false
     });
     
-    editStatus.textContent = `✅ Копия "${manifest.name}" создана!`;
+    editStatus.textContent = `✅ Копия "${manifest.name}" создана как отдельное приложение!`;
     editStatus.className = 'modal-status success';
     
     setTimeout(() => {
       closeEditModal();
       renderInstalledApps();
       renderAllApps();
-    }, 800);
+    }, 1000);
     
   } catch (error) {
     console.error(error);
@@ -559,7 +698,7 @@ async function applyEditChanges() {
   }
 }
 
-// --- КНОПКА ОЧИСТКИ КЭША ---
+// --- ОЧИСТКА КЭША ---
 async function refreshApp() {
   const btn = $('refresh-btn');
   if (btn) btn.textContent = '⏳';
@@ -579,7 +718,7 @@ async function refreshApp() {
   }
 }
 
-// --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
+// --- ДОБАВЛЕНИЕ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
   if (!addModal) return;
   addModal.classList.add('active');
@@ -670,7 +809,7 @@ async function addLocalFileModule() {
     localStorage.setItem('customModules', JSON.stringify(customModules));
     if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
     const blob = new Blob([fileText], { type: 'text/html' });
-    allModules.push({ ...manifest, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
+    allModules.push({ ...manifest, content: fileText, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
     if (modalStatus) { modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success'; }
     setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
   } catch (error) { if (modalStatus) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; } }
@@ -706,7 +845,7 @@ async function addFolderModule() {
     const folderData = { id: manifest.id, manifest, files, mainHtml };
     const vfs = createVirtualFS(folderData);
     activeVirtualFS.set(manifest.id, vfs);
-    allModules.push({ ...manifest, url: vfs.url, isCustom: true, isLocal: true, isFolder: true });
+    allModules.push({ ...manifest, content: mainHtml, url: vfs.url, isCustom: true, isLocal: true, isFolder: true });
     if (modalStatus) { modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success'; }
     setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
   } catch (error) { if (modalStatus) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; } }
@@ -730,7 +869,16 @@ async function addUrlModule() {
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    const newModule = { ...manifest, description: manifest.description || 'Пользовательский модуль', url, isCustom: true, isLocal: false, isFolder: false };
+    // 🆕 Сохраняем content и для URL-модулей
+    const newModule = { 
+      ...manifest, 
+      description: manifest.description || 'Пользовательский модуль', 
+      content: htmlText, // 🆕
+      url, 
+      isCustom: true, 
+      isLocal: false, 
+      isFolder: false 
+    };
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
     if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
@@ -740,14 +888,13 @@ async function addUrlModule() {
   } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
-// --- БЕЗОПАСНАЯ НАСТРОЙКА СОБЫТИЙ ---
+// --- СОБЫТИЯ ---
 function setupEventListeners() {
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Создание приложения
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -757,10 +904,8 @@ function setupEventListeners() {
   
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
-  // Очистка кэша
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Редактирование приложения
   $('close-edit-btn')?.addEventListener('click', closeEditModal);
   $('cancel-edit-btn')?.addEventListener('click', closeEditModal);
   $('toggle-code-btn')?.addEventListener('click', toggleCodeVisibility);
@@ -768,7 +913,6 @@ function setupEventListeners() {
   $('apply-edit-btn')?.addEventListener('click', applyEditChanges);
   editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
 
-  // Добавить модуль
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
