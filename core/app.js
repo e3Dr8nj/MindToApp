@@ -1,17 +1,23 @@
+// ============================================
+// MindToApp Platform — app.js (оптимизирован)
+// ============================================
+
 const REGISTRY_URL = 'https://e3dr8nj.github.io/MindToApp/registry/registry.json';
 
+// --- Состояние ---
 let allModules = [];
 let installedModules = JSON.parse(localStorage.getItem('installedModules') || '[]');
 let customModules = JSON.parse(localStorage.getItem('customModules') || '[]');
 let currentTab = 'url';
 let selectedLocalFile = null;
 let selectedFolderFiles = null;
-const activeVirtualFS = new Map();
 let currentEditingModule = null;
+const activeVirtualFS = new Map();
 
+// --- DOM-хелпер ---
 const $ = (id) => document.getElementById(id);
 
-// DOM-элементы
+// --- Элементы ---
 const homeScreen = $('home-screen');
 const storeScreen = $('store-screen');
 const appScreen = $('app-screen');
@@ -33,15 +39,12 @@ const createStatus = $('create-status');
 const userIdeaInput = $('user-idea-input');
 const promptText = $('prompt-text');
 const editModal = $('edit-modal');
-const editModalTitle = $('edit-modal-title');
-const editPreviewIcon = $('edit-preview-icon');
-const editPreviewName = $('edit-preview-name');
-const editPreviewDesc = $('edit-preview-desc');
 const editSourceCode = $('edit-source-code');
 const editChangesInput = $('edit-changes-input');
 const editNewCodeInput = $('edit-new-code-input');
 const editStatus = $('edit-status');
 
+// --- Константы ---
 const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
 
 Требования:
@@ -55,19 +58,12 @@ const BASE_PROMPT = `Создай одностраничное веб-прило
 
 Задача: `;
 
-// ===================== УТИЛИТЫ =====================
+// ============================================
+// УТИЛИТЫ (DRY)
+// ============================================
 
-function showStatus(element, message, type = '') {
-  if (!element) return;
-  element.textContent = message;
-  element.className = `modal-status ${type}`.trim();
-}
-
-function closeModal(modalElement) {
-  if (modalElement) modalElement.classList.remove('active');
-}
-
-function parseAndValidateManifest(code) {
+// Парсинг и валидация manifest из HTML-кода
+function parseAndValidateManifest(code, checkDuplicate = true) {
   const doc = new DOMParser().parseFromString(code, 'text/html');
   const script = doc.getElementById('manifest');
   if (!script) throw new Error('Не найден тег <script id="manifest">');
@@ -75,10 +71,21 @@ function parseAndValidateManifest(code) {
   if (!manifest.id || !manifest.name || !manifest.icon) {
     throw new Error('В manifest не хватает полей id, name или icon');
   }
+  if (checkDuplicate && allModules.some(m => m.id === manifest.id)) {
+    throw new Error('Приложение с таким ID уже существует');
+  }
   return manifest;
 }
 
-async function loadContentFromUrl(url) {
+// Показ статуса в модалке
+function showStatus(element, message, type = '') {
+  if (!element) return;
+  element.textContent = message;
+  element.className = `modal-status ${type}`.trim();
+}
+
+// Загрузка HTML-кода с URL
+async function fetchCode(url) {
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -89,7 +96,34 @@ async function loadContentFromUrl(url) {
   }
 }
 
-function saveContentToCustomModule(moduleId, content) {
+// Регистрация модуля (сохранение в customModules, installedModules, allModules)
+function registerModule(manifest, content, options = {}) {
+  const module = {
+    id: manifest.id,
+    name: manifest.name,
+    icon: manifest.icon,
+    description: manifest.description || options.defaultDesc || 'Модуль',
+    content,
+    url: options.url || URL.createObjectURL(new Blob([content], { type: 'text/html' })),
+    isCustom: true,
+    isLocal: options.isLocal !== false,
+    isFolder: options.isFolder || false
+  };
+
+  customModules.push(module);
+  localStorage.setItem('customModules', JSON.stringify(customModules));
+
+  if (!installedModules.includes(manifest.id)) {
+    installedModules.push(manifest.id);
+    localStorage.setItem('installedModules', JSON.stringify(installedModules));
+  }
+
+  allModules.push(module);
+  return module;
+}
+
+// Сохранение content обратно в customModules
+function saveContentToCustom(moduleId, content) {
   const idx = customModules.findIndex(m => m.id === moduleId);
   if (idx !== -1) {
     customModules[idx].content = content;
@@ -97,42 +131,38 @@ function saveContentToCustomModule(moduleId, content) {
   }
 }
 
-function registerModule(manifest, content, options = {}) {
-  const module = {
-    ...manifest,
-    content,
-    url: options.url || URL.createObjectURL(new Blob([content], { type: 'text/html' })),
-    isCustom: true,
-    isLocal: options.isLocal !== undefined ? options.isLocal : true,
-    isFolder: options.isFolder || false,
-    description: manifest.description || options.defaultDescription || 'Модуль'
-  };
-  customModules.push(module);
-  localStorage.setItem('customModules', JSON.stringify(customModules));
-  if (!installedModules.includes(manifest.id)) {
-    installedModules.push(manifest.id);
-    localStorage.setItem('installedModules', JSON.stringify(installedModules));
+// Универсальное закрытие модалки
+function closeModal(modalEl) {
+  if (modalEl) modalEl.classList.remove('active');
+}
+
+// Универсальное открытие модалки
+function openModal(modalEl) {
+  if (modalEl) modalEl.classList.add('active');
+}
+
+// Копирование текста в буфер обмена
+async function copyToClipboard(text, successCallback) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    if (successCallback) successCallback();
+  } catch (e) {
+    console.error('Ошибка копирования:', e);
   }
-  allModules.push(module);
-  return module;
 }
 
-// ===================== ИНИЦИАЛИЗАЦИЯ =====================
-
-async function init() {
-  await loadRegistry();
-  renderInstalledApps();
-  setupEventListeners();
-  updatePromptPreview();
-}
-
-function updatePromptPreview() {
-  if (!promptText) return;
-  const userIdea = userIdeaInput?.value.trim() || '[опиши здесь функционал и дизайн приложения]';
-  promptText.value = BASE_PROMPT + userIdea;
-}
-
-// ===================== ЗАГРУЗКА МОДУЛЕЙ =====================
+// ============================================
+// ЗАГРУЗКА МОДУЛЕЙ (разбита на подфункции)
+// ============================================
 
 async function loadRegistryModules() {
   const response = await fetch(REGISTRY_URL);
@@ -140,8 +170,9 @@ async function loadRegistryModules() {
   const modules = await Promise.all(
     data.modules.map(async (module) => {
       try {
-        const htmlText = await (await fetch(module.url)).text();
-        const manifest = parseAndValidateManifest(htmlText);
+        const htmlText = await fetchCode(module.url);
+        if (!htmlText) return null;
+        const manifest = parseAndValidateManifest(htmlText, false);
         return { ...manifest, url: module.url, content: htmlText, isCustom: false, isLocal: false, isFolder: false };
       } catch (error) {
         console.error('Ошибка загрузки модуля:', module.url, error);
@@ -156,20 +187,22 @@ async function restoreLocalModules() {
   const result = [];
   for (const m of customModules.filter(m => m.isLocal && !m.isFolder)) {
     let content = m.content;
+
+    // Миграция: если content отсутствует, загружаем с URL
     if (!content && m.url) {
-      if (m.url.startsWith('blob:')) {
-        try {
-          const resp = await fetch(m.url);
-          if (resp.ok) { content = await resp.text(); saveContentToCustomModule(m.id, content); }
-        } catch (e) { console.warn(`Модуль ${m.id}: blob URL недоступен`); continue; }
-      } else {
-        content = await loadContentFromUrl(m.url);
-        if (content) saveContentToCustomModule(m.id, content);
-        else { console.warn(`Модуль ${m.id}: не удалось загрузить`); continue; }
-      }
+      content = await fetchCode(m.url);
+      if (content) saveContentToCustom(m.id, content);
     }
+
     if (content) {
-      result.push({ id: m.id, name: m.name, icon: m.icon, description: m.description, content, url: URL.createObjectURL(new Blob([content], { type: 'text/html' })), isCustom: true, isLocal: true, isFolder: false });
+      result.push({
+        id: m.id, name: m.name, icon: m.icon, description: m.description,
+        content,
+        url: URL.createObjectURL(new Blob([content], { type: 'text/html' })),
+        isCustom: true, isLocal: true, isFolder: false
+      });
+    } else {
+      console.warn(`Модуль ${m.id}: код недоступен, пропускаю`);
     }
   }
   return result;
@@ -181,7 +214,13 @@ async function restoreFolderModules() {
     return folderData.map(fd => {
       const vfs = createVirtualFS(fd);
       activeVirtualFS.set(fd.id, vfs);
-      return { id: fd.manifest.id, name: fd.manifest.name, icon: fd.manifest.icon, description: fd.manifest.description || 'Папка модуля', content: fd.mainHtml, url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
+      return {
+        id: fd.manifest.id, name: fd.manifest.name, icon: fd.manifest.icon,
+        description: fd.manifest.description || 'Папка модуля',
+        content: fd.mainHtml,
+        url: vfs.url,
+        isCustom: true, isLocal: true, isFolder: true
+      };
     });
   } catch (error) {
     console.error('Ошибка восстановления папок:', error);
@@ -199,7 +238,11 @@ function cleanupBrokenModules() {
   }
 }
 
-async function loadRegistry() {
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================
+
+async function init() {
   try {
     const [registry, local, folders] = await Promise.all([
       loadRegistryModules(),
@@ -209,13 +252,23 @@ async function loadRegistry() {
     allModules = [...registry, ...local, ...folders];
     cleanupBrokenModules();
   } catch (error) {
-    console.error('Ошибка загрузки реестра:', error);
-    const [local, folders] = await Promise.all([restoreLocalModules(), restoreFolderModules()]);
-    allModules = [...local, ...folders];
+    console.error('Критическая ошибка загрузки:', error);
+    allModules = [];
   }
+  renderInstalledApps();
+  setupEventListeners();
+  updatePromptPreview();
 }
 
-// ===================== РЕНДЕР =====================
+function updatePromptPreview() {
+  if (!promptText) return;
+  const idea = userIdeaInput?.value.trim() || '[опиши здесь функционал и дизайн приложения]';
+  promptText.value = BASE_PROMPT + idea;
+}
+
+// ============================================
+// РЕНДЕРИНГ
+// ============================================
 
 function renderInstalledApps() {
   installedAppsContainer.innerHTML = '';
@@ -235,10 +288,10 @@ function renderInstalledApps() {
 function renderAllApps() {
   allAppsContainer.innerHTML = '';
   if (allModules.length === 0) {
-    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Нет доступных модулей</p>';
+    allAppsContainer.innerHTML = '<p style="color:white;text-align:center;grid-column:1/-1;">Нет доступных модулей</p>';
     return;
   }
-  allModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
+  allModules.forEach(m => allAppsContainer.appendChild(createAppCard(m, false)));
 }
 
 function createAppCard(module, isInstalled) {
@@ -277,7 +330,9 @@ function createAppCard(module, isInstalled) {
   return card;
 }
 
-// ===================== ДЕЙСТВИЯ =====================
+// ============================================
+// ДЕЙСТВИЯ С МОДУЛЯМИ
+// ============================================
 
 function toggleInstall(moduleId) {
   const idx = installedModules.indexOf(moduleId);
@@ -322,30 +377,27 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-// ===================== СОЗДАНИЕ ПРИЛОЖЕНИЯ =====================
+// ============================================
+// СОЗДАНИЕ ПРИЛОЖЕНИЯ
+// ============================================
 
 function openCreateModal() {
-  if (!createModal) return;
-  createModal.classList.add('active');
   if (generatedCodeInput) generatedCodeInput.value = '';
   if (userIdeaInput) userIdeaInput.value = '';
   showStatus(createStatus, '');
   updatePromptPreview();
+  openModal(createModal);
 }
 
 function copyPrompt() {
   if (!promptText) return;
   const btn = $('copy-prompt-btn');
-  const doCopy = () => {
-    if (btn) { btn.textContent = '✅ Скопировано!'; setTimeout(() => btn.textContent = '📋 Копировать готовый промпт', 2000); }
-  };
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(promptText.value).then(doCopy);
-  } else {
-    promptText.select();
-    document.execCommand('copy');
-    doCopy();
-  }
+  copyToClipboard(promptText.value, () => {
+    if (btn) {
+      btn.textContent = '✅ Скопировано!';
+      setTimeout(() => btn.textContent = '📋 Копировать готовый промпт', 2000);
+    }
+  });
 }
 
 async function createAppFromText() {
@@ -356,8 +408,7 @@ async function createAppFromText() {
   showStatus(createStatus, '⏳ Анализ кода...', 'loading');
   try {
     const manifest = parseAndValidateManifest(code);
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
-    registerModule(manifest, code, { defaultDescription: 'Создано через AI' });
+    registerModule(manifest, code, { defaultDesc: 'Создано через AI' });
     showStatus(createStatus, '✅ Приложение успешно создано!', 'success');
     setTimeout(() => { closeModal(createModal); renderInstalledApps(); renderAllApps(); }, 800);
   } catch (error) {
@@ -365,36 +416,33 @@ async function createAppFromText() {
   }
 }
 
-// ===================== РЕДАКТИРОВАНИЕ =====================
+// ============================================
+// РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ
+// ============================================
 
 async function openEditModal(module) {
-  if (!editModal) return;
   currentEditingModule = module;
-
-  if (editModalTitle) editModalTitle.textContent = `✏️ Редактировать: ${module.name}`;
-  if (editPreviewIcon) editPreviewIcon.textContent = module.icon;
-  if (editPreviewName) editPreviewName.textContent = module.name;
-  if (editPreviewDesc) editPreviewDesc.textContent = module.description || '';
+  $('edit-modal-title').textContent = `✏️ Редактировать: ${module.name}`;
+  $('edit-preview-icon').textContent = module.icon;
+  $('edit-preview-name').textContent = module.name;
+  $('edit-preview-desc').textContent = module.description || '';
 
   let sourceCode = module.content || '';
   if (!sourceCode && module.url) {
-    if (editSourceCode) { editSourceCode.value = '⏳ Загрузка кода...'; editSourceCode.style.display = 'block'; }
-    sourceCode = await loadContentFromUrl(module.url);
-    if (sourceCode) {
-      module.content = sourceCode;
-      if (module.isCustom) saveContentToCustomModule(module.id, sourceCode);
-    } else {
-      sourceCode = '// ⚠️ Не удалось загрузить код. Попробуйте создать приложение заново.';
-    }
+    if (editSourceCode) { editSourceCode.value = '⏳ Загрузка...'; editSourceCode.style.display = 'block'; }
+    sourceCode = await fetchCode(module.url) || '// ⚠️ Не удалось загрузить код. Создайте приложение заново.';
+    module.content = sourceCode;
+    if (module.isCustom) saveContentToCustom(module.id, sourceCode);
   }
 
   if (editSourceCode) { editSourceCode.value = sourceCode; editSourceCode.style.display = 'none'; }
   const toggleBtn = $('toggle-code-btn');
   if (toggleBtn) toggleBtn.textContent = '👁 Показать код приложения';
+
   if (editChangesInput) editChangesInput.value = '';
   if (editNewCodeInput) editNewCodeInput.value = '';
   showStatus(editStatus, '');
-  editModal.classList.add('active');
+  openModal(editModal);
 }
 
 function toggleCodeVisibility() {
@@ -407,7 +455,7 @@ function toggleCodeVisibility() {
 
 function generateEditPrompt() {
   const sourceCode = editSourceCode?.value || '';
-  const changes = editChangesInput?.value.trim() || '';
+  const changes = editChangesInput?.value.trim();
   if (!changes) return '';
 
   return `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
@@ -443,22 +491,13 @@ function copyEditPrompt() {
   if (!prompt) return showStatus(editStatus, '❌ Сначала опишите, что нужно изменить', 'error');
 
   const btn = $('copy-edit-prompt-btn');
-  const doCopy = () => {
-    if (btn) { btn.textContent = '✅ Скопировано!'; setTimeout(() => btn.textContent = '📋 Скопировать промпт для AI', 2000); }
+  copyToClipboard(prompt, () => {
+    if (btn) {
+      btn.textContent = '✅ Скопировано!';
+      setTimeout(() => btn.textContent = '📋 Скопировать промпт для AI', 2000);
+    }
     showStatus(editStatus, '✅ Промпт скопирован! Откройте AI, вставьте и дождитесь ответа.', 'success');
-  };
-
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(prompt).then(doCopy);
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = prompt;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    doCopy();
-  }
+  });
 }
 
 async function applyEditChanges() {
@@ -469,9 +508,10 @@ async function applyEditChanges() {
   showStatus(editStatus, '⏳ Анализ кода...', 'loading');
   try {
     const manifest = parseAndValidateManifest(newCode);
-    if (manifest.id === currentEditingModule.id) throw new Error('ID не изменился! Попросите AI сгенерировать новый уникальный ID (добавить 6 случайных цифр).');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует. Попросите AI сгенерировать другой ID.');
-    registerModule(manifest, newCode, { defaultDescription: `Копия: ${currentEditingModule.name}` });
+    if (currentEditingModule && manifest.id === currentEditingModule.id) {
+      throw new Error('ID не изменился! Попросите AI сгенерировать новый уникальный ID.');
+    }
+    registerModule(manifest, newCode, { defaultDesc: `Копия: ${currentEditingModule?.name || 'приложение'}` });
     showStatus(editStatus, `✅ Копия "${manifest.name}" создана как отдельное приложение!`, 'success');
     setTimeout(() => { closeModal(editModal); renderInstalledApps(); renderAllApps(); }, 1000);
   } catch (error) {
@@ -479,23 +519,31 @@ async function applyEditChanges() {
   }
 }
 
-// ===================== ОЧИСТКА КЭША =====================
+// ============================================
+// ОЧИСТКА КЭША
+// ============================================
 
 async function refreshApp() {
   const btn = $('refresh-btn');
   if (btn) btn.textContent = '⏳';
   try {
-    if ('caches' in window) { const names = await caches.keys(); await Promise.all(names.map(n => caches.delete(n))); }
-    if ('serviceWorker' in navigator) { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); }
-    setTimeout(() => window.location.reload(), 500);
-  } catch (e) { window.location.reload(); }
+    if ('caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map(n => caches.delete(n)));
+    }
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+  } catch (e) { console.error(e); }
+  setTimeout(() => window.location.reload(), 500);
 }
 
-// ===================== ДОБАВЛЕНИЕ МОДУЛЯ =====================
+// ============================================
+// ДОБАВЛЕНИЕ МОДУЛЯ (URL/ФАЙЛ/ПАПКА)
+// ============================================
 
 function openAddModal() {
-  if (!addModal) return;
-  addModal.classList.add('active');
   if (moduleUrlInput) moduleUrlInput.value = '';
   selectedLocalFile = null;
   if (selectedFileName) selectedFileName.textContent = '';
@@ -505,14 +553,17 @@ function openAddModal() {
   if (folderInput) folderInput.value = '';
   showStatus(modalStatus, '');
   switchTab('url');
+  openModal(addModal);
 }
 
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-  document.querySelector(`.tab[data-tab="${tab}"]`)?.style.setProperty('display', 'block');
+  const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if (activeTab) activeTab.style.display = 'block';
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.tab-btn[data-target="${tab}"]`)?.classList.add('active');
+  const activeBtn = document.querySelector(`.tab-btn[data-target="${tab}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   showStatus(modalStatus, '');
 }
 
@@ -526,13 +577,14 @@ async function addLocalFileModule() {
   if (!selectedLocalFile) return showStatus(modalStatus, '❌ Выберите файл', 'error');
   showStatus(modalStatus, '⏳ Чтение файла...', 'loading');
   try {
-    const fileText = await selectedLocalFile.text();
-    const manifest = parseAndValidateManifest(fileText);
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    registerModule(manifest, fileText, { defaultDescription: 'Локальный модуль' });
+    const code = await selectedLocalFile.text();
+    const manifest = parseAndValidateManifest(code);
+    registerModule(manifest, code, { defaultDesc: 'Локальный модуль' });
     showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
     setTimeout(() => { closeModal(addModal); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
+  } catch (error) {
+    showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error');
+  }
 }
 
 async function addFolderModule() {
@@ -543,57 +595,69 @@ async function addFolderModule() {
     if (!indexFile) throw new Error('index.html не найден');
     const mainHtml = await indexFile.text();
     const manifest = parseAndValidateManifest(mainHtml);
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    showStatus(modalStatus, `⏳ Загрузка ${selectedFolderFiles.length} файлов...`);
+    showStatus(modalStatus, `⏳ Загрузка ${selectedFolderFiles.length} файлов...`, 'loading');
+
     const files = [];
     for (const file of selectedFolderFiles) {
       const parts = file.webkitRelativePath.split('/');
       const rel = parts.slice(1).join('/');
-      if (parts[parts.length - 1].toLowerCase() !== 'index.html' && rel) files.push({ path: rel, blob: file });
+      if (parts[parts.length - 1].toLowerCase() === 'index.html' || !rel) continue;
+      files.push({ path: rel, blob: file });
     }
+
     await saveFolderModule(manifest.id, manifest, files, mainHtml);
-    const vfs = createVirtualFS({ id: manifest.id, manifest, files, mainHtml });
-    activeVirtualFS.set(manifest.id, vfs);
-    registerModule(manifest, mainHtml, { url: vfs.url, isFolder: true, defaultDescription: 'Папка модуля' });
+    registerModule(manifest, mainHtml, { defaultDesc: 'Папка модуля', isFolder: true, url: createVirtualFS({ id: manifest.id, manifest, files, mainHtml }).url });
+    activeVirtualFS.set(manifest.id, createVirtualFS({ id: manifest.id, manifest, files, mainHtml }));
+
     showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
     setTimeout(() => { closeModal(addModal); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
+  } catch (error) {
+    showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error');
+  }
 }
 
 async function addUrlModule() {
   let url = moduleUrlInput?.value.trim();
   if (!url) return showStatus(modalStatus, '❌ Введите URL', 'error');
-  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  if (!url.startsWith('http')) url = 'https://' + url;
   if (!url.endsWith('/') && !url.endsWith('.html')) url += '/';
   showStatus(modalStatus, '⏳ Загрузка модуля...', 'loading');
   try {
-    const htmlText = await (await fetch(url)).text();
-    const manifest = parseAndValidateManifest(htmlText);
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    registerModule(manifest, htmlText, { url, isLocal: false, defaultDescription: 'Пользовательский модуль' });
+    const code = await fetchCode(url);
+    if (!code) throw new Error('Не удалось загрузить');
+    const manifest = parseAndValidateManifest(code);
+    registerModule(manifest, code, { defaultDesc: 'Пользовательский модуль', url, isLocal: false });
     showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
     setTimeout(() => { closeModal(addModal); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
+  } catch (error) {
+    showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error');
+  }
 }
 
-// ===================== СОБЫТИЯ =====================
+// ============================================
+// СОБЫТИЯ
+// ============================================
 
 function setupEventListeners() {
+  // Навигация
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
+  // Создание
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', () => closeModal(createModal));
   $('cancel-create-btn')?.addEventListener('click', () => closeModal(createModal));
   $('copy-prompt-btn')?.addEventListener('click', copyPrompt);
   $('confirm-create-btn')?.addEventListener('click', createAppFromText);
   createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeModal(createModal); });
-
   userIdeaInput?.addEventListener('input', updatePromptPreview);
+
+  // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
+  // Редактирование
   $('close-edit-btn')?.addEventListener('click', () => closeModal(editModal));
   $('cancel-edit-btn')?.addEventListener('click', () => closeModal(editModal));
   $('toggle-code-btn')?.addEventListener('click', toggleCodeVisibility);
@@ -601,6 +665,7 @@ function setupEventListeners() {
   $('apply-edit-btn')?.addEventListener('click', applyEditChanges);
   editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeModal(editModal); });
 
+  // Добавление
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', () => closeModal(addModal));
@@ -611,9 +676,7 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.target)));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(createModal); closeModal(addModal); closeModal(editModal); } });
-
+  // Input handlers
   localFileInput?.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -631,19 +694,29 @@ function setupEventListeners() {
   folderInput?.addEventListener('change', (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const idx = files.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
-    if (!idx) {
-      showStatus(modalStatus, '❌ В папке должен быть файл index.html', 'error');
+    if (!files.some(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html')) {
+      showStatus(modalStatus, '❌ В папке должен быть index.html', 'error');
       selectedFolderFiles = null;
       if (selectedFolderInfo) selectedFolderInfo.textContent = '';
       return;
     }
     selectedFolderFiles = files;
-    const root = idx.webkitRelativePath.split('/')[0];
+    const root = files[0].webkitRelativePath.split('/')[0];
     const size = (files.reduce((s, f) => s + f.size, 0) / 1048576).toFixed(2);
     if (selectedFolderInfo) selectedFolderInfo.textContent = `✅ Папка: ${root} (${files.length} файлов, ${size} МБ)`;
     showStatus(modalStatus, '');
   });
+
+  // Вкладки
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.target));
+  });
+
+  // Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(createModal); closeModal(addModal); closeModal(editModal); }
+  });
 }
 
+// Запуск
 init();
