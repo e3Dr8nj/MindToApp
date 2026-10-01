@@ -31,6 +31,19 @@ const createStatus = $('create-status');
 const userIdeaInput = $('user-idea-input');
 const promptText = $('prompt-text');
 
+// Элементы модалки редактирования
+const editModal = $('edit-modal');
+const editModalTitle = $('edit-modal-title');
+const editPreviewIcon = $('edit-preview-icon');
+const editPreviewName = $('edit-preview-name');
+const editPreviewDesc = $('edit-preview-desc');
+const editSourceCode = $('edit-source-code');
+const editChangesInput = $('edit-changes-input');
+const editNewCodeInput = $('edit-new-code-input');
+const editStatus = $('edit-status');
+
+let currentEditingModule = null;
+
 const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
 
 Требования:
@@ -145,6 +158,7 @@ function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
   card.innerHTML = `<div class="app-icon">${module.icon}</div><div class="app-name">${module.name}</div><div class="app-description">${module.description}</div>`;
+  
   if (!isInstalled) {
     const installBtn = document.createElement('button');
     installBtn.className = 'install-btn';
@@ -155,6 +169,21 @@ function createAppCard(module, isInstalled) {
   } else {
     card.addEventListener('click', () => openApp(module));
   }
+  
+  // Кнопка редактирования — для пользовательских модулей
+  if (module.isCustom) {
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
+    editBtn.textContent = '✏️';
+    editBtn.title = 'Редактировать';
+    editBtn.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      openEditModal(module); 
+    });
+    card.appendChild(editBtn);
+  }
+  
+  // Кнопка удаления — для пользовательских модулей
   if (module.isCustom) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
@@ -163,6 +192,7 @@ function createAppCard(module, isInstalled) {
     deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); removeCustomModule(module.id); });
     card.appendChild(deleteBtn);
   }
+  
   return card;
 }
 
@@ -209,6 +239,7 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
+// --- ЛОГИКА СОЗДАНИЯ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
 function openCreateModal() {
   if (createModal) {
     createModal.classList.add('active');
@@ -309,6 +340,226 @@ async function createAppFromText() {
   }
 }
 
+// --- ЛОГИКА РЕДАКТИРОВАНИЯ ПРИЛОЖЕНИЯ ---
+function openEditModal(module) {
+  if (!editModal) return;
+  currentEditingModule = module;
+  
+  // Заполняем превью
+  if (editModalTitle) editModalTitle.textContent = `✏️ Редактировать: ${module.name}`;
+  if (editPreviewIcon) editPreviewIcon.textContent = module.icon;
+  if (editPreviewName) editPreviewName.textContent = module.name;
+  if (editPreviewDesc) editPreviewDesc.textContent = module.description || '';
+  
+  // Заполняем код
+  if (editSourceCode) {
+    editSourceCode.value = module.content || '';
+    editSourceCode.style.display = 'none';
+    const toggleBtn = $('toggle-code-btn');
+    if (toggleBtn) toggleBtn.textContent = '👁 Показать код приложения';
+  }
+  
+  // Очищаем поля
+  if (editChangesInput) editChangesInput.value = '';
+  if (editNewCodeInput) editNewCodeInput.value = '';
+  if (editStatus) {
+    editStatus.textContent = '';
+    editStatus.className = 'modal-status';
+  }
+  
+  editModal.classList.add('active');
+}
+
+function closeEditModal() {
+  if (editModal) editModal.classList.remove('active');
+  currentEditingModule = null;
+}
+
+function toggleCodeVisibility() {
+  if (!editSourceCode) return;
+  const toggleBtn = $('toggle-code-btn');
+  if (editSourceCode.style.display === 'none') {
+    editSourceCode.style.display = 'block';
+    if (toggleBtn) toggleBtn.textContent = '🙈 Скрыть код';
+  } else {
+    editSourceCode.style.display = 'none';
+    if (toggleBtn) toggleBtn.textContent = '👁 Показать код приложения';
+  }
+}
+
+// Генерация умного промпта с полной инструкцией платформы
+function generateEditPrompt() {
+  if (!currentEditingModule) return '';
+  
+  const sourceCode = editSourceCode?.value || '';
+  const changes = editChangesInput?.value.trim() || '';
+  
+  if (!changes) return '';
+  
+  // Полная инструкция для совместимости с платформой
+  const platformInstruction = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
+
+Требования:
+- Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
+- ВАЖНО: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности, так как создаётся копия приложения.
+- CSS в <style>, JS в <script>, без внешних библиотек
+- Адаптивный дизайн: работает на десктопе и мобильных
+- body { min-height: calc(100vh - 60px); margin: 0; }
+- Без alert/confirm/prompt (заблокированы в iframe)
+- Картинки/звуки только в Base64`;
+
+  const fullPrompt = `${platformInstruction}
+
+ЗАДАЧА: Модифицируй существующий HTML-код приложения согласно запросу пользователя.
+
+=== СУЩЕСТВУЮЩИЙ КОД ПРИЛОЖЕНИЯ ===
+${sourceCode}
+=== КОНЕЦ КОДА ===
+
+ЗАПРОС ПОЛЬЗОВАТЕЛЯ:
+${changes}
+
+ВАЖНЫЕ ПРАВИЛА:
+- Верни ТОЛЬКО полный обновлённый HTML-код, без объяснений и комментариев
+- ОБЯЗАТЕЛЬНО сгенерируй НОВОЕ уникальное значение "id" в manifest (добавь 6 случайных цифр к исходному ID)
+- Сохрани name, icon, description или обнови их, если пользователь об этом просил
+- Сохрани всю существующую функциональность, если пользователь не просил её изменить
+- Убедись, что код полностью рабочий и самодостаточный`;
+
+  return fullPrompt;
+}
+
+function copyEditPrompt() {
+  const prompt = generateEditPrompt();
+  const copyBtn = $('copy-edit-prompt-btn');
+  
+  if (!prompt) {
+    if (editStatus) {
+      editStatus.textContent = '❌ Сначала опишите, что нужно изменить';
+      editStatus.className = 'modal-status error';
+    }
+    return;
+  }
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(prompt).then(() => {
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт для AI', 2000);
+      }
+      if (editStatus) {
+        editStatus.textContent = '✅ Промпт скопирован! Откройте AI, вставьте и дождитесь ответа.';
+        editStatus.className = 'modal-status success';
+      }
+    });
+  } else {
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = prompt;
+    document.body.appendChild(tempTextarea);
+    tempTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextarea);
+    if (copyBtn) {
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт для AI', 2000);
+    }
+    if (editStatus) {
+      editStatus.textContent = '✅ Промпт скопирован!';
+      editStatus.className = 'modal-status success';
+    }
+  }
+}
+
+// Создание копии приложения с новым кодом
+async function applyEditChanges() {
+  if (!currentEditingModule) return;
+  if (!editNewCodeInput || !editStatus) return;
+  
+  const newCode = editNewCodeInput.value.trim();
+  if (!newCode) {
+    editStatus.textContent = '❌ Вставьте исправленный HTML-код';
+    editStatus.className = 'modal-status error';
+    return;
+  }
+  if (!newCode.includes('<html') && !newCode.includes('<!DOCTYPE')) {
+    editStatus.textContent = '❌ Это не похоже на HTML-код';
+    editStatus.className = 'modal-status error';
+    return;
+  }
+  
+  editStatus.textContent = '⏳ Анализ кода...';
+  editStatus.className = 'modal-status loading';
+  
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(newCode, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    if (!manifestScript) throw new Error('Не найден тег <script id="manifest">');
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    if (!manifest.id || !manifest.name || !manifest.icon) {
+      throw new Error('В manifest не хватает полей id, name или icon');
+    }
+    
+    // Проверка: ID должен измениться (иначе это не копия)
+    if (manifest.id === currentEditingModule.id) {
+      throw new Error('ID не изменился! Попросите AI сгенерировать новый уникальный ID (добавить 6 случайных цифр).');
+    }
+    
+    // Проверка на уникальность нового ID
+    if (allModules.some(m => m.id === manifest.id)) {
+      throw new Error('Приложение с таким ID уже существует. Попросите AI сгенерировать другой ID.');
+    }
+    
+    // Создаём копию
+    const newModule = {
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || `Копия: ${currentEditingModule.name}`,
+      content: newCode,
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    };
+    
+    customModules.push(newModule);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+    
+    if (!installedModules.includes(manifest.id)) {
+      installedModules.push(manifest.id);
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+    
+    const blob = new Blob([newCode], { type: 'text/html' });
+    allModules.push({
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || `Копия: ${currentEditingModule.name}`,
+      url: URL.createObjectURL(blob),
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    });
+    
+    editStatus.textContent = `✅ Копия "${manifest.name}" создана!`;
+    editStatus.className = 'modal-status success';
+    
+    setTimeout(() => {
+      closeEditModal();
+      renderInstalledApps();
+      renderAllApps();
+    }, 800);
+    
+  } catch (error) {
+    console.error(error);
+    editStatus.textContent = `❌ Ошибка: ${error.message}`;
+    editStatus.className = 'modal-status error';
+  }
+}
+
+// --- КНОПКА ОЧИСТКИ КЭША ---
 async function refreshApp() {
   const btn = $('refresh-btn');
   if (btn) btn.textContent = '⏳';
@@ -328,6 +579,7 @@ async function refreshApp() {
   }
 }
 
+// --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
   if (!addModal) return;
   addModal.classList.add('active');
@@ -488,12 +740,14 @@ async function addUrlModule() {
   } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
+// --- БЕЗОПАСНАЯ НАСТРОЙКА СОБЫТИЙ ---
 function setupEventListeners() {
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
+  // Создание приложения
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -503,8 +757,18 @@ function setupEventListeners() {
   
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
+  // Очистка кэша
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
+  // Редактирование приложения
+  $('close-edit-btn')?.addEventListener('click', closeEditModal);
+  $('cancel-edit-btn')?.addEventListener('click', closeEditModal);
+  $('toggle-code-btn')?.addEventListener('click', toggleCodeVisibility);
+  $('copy-edit-prompt-btn')?.addEventListener('click', copyEditPrompt);
+  $('apply-edit-btn')?.addEventListener('click', applyEditChanges);
+  editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+
+  // Добавить модуль
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
@@ -520,7 +784,7 @@ function setupEventListeners() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); }
+    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); }
   });
 }
 

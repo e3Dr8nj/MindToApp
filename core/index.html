@@ -58,14 +58,10 @@
         <button class="modal-close" id="close-create-btn">&times;</button>
       </div>
       <div class="modal-body">
-        
-        <!-- Шаг 1: Идея пользователя -->
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
           <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
         </div>
-
-        <!-- Шаг 2: Готовый промпт -->
         <div class="step-box">
           <h3>2. Готовый промпт (обновляется автоматически):</h3>
           <div class="prompt-code-box">
@@ -73,8 +69,6 @@
           </div>
           <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать готовый промпт</button>
         </div>
-
-        <!-- Шаг 3: Ресурсы -->
         <div class="step-box">
           <h3>3. Вставьте промпт в любой бесплатный AI:</h3>
           <div class="ai-links">
@@ -90,14 +84,11 @@
             <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
           </div>
         </div>
-
-        <!-- Шаг 4: Вставка кода -->
         <div class="step-box">
           <h3>4. Вставьте полученный HTML-код сюда:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдал нейросеть..."></textarea>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдала нейросеть..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
-
       </div>
       <div class="modal-footer">
         <button id="cancel-create-btn" class="btn btn-secondary">Отмена</button>
@@ -141,6 +132,73 @@
       <div class="modal-footer">
         <button id="cancel-modal-btn" class="btn btn-secondary">Отмена</button>
         <button id="confirm-add-btn" class="btn btn-primary">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Редактирование приложения -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content modal-edit">
+      <div class="modal-header">
+        <h2 id="edit-modal-title">✏️ Редактировать</h2>
+        <button class="modal-close" id="close-edit-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Превью приложения -->
+        <div class="edit-preview">
+          <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
+          <div class="edit-preview-info">
+            <div class="edit-preview-name" id="edit-preview-name">Название</div>
+            <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
+          </div>
+        </div>
+
+        <!-- Код приложения (скрыт по умолчанию) -->
+        <div class="step-box">
+          <button id="toggle-code-btn" class="btn btn-small">👁 Показать код приложения</button>
+          <textarea id="edit-source-code" class="code-input" style="display: none; margin-top: 10px;" readonly></textarea>
+        </div>
+
+        <!-- Описание изменений -->
+        <div class="step-box">
+          <h3>Что нужно изменить?</h3>
+          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмно-синим, увеличь шрифт, добавь кнопку сброса..."></textarea>
+        </div>
+
+        <!-- Кнопка копирования промпта -->
+        <div class="step-box">
+          <button id="copy-edit-prompt-btn" class="btn btn-small">📋 Скопировать промпт для AI</button>
+        </div>
+
+        <!-- Список AI -->
+        <div class="step-box">
+          <h3>Вставьте промпт в любой AI:</h3>
+          <div class="ai-links">
+            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
+            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+            <a href="https://gemini.google.com" target="_blank" class="ai-link">Gemini</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Copilot</a>
+            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral</a>
+            <a href="https://groq.com" target="_blank" class="ai-link">Groq</a>
+            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox</a>
+            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen</a>
+          </div>
+        </div>
+
+        <!-- Поле для вставки нового кода -->
+        <div class="step-box">
+          <h3>Вставьте исправленный HTML-код:</h3>
+          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте сюда код, который вернула нейросеть..."></textarea>
+          <div id="edit-status" class="modal-status"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-edit-btn" class="btn btn-secondary">Отмена</button>
+        <button id="apply-edit-btn" class="btn btn-primary">📋 Создать копию</button>
       </div>
     </div>
   </div>
