@@ -36,10 +36,8 @@ h1 { color: white; font-size: 24px; }
 .btn-primary:hover { background: #f0f0f0; }
 .btn-secondary { background: #e0e0e0; color: #333; }
 .btn-secondary:hover { background: #d0d0d0; }
-.btn-prompt { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3); }
-.btn-prompt:hover { background: rgba(255, 255, 255, 0.25); }
 
-.header-buttons { display: flex; gap: 10px; }
+.header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .app-grid {
   display: grid;
@@ -107,8 +105,7 @@ h1 { color: white; font-size: 24px; }
 }
 @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-/* Промпт модалка — шире */
-.modal-prompt { max-width: 650px; }
+.modal-create { max-width: 700px; max-height: 90vh; overflow-y: auto; }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .modal-header h2 { color: #333; font-size: 24px; margin: 0; }
@@ -129,15 +126,14 @@ h1 { color: white; font-size: 24px; }
 }
 .url-input:focus { border-color: #667eea; }
 
-/* Стили промпт-модалки */
-.prompt-explanation {
-  color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px;
-}
+/* Шаги создания приложения */
+.step-box { margin-bottom: 25px; }
+.step-box h3 { font-size: 15px; color: #333; margin-bottom: 10px; font-weight: 600; }
 
-.prompt-code-box { margin-bottom: 15px; }
+.prompt-code-box { position: relative; margin-bottom: 10px; }
 
 #prompt-text {
-  width: 100%; height: 220px;
+  width: 100%; height: 160px;
   background: #1e1e2e; color: #cdd6f4;
   border: none; border-radius: 10px;
   padding: 15px; font-family: 'Courier New', monospace;
@@ -145,14 +141,58 @@ h1 { color: white; font-size: 24px; }
   resize: vertical; outline: none;
 }
 
-.prompt-steps {
-  background: #f0f4ff; border-radius: 10px;
-  padding: 15px; font-size: 13px; color: #444; line-height: 1.6;
+.btn-small {
+  padding: 8px 16px; font-size: 13px;
+  background: #667eea; color: white;
+  border: none; border-radius: 6px;
+  cursor: pointer; transition: background 0.2s;
 }
-.prompt-steps p { margin-bottom: 8px; }
-.prompt-steps ol { padding-left: 20px; }
-.prompt-steps li { margin-bottom: 4px; }
-.prompt-steps code { background: #e0e7ff; padding: 1px 5px; border-radius: 3px; font-size: 12px; color: #667eea; }
+.btn-small:hover { background: #5568d3; }
+
+/* Поле для идеи */
+.idea-input {
+  width: 100%; height: 100px;
+  background: white; border: 2px solid #e0e0e0;
+  border-radius: 10px; padding: 15px;
+  font-size: 14px; line-height: 1.5;
+  resize: vertical; outline: none;
+  font-family: inherit;
+  transition: border-color 0.3s;
+}
+.idea-input:focus { border-color: #667eea; }
+.idea-input::placeholder { color: #94a3b8; }
+
+/* Ссылки на AI */
+.ai-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.ai-link {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px; background: #f0f4ff; color: #667eea;
+  text-decoration: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  transition: all 0.2s; border: 1px solid transparent;
+}
+.ai-link:hover {
+  background: #667eea; color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Поле для вставки кода */
+.code-input {
+  width: 100%; height: 200px;
+  background: #f8f9fa; border: 2px dashed #cbd5e1;
+  border-radius: 10px; padding: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px; color: #333;
+  resize: vertical; outline: none;
+  transition: border-color 0.3s;
+}
+.code-input:focus { border-color: #667eea; background: white; }
+.code-input::placeholder { color: #94a3b8; }
 
 /* Вкладки */
 .tab-switcher {
@@ -191,144 +231,10 @@ h1 { color: white; font-size: 24px; }
   .modal-header h2 { font-size: 20px; }
   #app-screen header { padding: 8px 15px; }
   #app-frame { height: calc(100vh - 55px); }
-  #prompt-text { height: 180px; font-size: 12px; }
-  .tab-btn { font-size: 12px; padding: 8px 4px; }
-}
-/* Стили для модального окна создания приложения */
-.modal-create {
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.step-box {
-  margin-bottom: 25px;
-}
-
-.step-box h3 {
-  font-size: 15px;
-  color: #333;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.prompt-code-box {
-  position: relative;
-  margin-bottom: 10px;
-}
-
-#prompt-text {
-  width: 100%;
-  height: 160px;
-  background: #1e1e2e;
-  color: #cdd6f4;
-  border: none;
-  border-radius: 10px;
-  padding: 15px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  resize: vertical;
-  outline: none;
-}
-
-.btn-small {
-  padding: 8px 16px;
-  font-size: 13px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-small:hover { background: #5568d3; }
-
-/* Сетка ссылок на AI */
-.ai-links {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
-}
-
-.ai-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  background: #f0f4ff;
-  color: #667eea;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-}
-
-.ai-link:hover {
-  background: #667eea;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
-}
-
-/* Поле для вставки кода */
-.code-input {
-  width: 100%;
-  height: 200px;
-  background: #f8f9fa;
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  padding: 15px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #333;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.code-input:focus {
-  border-color: #667eea;
-  background: white;
-}
-
-.code-input::placeholder {
-  color: #94a3b8;
-}
-
-@media (max-width: 600px) {
-  .modal-create { max-height: 95vh; padding: 20px; }
-  .ai-links { grid-template-columns: 1fr 1fr; }
   #prompt-text { height: 140px; font-size: 12px; }
   .code-input { height: 150px; font-size: 11px; }
-}
-/* Поле для ввода идеи пользователя */
-.idea-input {
-  width: 100%;
-  height: 100px;
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 15px;
-  font-size: 14px;
-  line-height: 1.5;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.3s;
-  font-family: inherit;
-}
-
-.idea-input:focus {
-  border-color: #667eea;
-}
-
-.idea-input::placeholder {
-  color: #94a3b8;
-}
-
-@media (max-width: 600px) {
+  .tab-btn { font-size: 12px; padding: 8px 4px; }
+  .modal-create { max-height: 95vh; padding: 20px; }
+  .ai-links { grid-template-columns: 1fr 1fr; }
   .idea-input { height: 80px; font-size: 13px; }
 }

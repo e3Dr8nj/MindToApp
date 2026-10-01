@@ -2,15 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-
-<meta http-equiv="Expires" content="0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NexusAI Platform</title>
   <link rel="stylesheet" href="styles.css">
-
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#667eea">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
@@ -21,6 +18,7 @@
     <header>
       <h1>🏠 Мои приложения</h1>
       <div class="header-buttons">
+        <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
         <button id="create-app-btn" class="btn btn-primary">✨ Создать приложение</button>
         <button id="add-custom-btn" class="btn">➕ Добавить</button>
         <button id="open-store-btn" class="btn">🛒 Магазин</button>
@@ -61,13 +59,13 @@
       </div>
       <div class="modal-body">
         
-        <!-- Шаг 1: Промпт + Моя идея -->
+        <!-- Шаг 1: Идея пользователя -->
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
           <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
         </div>
 
-        <!-- Шаг 2: Промпт для копирования -->
+        <!-- Шаг 2: Готовый промпт -->
         <div class="step-box">
           <h3>2. Готовый промпт (обновляется автоматически):</h3>
           <div class="prompt-code-box">
@@ -93,7 +91,7 @@
           </div>
         </div>
 
-        <!-- Шаг 4: Вставка и создание -->
+        <!-- Шаг 4: Вставка кода -->
         <div class="step-box">
           <h3>4. Вставьте полученный HTML-код сюда:</h3>
           <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдал нейросеть..."></textarea>
@@ -108,7 +106,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно: Добавить модуль (старое, для ссылок/файлов) -->
+  <!-- Модальное окно: Добавить модуль -->
   <div id="add-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">

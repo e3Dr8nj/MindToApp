@@ -8,7 +8,6 @@ let selectedLocalFile = null;
 let selectedFolderFiles = null;
 const activeVirtualFS = new Map();
 
-// Безопасный помощник для поиска элементов
 const $ = (id) => document.getElementById(id);
 
 const homeScreen = $('home-screen');
@@ -32,7 +31,6 @@ const createStatus = $('create-status');
 const userIdeaInput = $('user-idea-input');
 const promptText = $('prompt-text');
 
-// Базовый промпт (без описания задачи)
 const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html.
 
 Требования:
@@ -52,7 +50,6 @@ async function init() {
   updatePromptPreview();
 }
 
-// Обновление промпта в реальном времени
 function updatePromptPreview() {
   if (!promptText) return;
   const userIdea = userIdeaInput?.value.trim() || '[опиши здесь функционал и дизайн приложения]';
@@ -211,7 +208,6 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
-// --- ЛОГИКА СОЗДАНИЯ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
 function openCreateModal() {
   if (createModal) {
     createModal.classList.add('active');
@@ -232,7 +228,6 @@ function closeCreateModal() {
 function copyPrompt() {
   if (!promptText) return;
   const copyBtn = $('copy-prompt-btn');
-  
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(promptText.value).then(() => {
       if (copyBtn) {
@@ -271,9 +266,7 @@ async function createAppFromText() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(code, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
     if (!manifestScript) throw new Error('Не найден тег <script id="manifest">');
-    
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('В manifest не хватает полей id, name или icon');
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
@@ -291,7 +284,6 @@ async function createAppFromText() {
 
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
     if (!installedModules.includes(manifest.id)) {
       installedModules.push(manifest.id);
       localStorage.setItem('installedModules', JSON.stringify(installedModules));
@@ -316,35 +308,25 @@ async function createAppFromText() {
   }
 }
 
-// --- КНОПКА ОЧИСТКИ КЭША ---
 async function refreshApp() {
   const btn = $('refresh-btn');
   if (btn) btn.textContent = '⏳';
-  
   try {
-    // 1. Очищаем все кэши Service Worker
     if ('caches' in window) {
       const names = await caches.keys();
       await Promise.all(names.map(name => caches.delete(name)));
     }
-    
-    // 2. Перерегистрируем Service Worker
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map(reg => reg.unregister()));
     }
-    
-    // 3. Жёсткая перезагрузка
-    setTimeout(() => {
-      window.location.reload();
-    }, 500);
+    setTimeout(() => { window.location.reload(); }, 500);
   } catch (error) {
     console.error('Ошибка очистки кэша:', error);
     window.location.reload();
   }
 }
 
-// --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
   if (!addModal) return;
   addModal.classList.add('active');
@@ -505,14 +487,12 @@ async function addUrlModule() {
   } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
-// --- БЕЗОПАСНАЯ НАСТРОЙКА СОБЫТИЙ ---
 function setupEventListeners() {
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Создание приложения через AI
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -520,13 +500,10 @@ function setupEventListeners() {
   $('confirm-create-btn')?.addEventListener('click', createAppFromText);
   createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
   
-  // Обновление промпта при вводе идеи
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
-  // Кнопка очистки кэша
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Добавить модуль (URL/файл/папка)
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
