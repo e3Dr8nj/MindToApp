@@ -1,8 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -11,15 +7,8 @@ body {
   color: #333;
 }
 
-.screen {
-  display: none;
-  min-height: 100vh;
-  padding: 20px;
-}
-
-.screen.active {
-  display: block;
-}
+.screen { display: none; min-height: 100vh; padding: 20px; }
+.screen.active { display: block; }
 
 header {
   display: flex;
@@ -30,10 +19,7 @@ header {
   gap: 10px;
 }
 
-h1 {
-  color: white;
-  font-size: 24px;
-}
+h1 { color: white; font-size: 24px; }
 
 .btn {
   padding: 10px 20px;
@@ -45,34 +31,15 @@ h1 {
   font-size: 16px;
   transition: background 0.3s;
 }
+.btn:hover { background: rgba(255, 255, 255, 0.3); }
+.btn-primary { background: white; color: #667eea; font-weight: bold; }
+.btn-primary:hover { background: #f0f0f0; }
+.btn-secondary { background: #e0e0e0; color: #333; }
+.btn-secondary:hover { background: #d0d0d0; }
+.btn-prompt { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3); }
+.btn-prompt:hover { background: rgba(255, 255, 255, 0.25); }
 
-.btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.btn-primary {
-  background: white;
-  color: #667eea;
-  font-weight: bold;
-}
-
-.btn-primary:hover {
-  background: #f0f0f0;
-}
-
-.btn-secondary {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.btn-secondary:hover {
-  background: #d0d0d0;
-}
-
-.header-buttons {
-  display: flex;
-  gap: 10px;
-}
+.header-buttons { display: flex; gap: 10px; }
 
 .app-grid {
   display: grid;
@@ -92,356 +59,138 @@ h1 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
 }
-
-.app-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-}
-
-.app-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-}
-
-.app-name {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.app-description {
-  font-size: 12px;
-  color: #666;
-  margin-bottom: 10px;
-}
+.app-card:hover { transform: translateY(-5px); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); }
+.app-icon { font-size: 48px; margin-bottom: 10px; }
+.app-name { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+.app-description { font-size: 12px; color: #666; margin-bottom: 10px; }
 
 .install-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #667eea;
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  width: 100%;
-  transition: background 0.3s;
+  padding: 6px 12px; border: none; border-radius: 6px;
+  background: #667eea; color: white; cursor: pointer;
+  font-size: 12px; width: 100%; transition: background 0.3s;
 }
-
-.install-btn:hover {
-  background: #5568d3;
-}
-
-.install-btn.installed {
-  background: #e74c3c;
-}
-
-.install-btn.installed:hover {
-  background: #c0392b;
-}
+.install-btn:hover { background: #5568d3; }
+.install-btn.installed { background: #e74c3c; }
 
 .delete-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #e74c3c;
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-  opacity: 0.7;
-  line-height: 1;
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px; border: none; border-radius: 50%;
+  background: #e74c3c; color: white; cursor: pointer;
+  font-size: 16px; display: flex; align-items: center;
+  justify-content: center; opacity: 0.7; line-height: 1;
 }
+.delete-btn:hover { opacity: 1; transform: scale(1.1); }
 
-.delete-btn:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
+.empty-state { text-align: center; color: white; padding: 60px 20px; }
+.empty-state p { font-size: 18px; margin-bottom: 20px; }
 
-.empty-state {
-  text-align: center;
-  color: white;
-  padding: 60px 20px;
-}
+#app-screen { padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+#app-screen.active { display: flex; }
+#app-screen header { background: white; padding: 10px 20px; margin: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; z-index: 100; }
+#app-screen h1 { color: #333; font-size: 18px; margin: 0; }
+#app-frame { width: 100%; height: calc(100vh - 60px); border: none; display: block; background: white; flex: 1; }
 
-.empty-state p {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-#app-screen {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-#app-screen.active {
-  display: flex;
-}
-
-#app-screen header {
-  background: white;
-  padding: 10px 20px;
-  margin: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
-  z-index: 100;
-}
-
-#app-screen h1 {
-  color: #333;
-  font-size: 18px;
-  margin: 0;
-}
-
-#app-frame {
-  width: 100%;
-  height: calc(100vh - 60px);
-  border: none;
-  display: block;
-  background: white;
-  flex: 1;
-}
-
-/* Модальное окно */
+/* Модальные окна */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  display: none; position: fixed; z-index: 1000;
+  left: 0; top: 0; width: 100%; height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
 }
-
-.modal.active {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+.modal.active { display: flex; justify-content: center; align-items: center; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  max-width: 500px;
-  width: 90%;
+  background: white; border-radius: 20px; padding: 30px;
+  max-width: 500px; width: 90%;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s;
 }
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+/* Промпт модалка — шире */
+.modal-prompt { max-width: 650px; }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.modal-header h2 {
-  color: #333;
-  font-size: 24px;
-  margin: 0;
-}
-
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-header h2 { color: #333; font-size: 24px; margin: 0; }
 .modal-close {
-  background: none;
-  border: none;
-  font-size: 32px;
-  color: #999;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s;
+  background: none; border: none; font-size: 32px; color: #999;
+  cursor: pointer; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: all 0.3s;
 }
-
-.modal-close:hover {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.modal-body {
-  margin-bottom: 20px;
-}
-
-.modal-description {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 15px;
-  line-height: 1.5;
-}
-
-.modal-description code {
-  background: #f5f5f5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: #667eea;
-}
-
+.modal-close:hover { background: #f5f5f5; color: #333; }
+.modal-body { margin-bottom: 20px; }
+.modal-description { color: #666; font-size: 14px; margin-bottom: 15px; line-height: 1.5; }
+.modal-description code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #667eea; }
 .url-input {
-  width: 100%;
-  padding: 14px;
-  border: 2px solid #e0e0e0;
-  border-radius: 10px;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.3s;
+  width: 100%; padding: 14px; border: 2px solid #e0e0e0;
+  border-radius: 10px; font-size: 15px; outline: none;
   font-family: 'Courier New', monospace;
 }
+.url-input:focus { border-color: #667eea; }
 
-.url-input:focus {
-  border-color: #667eea;
+/* Стили промпт-модалки */
+.prompt-explanation {
+  color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 15px;
 }
 
-/* Стили для вкладок в модальном окне */
+.prompt-code-box { margin-bottom: 15px; }
+
+#prompt-text {
+  width: 100%; height: 220px;
+  background: #1e1e2e; color: #cdd6f4;
+  border: none; border-radius: 10px;
+  padding: 15px; font-family: 'Courier New', monospace;
+  font-size: 13px; line-height: 1.5;
+  resize: vertical; outline: none;
+}
+
+.prompt-steps {
+  background: #f0f4ff; border-radius: 10px;
+  padding: 15px; font-size: 13px; color: #444; line-height: 1.6;
+}
+.prompt-steps p { margin-bottom: 8px; }
+.prompt-steps ol { padding-left: 20px; }
+.prompt-steps li { margin-bottom: 4px; }
+.prompt-steps code { background: #e0e7ff; padding: 1px 5px; border-radius: 3px; font-size: 12px; color: #667eea; }
+
+/* Вкладки */
 .tab-switcher {
-  display: flex;
-  background: #f0f0f0;
-  border-radius: 10px;
-  padding: 4px;
-  margin-top: 20px;
-  margin-bottom: 15px;
+  display: flex; background: #f0f0f0;
+  border-radius: 10px; padding: 4px;
+  margin-top: 20px; margin-bottom: 15px;
 }
-
 .tab-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #666;
-  transition: all 0.3s;
+  flex: 1; padding: 10px; border: none; background: transparent;
+  border-radius: 8px; cursor: pointer; font-size: 14px;
+  font-weight: 600; color: #666; transition: all 0.3s;
 }
+.tab-btn.active { background: white; color: #667eea; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.tab-btn:hover:not(.active) { color: #333; }
 
-.tab-btn.active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+.modal-status { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 14px; text-align: center; min-height: 20px; }
+.modal-status:empty { display: none; }
+.modal-status.error { background: #fee; color: #c33; }
+.modal-status.success { background: #efe; color: #3c3; }
+.modal-status.loading { background: #eef; color: #667eea; }
 
-.tab-btn:hover:not(.active) {
-  color: #333;
-}
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
 
-.modal-status {
-  margin-top: 15px;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  text-align: center;
-  min-height: 20px;
-}
-
-.modal-status:empty {
-  display: none;
-}
-
-.modal-status.error {
-  background: #fee;
-  color: #c33;
-}
-
-.modal-status.success {
-  background: #efe;
-  color: #3c3;
-}
-
-.modal-status.loading {
-  background: #eef;
-  color: #667eea;
-}
-
-.modal-footer {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-/* Адаптивность */
-@media (max-width: 600px) {
-  .app-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 15px;
-  }
-  
-  .app-icon {
-    font-size: 36px;
-  }
-  
-  h1 {
-    font-size: 20px;
-  }
-  
-  .header-buttons {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .header-buttons .btn {
-    padding: 8px 15px;
-    font-size: 14px;
-  }
-  
-  .modal-content {
-    padding: 20px;
-  }
-  
-  .modal-header h2 {
-    font-size: 20px;
-  }
-  
-  #app-screen header {
-    padding: 8px 15px;
-  }
-  
-  #app-frame {
-    height: calc(100vh - 55px);
-  }
-}
-/* Предупреждение для вкладки "Папка" */
 .folder-warning {
-  margin-top: 15px;
-  padding: 10px;
-  background: #fff3cd;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #856404;
-  text-align: center;
-  line-height: 1.4;
+  margin-top: 15px; padding: 10px; background: #fff3cd;
+  border-radius: 8px; font-size: 12px; color: #856404; text-align: center;
 }
 
-/* Адаптация переключателя вкладок под 3 кнопки */
-@media (max-width: 500px) {
-  .tab-btn {
-    font-size: 12px;
-    padding: 8px 4px;
-  }
+@media (max-width: 600px) {
+  .app-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
+  .app-icon { font-size: 36px; }
+  h1 { font-size: 20px; }
+  .header-buttons { flex-direction: column; gap: 5px; }
+  .header-buttons .btn { padding: 8px 15px; font-size: 14px; }
+  .modal-content { padding: 20px; }
+  .modal-header h2 { font-size: 20px; }
+  #app-screen header { padding: 8px 15px; }
+  #app-frame { height: calc(100vh - 55px); }
+  #prompt-text { height: 180px; font-size: 12px; }
+  .tab-btn { font-size: 12px; padding: 8px 4px; }
 }

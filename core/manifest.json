@@ -3,7 +3,7 @@
   "short_name": "NexusAl",
   "description": "Платформа для AI-микроприложений",
   
-  "start_url": "/NexusAl/core/index.html?v=3",
+  "start_url": "/NexusAl/core/index.html?v=4",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

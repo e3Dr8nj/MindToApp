@@ -1,7 +1,5 @@
-// Конфигурация
 const REGISTRY_URL = 'https://e3dr8nj.github.io/NexusAl/registry/registry.json';
 
-// Состояние приложения
 let allModules = [];
 let installedModules = JSON.parse(localStorage.getItem('installedModules') || '[]');
 let customModules = JSON.parse(localStorage.getItem('customModules') || '[]');
@@ -9,11 +7,8 @@ let currentTab = 'url';
 let selectedLocalFile = null;
 let selectedFolderFiles = null;
 let selectedFolderName = '';
-
-// Активные виртуальные файловые системы (чтобы можно было их очищать)
 const activeVirtualFS = new Map();
 
-// DOM элементы
 const homeScreen = document.getElementById('home-screen');
 const storeScreen = document.getElementById('store-screen');
 const appScreen = document.getElementById('app-screen');
@@ -29,23 +24,18 @@ const localFileInput = document.getElementById('local-file-input');
 const selectedFileName = document.getElementById('selected-file-name');
 const folderInput = document.getElementById('folder-input');
 const selectedFolderInfo = document.getElementById('selected-folder-info');
+const promptModal = document.getElementById('prompt-modal');
 
-// Инициализация
 async function init() {
-  console.log('Инициализация приложения...');
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
-  console.log('Приложение готово. Загружено модулей:', allModules.length);
 }
 
-// Загрузка реестра и восстановление всех модулей
 async function loadRegistry() {
   try {
-    console.log('Загрузка реестра из:', REGISTRY_URL);
     const response = await fetch(REGISTRY_URL);
     const data = await response.json();
-    
     const registryModules = await Promise.all(
       data.modules.map(async (module) => {
         try {
@@ -55,7 +45,6 @@ async function loadRegistry() {
           const parser = new DOMParser();
           const doc = parser.parseFromString(htmlText, 'text/html');
           const manifestScript = doc.getElementById('manifest');
-          
           if (manifestScript) {
             return { ...JSON.parse(manifestScript.textContent), url: module.url, isCustom: false, isLocal: false, isFolder: false };
           }
@@ -65,81 +54,40 @@ async function loadRegistry() {
         return null;
       })
     );
-    
     const validRegistryModules = registryModules.filter(m => m !== null);
-    
-    // Восстанавливаем одиночные локальные модули из localStorage
     const restoredLocalModules = customModules.filter(m => m.isLocal && !m.isFolder).map(m => {
       const blob = new Blob([m.content], { type: 'text/html' });
-      return {
-        id: m.id,
-        name: m.name,
-        icon: m.icon,
-        description: m.description,
-        url: URL.createObjectURL(blob),
-        isCustom: true,
-        isLocal: true,
-        isFolder: false
-      };
+      return { id: m.id, name: m.name, icon: m.icon, description: m.description, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false };
     });
-    
-    // Восстанавливаем папки модулей из IndexedDB
     let restoredFolderModules = [];
     try {
       const folderModulesData = await getAllFolderModules();
       restoredFolderModules = folderModulesData.map(folderData => {
         const vfs = createVirtualFS(folderData);
         activeVirtualFS.set(folderData.id, vfs);
-        return {
-          id: folderData.manifest.id,
-          name: folderData.manifest.name,
-          icon: folderData.manifest.icon,
-          description: folderData.manifest.description || 'Папка модуля',
-          url: vfs.url,
-          isCustom: true,
-          isLocal: true,
-          isFolder: true
-        };
+        return { id: folderData.manifest.id, name: folderData.manifest.name, icon: folderData.manifest.icon, description: folderData.manifest.description || 'Папка модуля', url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
       });
-    } catch (error) {
-      console.error('Ошибка восстановления папок модулей:', error);
-    }
-    
+    } catch (error) { console.error(error); }
     allModules = [...validRegistryModules, ...restoredLocalModules, ...restoredFolderModules];
-    console.log('Успешно загружено модулей:', allModules.length);
-    
   } catch (error) {
     console.error('Ошибка загрузки реестра:', error);
-    // Даже если реестр не загрузился, показываем локальные модули
     const restoredLocalModules = customModules.filter(m => m.isLocal && !m.isFolder).map(m => {
       const blob = new Blob([m.content], { type: 'text/html' });
       return { ...m, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false };
     });
-    
     let restoredFolderModules = [];
     try {
       const folderModulesData = await getAllFolderModules();
       restoredFolderModules = folderModulesData.map(folderData => {
         const vfs = createVirtualFS(folderData);
         activeVirtualFS.set(folderData.id, vfs);
-        return {
-          ...folderData.manifest,
-          description: folderData.manifest.description || 'Папка модуля',
-          url: vfs.url,
-          isCustom: true,
-          isLocal: true,
-          isFolder: true
-        };
+        return { ...folderData.manifest, description: folderData.manifest.description || 'Папка модуля', url: vfs.url, isCustom: true, isLocal: true, isFolder: true };
       });
-    } catch (e) {
-      console.error(e);
-    }
-    
+    } catch (e) { console.error(e); }
     allModules = [...restoredLocalModules, ...restoredFolderModules];
   }
 }
 
-// Отрисовка установленных приложений
 function renderInstalledApps() {
   installedAppsContainer.innerHTML = '';
   if (installedModules.length === 0) {
@@ -149,7 +97,6 @@ function renderInstalledApps() {
   }
   emptyState.style.display = 'none';
   installedAppsContainer.style.display = 'grid';
-  
   installedModules.forEach(moduleId => {
     const module = allModules.find(m => m.id === moduleId);
     if (module) {
@@ -159,7 +106,6 @@ function renderInstalledApps() {
   });
 }
 
-// Отрисовка всех приложений в магазине
 function renderAllApps() {
   allAppsContainer.innerHTML = '';
   if (allModules.length === 0) {
@@ -172,44 +118,28 @@ function renderAllApps() {
   });
 }
 
-// Создание карточки приложения
 function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
-  
-  card.innerHTML = `
-    <div class="app-icon">${module.icon}</div>
-    <div class="app-name">${module.name}</div>
-    <div class="app-description">${module.description}</div>
-  `;
-  
+  card.innerHTML = `<div class="app-icon">${module.icon}</div><div class="app-name">${module.name}</div><div class="app-description">${module.description}</div>`;
   if (!isInstalled) {
     const installBtn = document.createElement('button');
     installBtn.className = 'install-btn';
     installBtn.textContent = installedModules.includes(module.id) ? 'Удалить' : 'Установить';
     if (installedModules.includes(module.id)) installBtn.classList.add('installed');
-    
-    installBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleInstall(module.id);
-    });
+    installBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleInstall(module.id); });
     card.appendChild(installBtn);
   } else {
     card.addEventListener('click', () => openApp(module));
   }
-  
   if (module.isCustom) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.textContent = '✕';
     deleteBtn.title = 'Удалить модуль';
-    deleteBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      removeCustomModule(module.id);
-    });
+    deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); removeCustomModule(module.id); });
     card.appendChild(deleteBtn);
   }
-  
   return card;
 }
 
@@ -217,7 +147,6 @@ function toggleInstall(moduleId) {
   const index = installedModules.indexOf(moduleId);
   if (index > -1) installedModules.splice(index, 1);
   else installedModules.push(moduleId);
-  
   localStorage.setItem('installedModules', JSON.stringify(installedModules));
   renderInstalledApps();
   renderAllApps();
@@ -225,28 +154,17 @@ function toggleInstall(moduleId) {
 
 async function removeCustomModule(moduleId) {
   if (!confirm('Удалить этот модуль?')) return;
-  
-  // Если это папка модуля — удаляем из IndexedDB
   const module = allModules.find(m => m.id === moduleId);
   if (module && module.isFolder) {
     try {
       await deleteFolderModule(moduleId);
-      // Освобождаем Blob URL
-      if (activeVirtualFS.has(moduleId)) {
-        activeVirtualFS.get(moduleId).cleanup();
-        activeVirtualFS.delete(moduleId);
-      }
-    } catch (error) {
-      console.error('Ошибка удаления из IndexedDB:', error);
-    }
+      if (activeVirtualFS.has(moduleId)) { activeVirtualFS.get(moduleId).cleanup(); activeVirtualFS.delete(moduleId); }
+    } catch (error) { console.error(error); }
   }
-  
   customModules = customModules.filter(m => m.id !== moduleId);
   installedModules = installedModules.filter(id => id !== moduleId);
-  
   localStorage.setItem('customModules', JSON.stringify(customModules));
   localStorage.setItem('installedModules', JSON.stringify(installedModules));
-  
   allModules = allModules.filter(m => m.id !== moduleId);
   renderInstalledApps();
   renderAllApps();
@@ -268,6 +186,33 @@ function showScreen(screen) {
   screen.classList.add('active');
 }
 
+// --- Промпт модалка ---
+function openPromptModal() {
+  promptModal.classList.add('active');
+}
+
+function closePromptModal() {
+  promptModal.classList.remove('active');
+}
+
+function copyPrompt() {
+  const promptText = document.getElementById('prompt-text');
+  const copyBtn = document.getElementById('copy-prompt-btn');
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(promptText.value).then(() => {
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+    });
+  } else {
+    promptText.select();
+    document.execCommand('copy');
+    copyBtn.textContent = '✅ Скопировано!';
+    setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+  }
+}
+
+// --- Добавить модуль модалка ---
 function openAddModal() {
   addModal.classList.add('active');
   moduleUrlInput.value = '';
@@ -283,51 +228,39 @@ function openAddModal() {
   switchTab('url');
 }
 
-function closeAddModal() {
-  addModal.classList.remove('active');
-}
+function closeAddModal() { addModal.classList.remove('active'); }
 
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
   document.querySelector(`.tab[data-tab="${tab}"]`).style.display = 'block';
-  
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`.tab-btn[data-target="${tab}"]`).classList.add('active');
-  
   modalStatus.textContent = '';
 }
 
-// Обработка выбора локального файла
 localFileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  
   if (!file.name.toLowerCase().endsWith('.html')) {
-    modalStatus.textContent = '❌ Пожалуйста, выберите файл с расширением .html';
+    modalStatus.textContent = '❌ Выберите файл .html';
     modalStatus.className = 'modal-status error';
     selectedLocalFile = null;
     selectedFileName.textContent = '';
     return;
   }
-  
   selectedLocalFile = file;
   selectedFileName.textContent = `✅ Выбран: ${file.name}`;
   modalStatus.textContent = '';
 });
 
-// Обработка выбора папки
 folderInput.addEventListener('change', (e) => {
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  
-  // Проверяем наличие index.html
   const indexFile = files.find(f => {
-    // webkitdirectory возвращает пути вида "folderName/index.html"
     const parts = f.webkitRelativePath.split('/');
     return parts[parts.length - 1].toLowerCase() === 'index.html';
   });
-  
   if (!indexFile) {
     modalStatus.textContent = '❌ В папке должен быть файл index.html';
     modalStatus.className = 'modal-status error';
@@ -335,259 +268,104 @@ folderInput.addEventListener('change', (e) => {
     selectedFolderInfo.textContent = '';
     return;
   }
-  
-  // Получаем имя корневой папки
   const rootFolder = indexFile.webkitRelativePath.split('/')[0];
   selectedFolderName = rootFolder;
   selectedFolderFiles = files;
-  
   const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-  const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-  selectedFolderInfo.textContent = `✅ Папка: ${rootFolder} (${files.length} файлов, ${sizeMB} МБ)`;
+  selectedFolderInfo.textContent = `✅ Папка: ${rootFolder} (${files.length} файлов, ${(totalSize / 1048576).toFixed(2)} МБ)`;
   modalStatus.textContent = '';
 });
 
-// Добавление модуля (URL / Локальный файл / Папка)
 async function addModule() {
-  if (currentTab === 'folder') {
-    await addFolderModule();
-  } else if (currentTab === 'local') {
-    await addLocalFileModule();
-  } else {
-    await addUrlModule();
-  }
+  if (currentTab === 'folder') await addFolderModule();
+  else if (currentTab === 'local') await addLocalFileModule();
+  else await addUrlModule();
 }
 
-// Добавление одиночного локального файла
 async function addLocalFileModule() {
-  if (!selectedLocalFile) {
-    modalStatus.textContent = '❌ Выберите файл';
-    modalStatus.className = 'modal-status error';
-    return;
-  }
-  
-  modalStatus.textContent = '⏳ Чтение файла...';
-  modalStatus.className = 'modal-status loading';
-  
+  if (!selectedLocalFile) { modalStatus.textContent = '❌ Выберите файл'; modalStatus.className = 'modal-status error'; return; }
+  modalStatus.textContent = '⏳ Чтение файла...'; modalStatus.className = 'modal-status loading';
   try {
     const fileText = await selectedLocalFile.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(fileText, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
-    if (!manifestScript) throw new Error('Manifest не найден в файле');
-    
+    if (!manifestScript) throw new Error('Manifest не найден');
     const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля в manifest');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль с таким ID уже добавлен');
-    
-    const newModule = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
-      description: manifest.description || 'Локальный модуль',
-      content: fileText,
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    };
-    
+    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
+    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
+    const newModule = { id: manifest.id, name: manifest.name, icon: manifest.icon, description: manifest.description || 'Локальный модуль', content: fileText, isCustom: true, isLocal: true, isFolder: false };
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
-    }
-    
+    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
     const blob = new Blob([fileText], { type: 'text/html' });
     allModules.push({ ...manifest, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
-    
-    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`;
-    modalStatus.className = 'modal-status success';
-    
-    setTimeout(() => {
-      closeAddModal();
-      renderInstalledApps();
-      renderAllApps();
-    }, 1000);
-    
-  } catch (error) {
-    console.error('Ошибка:', error);
-    modalStatus.textContent = `❌ Ошибка: ${error.message}`;
-    modalStatus.className = 'modal-status error';
-  }
+    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success';
+    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
+  } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
-// Добавление папки модуля
 async function addFolderModule() {
-  if (!selectedFolderFiles || !selectedFolderFiles.length) {
-    modalStatus.textContent = '❌ Выберите папку';
-    modalStatus.className = 'modal-status error';
-    return;
-  }
-  
-  modalStatus.textContent = '⏳ Чтение файлов...';
-  modalStatus.className = 'modal-status loading';
-  
+  if (!selectedFolderFiles || !selectedFolderFiles.length) { modalStatus.textContent = '❌ Выберите папку'; modalStatus.className = 'modal-status error'; return; }
+  modalStatus.textContent = '⏳ Чтение файлов...'; modalStatus.className = 'modal-status loading';
   try {
-    // Находим index.html
-    const indexFile = selectedFolderFiles.find(f => {
-      const parts = f.webkitRelativePath.split('/');
-      return parts[parts.length - 1].toLowerCase() === 'index.html';
-    });
-    
+    const indexFile = selectedFolderFiles.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
     if (!indexFile) throw new Error('index.html не найден');
-    
     const mainHtml = await indexFile.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(mainHtml, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
-    if (!manifestScript) throw new Error('Manifest не найден в index.html');
-    
+    if (!manifestScript) throw new Error('Manifest не найден');
     const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля в manifest');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль с таким ID уже добавлен');
-    
-    // Читаем все файлы в Blob'ы
+    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
+    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
     modalStatus.textContent = `⏳ Загрузка ${selectedFolderFiles.length} файлов...`;
-    
     const files = [];
     for (const file of selectedFolderFiles) {
-      // Путь относительно корневой папки
       const parts = file.webkitRelativePath.split('/');
       const relativePath = parts.slice(1).join('/');
-      
-      // Пропускаем сам index.html — он уже прочитан
-      if (parts[parts.length - 1].toLowerCase() === 'index.html') continue;
-      
-      // Пропускаем пустые пути
-      if (!relativePath) continue;
-      
-      files.push({
-        path: relativePath,
-        blob: file
-      });
+      if (parts[parts.length - 1].toLowerCase() === 'index.html' || !relativePath) continue;
+      files.push({ path: relativePath, blob: file });
     }
-    
-    // Сохраняем в IndexedDB
     await saveFolderModule(manifest.id, manifest, files, mainHtml);
-    
-    // Добавляем в список пользовательских модулей (без content, т.к. он в IndexedDB)
-    const customEntry = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
-      description: manifest.description || 'Папка модуля',
-      isCustom: true,
-      isLocal: true,
-      isFolder: true
-    };
+    const customEntry = { id: manifest.id, name: manifest.name, icon: manifest.icon, description: manifest.description || 'Папка модуля', isCustom: true, isLocal: true, isFolder: true };
     customModules.push(customEntry);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
-    }
-    
-    // Создаём виртуальную ФС для текущего сеанса
-    const folderData = {
-      id: manifest.id,
-      manifest: manifest,
-      files: files,
-      mainHtml: mainHtml
-    };
+    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
+    const folderData = { id: manifest.id, manifest, files, mainHtml };
     const vfs = createVirtualFS(folderData);
     activeVirtualFS.set(manifest.id, vfs);
-    
-    allModules.push({
-      ...manifest,
-      url: vfs.url,
-      isCustom: true,
-      isLocal: true,
-      isFolder: true
-    });
-    
-    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен (${files.length} файлов)!`;
-    modalStatus.className = 'modal-status success';
-    
-    setTimeout(() => {
-      closeAddModal();
-      renderInstalledApps();
-      renderAllApps();
-    }, 1000);
-    
-  } catch (error) {
-    console.error('Ошибка:', error);
-    modalStatus.textContent = `❌ Ошибка: ${error.message}`;
-    modalStatus.className = 'modal-status error';
-  }
+    allModules.push({ ...manifest, url: vfs.url, isCustom: true, isLocal: true, isFolder: true });
+    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success';
+    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
+  } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
-// Добавление модуля по URL
 async function addUrlModule() {
   let url = moduleUrlInput.value.trim();
-  if (!url) {
-    modalStatus.textContent = '❌ Введите URL';
-    modalStatus.className = 'modal-status error';
-    return;
-  }
+  if (!url) { modalStatus.textContent = '❌ Введите URL'; modalStatus.className = 'modal-status error'; return; }
   if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
   if (!url.endsWith('/') && !url.endsWith('.html')) url += '/';
-  
-  modalStatus.textContent = '⏳ Загрузка модуля...';
-  modalStatus.className = 'modal-status loading';
-  
+  modalStatus.textContent = '⏳ Загрузка модуля...'; modalStatus.className = 'modal-status loading';
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
     const htmlText = await response.text();
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlText, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
     if (!manifestScript) throw new Error('Manifest не найден');
-    
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    
-    const newModule = { 
-      ...manifest, 
-      description: manifest.description || 'Пользовательский модуль', 
-      url, 
-      isCustom: true, 
-      isLocal: false,
-      isFolder: false
-    };
-    
+    const newModule = { ...manifest, description: manifest.description || 'Пользовательский модуль', url, isCustom: true, isLocal: false, isFolder: false };
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
-    }
-    
+    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
     allModules.push(newModule);
-    
-    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`;
-    modalStatus.className = 'modal-status success';
-    
-    setTimeout(() => {
-      closeAddModal();
-      renderInstalledApps();
-      renderAllApps();
-    }, 1000);
-    
-  } catch (error) {
-    console.error('Ошибка:', error);
-    modalStatus.textContent = `❌ Ошибка: ${error.message}`;
-    modalStatus.className = 'modal-status error';
-  }
+    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success';
+    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
+  } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
 function setupEventListeners() {
@@ -595,23 +373,31 @@ function setupEventListeners() {
   document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen(homeScreen));
   document.getElementById('go-to-store-btn').addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   document.getElementById('close-app-btn').addEventListener('click', closeApp);
-  
+
+  // Промпт модалка
+  document.getElementById('prompt-btn').addEventListener('click', openPromptModal);
+  document.getElementById('close-prompt-btn').addEventListener('click', closePromptModal);
+  document.getElementById('close-prompt-footer-btn').addEventListener('click', closePromptModal);
+  document.getElementById('copy-prompt-btn').addEventListener('click', copyPrompt);
+  promptModal.addEventListener('click', (e) => { if (e.target === promptModal) closePromptModal(); });
+
+  // Добавить модуль модалка
   document.getElementById('add-custom-btn').addEventListener('click', openAddModal);
   document.getElementById('add-custom-btn-store').addEventListener('click', openAddModal);
-  
   document.getElementById('close-modal-btn').addEventListener('click', closeAddModal);
   document.getElementById('cancel-modal-btn').addEventListener('click', closeAddModal);
   document.getElementById('confirm-add-btn').addEventListener('click', addModule);
-  
   addModal.addEventListener('click', (e) => { if (e.target === addModal) closeAddModal(); });
   moduleUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addModule(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && addModal.classList.contains('active')) closeAddModal(); });
-  
   document.getElementById('select-file-btn').addEventListener('click', () => localFileInput.click());
   document.getElementById('select-folder-btn').addEventListener('click', () => folderInput.click());
-  
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
+  });
+
+  // Escape закрывает любую модалку
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closePromptModal(); closeAddModal(); }
   });
 }
 
