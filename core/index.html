@@ -55,28 +55,24 @@
       </div>
       <div class="modal-body">
         
-        <!-- Шаг 1: Промпт -->
+        <!-- Шаг 1: Промпт + Моя идея -->
         <div class="step-box">
-          <h3>1. Скопируйте этот промпт:</h3>
-          <div class="prompt-code-box">
-            <textarea id="prompt-text" readonly>Создай одностраничное веб-приложение в одном файле index.html.
-
-Требования:
-- Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
-- CSS в <style>, JS в <script>, без внешних библиотек
-- Адаптивный дизайн: работает на десктопе и мобильных
-- body { min-height: calc(100vh - 60px); margin: 0; }
-- Без alert/confirm/prompt (заблокированы в iframe)
-- Картинки/звуки только в Base64
-
-Задача: [опиши здесь функционал и дизайн приложения]</textarea>
-          </div>
-          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать промпт</button>
+          <h3>1. Опишите свою идею:</h3>
+          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
         </div>
 
-        <!-- Шаг 2: Ресурсы -->
+        <!-- Шаг 2: Промпт для копирования -->
         <div class="step-box">
-          <h3>2. Сгенерируйте код в одном из этих бесплатных AI:</h3>
+          <h3>2. Готовый промпт (обновляется автоматически):</h3>
+          <div class="prompt-code-box">
+            <textarea id="prompt-text" readonly></textarea>
+          </div>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать готовый промпт</button>
+        </div>
+
+        <!-- Шаг 3: Ресурсы -->
+        <div class="step-box">
+          <h3>3. Вставьте промпт в любой бесплатный AI:</h3>
           <div class="ai-links">
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
@@ -91,9 +87,9 @@
           </div>
         </div>
 
-        <!-- Шаг 3: Вставка и создание -->
+        <!-- Шаг 4: Вставка и создание -->
         <div class="step-box">
-          <h3>3. Вставьте полученный HTML-код сюда:</h3>
+          <h3>4. Вставьте полученный HTML-код сюда:</h3>
           <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдал нейросеть..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>

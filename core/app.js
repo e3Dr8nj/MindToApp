@@ -8,29 +8,54 @@ let selectedLocalFile = null;
 let selectedFolderFiles = null;
 const activeVirtualFS = new Map();
 
-const homeScreen = document.getElementById('home-screen');
-const storeScreen = document.getElementById('store-screen');
-const appScreen = document.getElementById('app-screen');
-const installedAppsContainer = document.getElementById('installed-apps');
-const allAppsContainer = document.getElementById('all-apps');
-const emptyState = document.getElementById('empty-state');
-const currentAppName = document.getElementById('current-app-name');
-const appFrame = document.getElementById('app-frame');
-const addModal = document.getElementById('add-modal');
-const moduleUrlInput = document.getElementById('module-url-input');
-const modalStatus = document.getElementById('modal-status');
-const localFileInput = document.getElementById('local-file-input');
-const selectedFileName = document.getElementById('selected-file-name');
-const folderInput = document.getElementById('folder-input');
-const selectedFolderInfo = document.getElementById('selected-folder-info');
-const createModal = document.getElementById('create-modal');
-const generatedCodeInput = document.getElementById('generated-code-input');
-const createStatus = document.getElementById('create-status');
+const $ = (id) => document.getElementById(id);
+
+const homeScreen = $('home-screen');
+const storeScreen = $('store-screen');
+const appScreen = $('app-screen');
+const installedAppsContainer = $('installed-apps');
+const allAppsContainer = $('all-apps');
+const emptyState = $('empty-state');
+const currentAppName = $('current-app-name');
+const appFrame = $('app-frame');
+const addModal = $('add-modal');
+const moduleUrlInput = $('module-url-input');
+const modalStatus = $('modal-status');
+const localFileInput = $('local-file-input');
+const selectedFileName = $('selected-file-name');
+const folderInput = $('folder-input');
+const selectedFolderInfo = $('selected-folder-info');
+const createModal = $('create-modal');
+const generatedCodeInput = $('generated-code-input');
+const createStatus = $('create-status');
+const userIdeaInput = $('user-idea-input');
+const promptText = $('prompt-text');
+
+// Базовый промпт (без описания задачи)
+const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html.
+
+Требования:
+- Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
+- CSS в <style>, JS в <script>, без внешних библиотек
+- Адаптивный дизайн: работает на десктопе и мобильных
+- body { min-height: calc(100vh - 60px); margin: 0; }
+- Без alert/confirm/prompt (заблокированы в iframe)
+- Картинки/звуки только в Base64
+
+Задача: `;
 
 async function init() {
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
+  updatePromptPreview(); // Инициализация промпта
+}
+
+// Обновление промпта в реальном времени
+function updatePromptPreview() {
+  if (!promptText) return;
+  const userIdea = userIdeaInput?.value.trim() || '[опиши здесь функционал и дизайн приложения]';
+  promptText.value = BASE_PROMPT + userIdea;
 }
 
 async function loadRegistry() {
@@ -187,33 +212,45 @@ function showScreen(screen) {
 
 // --- ЛОГИКА СОЗДАНИЯ ПРИЛОЖЕНИЯ ИЗ ТЕКСТА ---
 function openCreateModal() {
-  createModal.classList.add('active');
-  generatedCodeInput.value = '';
-  createStatus.textContent = '';
-  createStatus.className = 'modal-status';
+  if (createModal) {
+    createModal.classList.add('active');
+    if (generatedCodeInput) generatedCodeInput.value = '';
+    if (userIdeaInput) userIdeaInput.value = '';
+    if (createStatus) {
+      createStatus.textContent = '';
+      createStatus.className = 'modal-status';
+    }
+    updatePromptPreview();
+  }
 }
 
 function closeCreateModal() {
-  createModal.classList.remove('active');
+  if (createModal) createModal.classList.remove('active');
 }
 
 function copyPrompt() {
-  const promptText = document.getElementById('prompt-text');
-  const copyBtn = document.getElementById('copy-prompt-btn');
+  if (!promptText) return;
+  const copyBtn = $('copy-prompt-btn');
+  
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(promptText.value).then(() => {
-      copyBtn.textContent = '✅ Скопировано!';
-      setTimeout(() => copyBtn.textContent = '📋 Копировать промпт', 2000);
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать готовый промпт', 2000);
+      }
     });
   } else {
     promptText.select();
     document.execCommand('copy');
-    copyBtn.textContent = '✅ Скопировано!';
-    setTimeout(() => copyBtn.textContent = '📋 Копировать промпт', 2000);
+    if (copyBtn) {
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(() => copyBtn.textContent = '📋 Копировать готовый промпт', 2000);
+    }
   }
 }
 
 async function createAppFromText() {
+  if (!generatedCodeInput || !createStatus) return;
   const code = generatedCodeInput.value.trim();
   if (!code) {
     createStatus.textContent = '❌ Вставьте HTML-код';
@@ -280,62 +317,71 @@ async function createAppFromText() {
 
 // --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
+  if (!addModal) return;
   addModal.classList.add('active');
-  moduleUrlInput.value = '';
+  if (moduleUrlInput) moduleUrlInput.value = '';
   selectedLocalFile = null;
-  selectedFileName.textContent = '';
-  localFileInput.value = '';
+  if (selectedFileName) selectedFileName.textContent = '';
+  if (localFileInput) localFileInput.value = '';
   selectedFolderFiles = null;
-  selectedFolderInfo.textContent = '';
-  folderInput.value = '';
-  modalStatus.textContent = '';
-  modalStatus.className = 'modal-status';
+  if (selectedFolderInfo) selectedFolderInfo.textContent = '';
+  if (folderInput) folderInput.value = '';
+  if (modalStatus) {
+    modalStatus.textContent = '';
+    modalStatus.className = 'modal-status';
+  }
   switchTab('url');
 }
 
-function closeAddModal() { addModal.classList.remove('active'); }
+function closeAddModal() { 
+  if (addModal) addModal.classList.remove('active'); 
+}
 
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-  document.querySelector(`.tab[data-tab="${tab}"]`).style.display = 'block';
+  const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
+  if (activeTab) activeTab.style.display = 'block';
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.tab-btn[data-target="${tab}"]`).classList.add('active');
-  modalStatus.textContent = '';
+  const activeBtn = document.querySelector(`.tab-btn[data-target="${tab}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  if (modalStatus) modalStatus.textContent = '';
 }
 
-localFileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  if (!file.name.toLowerCase().endsWith('.html')) {
-    modalStatus.textContent = '❌ Выберите файл .html';
-    modalStatus.className = 'modal-status error';
-    selectedLocalFile = null;
-    selectedFileName.textContent = '';
-    return;
-  }
-  selectedLocalFile = file;
-  selectedFileName.textContent = `✅ Выбран: ${file.name}`;
-  modalStatus.textContent = '';
-});
+if (localFileInput) {
+  localFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.html')) {
+      if (modalStatus) { modalStatus.textContent = '❌ Выберите файл .html'; modalStatus.className = 'modal-status error'; }
+      selectedLocalFile = null;
+      if (selectedFileName) selectedFileName.textContent = '';
+      return;
+    }
+    selectedLocalFile = file;
+    if (selectedFileName) selectedFileName.textContent = `✅ Выбран: ${file.name}`;
+    if (modalStatus) modalStatus.textContent = '';
+  });
+}
 
-folderInput.addEventListener('change', (e) => {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  const indexFile = files.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
-  if (!indexFile) {
-    modalStatus.textContent = '❌ В папке должен быть файл index.html';
-    modalStatus.className = 'modal-status error';
-    selectedFolderFiles = null;
-    selectedFolderInfo.textContent = '';
-    return;
-  }
-  const rootFolder = indexFile.webkitRelativePath.split('/')[0];
-  selectedFolderFiles = files;
-  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
-  selectedFolderInfo.textContent = `✅ Папка: ${rootFolder} (${files.length} файлов, ${(totalSize / 1048576).toFixed(2)} МБ)`;
-  modalStatus.textContent = '';
-});
+if (folderInput) {
+  folderInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    const indexFile = files.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
+    if (!indexFile) {
+      if (modalStatus) { modalStatus.textContent = '❌ В папке должен быть файл index.html'; modalStatus.className = 'modal-status error'; }
+      selectedFolderFiles = null;
+      if (selectedFolderInfo) selectedFolderInfo.textContent = '';
+      return;
+    }
+    const rootFolder = indexFile.webkitRelativePath.split('/')[0];
+    selectedFolderFiles = files;
+    const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+    if (selectedFolderInfo) selectedFolderInfo.textContent = `✅ Папка: ${rootFolder} (${files.length} файлов, ${(totalSize / 1048576).toFixed(2)} МБ)`;
+    if (modalStatus) modalStatus.textContent = '';
+  });
+}
 
 async function addModule() {
   if (currentTab === 'folder') await addFolderModule();
@@ -344,8 +390,8 @@ async function addModule() {
 }
 
 async function addLocalFileModule() {
-  if (!selectedLocalFile) { modalStatus.textContent = '❌ Выберите файл'; modalStatus.className = 'modal-status error'; return; }
-  modalStatus.textContent = '⏳ Чтение файла...'; modalStatus.className = 'modal-status loading';
+  if (!selectedLocalFile) { if (modalStatus) { modalStatus.textContent = '❌ Выберите файл'; modalStatus.className = 'modal-status error'; } return; }
+  if (modalStatus) { modalStatus.textContent = '⏳ Чтение файла...'; modalStatus.className = 'modal-status loading'; }
   try {
     const fileText = await selectedLocalFile.text();
     const parser = new DOMParser();
@@ -361,14 +407,14 @@ async function addLocalFileModule() {
     if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
     const blob = new Blob([fileText], { type: 'text/html' });
     allModules.push({ ...manifest, url: URL.createObjectURL(blob), isCustom: true, isLocal: true, isFolder: false });
-    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success';
+    if (modalStatus) { modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success'; }
     setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
+  } catch (error) { if (modalStatus) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; } }
 }
 
 async function addFolderModule() {
-  if (!selectedFolderFiles || !selectedFolderFiles.length) { modalStatus.textContent = '❌ Выберите папку'; modalStatus.className = 'modal-status error'; return; }
-  modalStatus.textContent = '⏳ Чтение файлов...'; modalStatus.className = 'modal-status loading';
+  if (!selectedFolderFiles || !selectedFolderFiles.length) { if (modalStatus) { modalStatus.textContent = '❌ Выберите папку'; modalStatus.className = 'modal-status error'; } return; }
+  if (modalStatus) { modalStatus.textContent = '⏳ Чтение файлов...'; modalStatus.className = 'modal-status loading'; }
   try {
     const indexFile = selectedFolderFiles.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
     if (!indexFile) throw new Error('index.html не найден');
@@ -380,7 +426,7 @@ async function addFolderModule() {
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    modalStatus.textContent = `⏳ Загрузка ${selectedFolderFiles.length} файлов...`;
+    if (modalStatus) modalStatus.textContent = `⏳ Загрузка ${selectedFolderFiles.length} файлов...`;
     const files = [];
     for (const file of selectedFolderFiles) {
       const parts = file.webkitRelativePath.split('/');
@@ -397,12 +443,13 @@ async function addFolderModule() {
     const vfs = createVirtualFS(folderData);
     activeVirtualFS.set(manifest.id, vfs);
     allModules.push({ ...manifest, url: vfs.url, isCustom: true, isLocal: true, isFolder: true });
-    modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success';
+    if (modalStatus) { modalStatus.textContent = `✅ Модуль "${manifest.name}" добавлен!`; modalStatus.className = 'modal-status success'; }
     setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
+  } catch (error) { if (modalStatus) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; } }
 }
 
 async function addUrlModule() {
+  if (!moduleUrlInput || !modalStatus) return;
   let url = moduleUrlInput.value.trim();
   if (!url) { modalStatus.textContent = '❌ Введите URL'; modalStatus.className = 'modal-status error'; return; }
   if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
@@ -430,29 +477,33 @@ async function addUrlModule() {
 }
 
 function setupEventListeners() {
-  document.getElementById('open-store-btn').addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
-  document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen(homeScreen));
-  document.getElementById('go-to-store-btn').addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
-  document.getElementById('close-app-btn').addEventListener('click', closeApp);
+  $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
+  $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
+  $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
+  $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Создание приложения (НОВОЕ)
-  document.getElementById('create-app-btn').addEventListener('click', openCreateModal);
-  document.getElementById('close-create-btn').addEventListener('click', closeCreateModal);
-  document.getElementById('cancel-create-btn').addEventListener('click', closeCreateModal);
-  document.getElementById('copy-prompt-btn').addEventListener('click', copyPrompt);
-  document.getElementById('confirm-create-btn').addEventListener('click', createAppFromText);
-  createModal.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
+  // Создание приложения
+  $('create-app-btn')?.addEventListener('click', openCreateModal);
+  $('close-create-btn')?.addEventListener('click', closeCreateModal);
+  $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
+  $('copy-prompt-btn')?.addEventListener('click', copyPrompt);
+  $('confirm-create-btn')?.addEventListener('click', createAppFromText);
+  createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
+  
+  // Обновление промпта при вводе идеи
+  userIdeaInput?.addEventListener('input', updatePromptPreview);
 
-  // Добавить модуль (СТАРОЕ)
-  document.getElementById('add-custom-btn').addEventListener('click', openAddModal);
-  document.getElementById('add-custom-btn-store').addEventListener('click', openAddModal);
-  document.getElementById('close-modal-btn').addEventListener('click', closeAddModal);
-  document.getElementById('cancel-modal-btn').addEventListener('click', closeAddModal);
-  document.getElementById('confirm-add-btn').addEventListener('click', addModule);
-  addModal.addEventListener('click', (e) => { if (e.target === addModal) closeAddModal(); });
-  moduleUrlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addModule(); });
-  document.getElementById('select-file-btn').addEventListener('click', () => localFileInput.click());
-  document.getElementById('select-folder-btn').addEventListener('click', () => folderInput.click());
+  // Добавить модуль
+  $('add-custom-btn')?.addEventListener('click', openAddModal);
+  $('add-custom-btn-store')?.addEventListener('click', openAddModal);
+  $('close-modal-btn')?.addEventListener('click', closeAddModal);
+  $('cancel-modal-btn')?.addEventListener('click', closeAddModal);
+  $('confirm-add-btn')?.addEventListener('click', addModule);
+  addModal?.addEventListener('click', (e) => { if (e.target === addModal) closeAddModal(); });
+  moduleUrlInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') addModule(); });
+  $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
+  $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
+  
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
