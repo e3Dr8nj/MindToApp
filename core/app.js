@@ -1,5 +1,5 @@
 // ============================================
-// MindToApp Platform — app.js (оптимизирован)
+// MindToApp Platform — app.js (оптимизирован v2)
 // ============================================
 
 const REGISTRY_URL = 'https://e3dr8nj.github.io/MindToApp/registry/registry.json';
@@ -62,7 +62,6 @@ const BASE_PROMPT = `Создай одностраничное веб-прило
 // УТИЛИТЫ (DRY)
 // ============================================
 
-// Парсинг и валидация manifest из HTML-кода
 function parseAndValidateManifest(code, checkDuplicate = true) {
   const doc = new DOMParser().parseFromString(code, 'text/html');
   const script = doc.getElementById('manifest');
@@ -77,14 +76,12 @@ function parseAndValidateManifest(code, checkDuplicate = true) {
   return manifest;
 }
 
-// Показ статуса в модалке
 function showStatus(element, message, type = '') {
   if (!element) return;
   element.textContent = message;
   element.className = `modal-status ${type}`.trim();
 }
 
-// Загрузка HTML-кода с URL
 async function fetchCode(url) {
   try {
     const response = await fetch(url);
@@ -96,7 +93,6 @@ async function fetchCode(url) {
   }
 }
 
-// Регистрация модуля (сохранение в customModules, installedModules, allModules)
 function registerModule(manifest, content, options = {}) {
   const module = {
     id: manifest.id,
@@ -122,7 +118,6 @@ function registerModule(manifest, content, options = {}) {
   return module;
 }
 
-// Сохранение content обратно в customModules
 function saveContentToCustom(moduleId, content) {
   const idx = customModules.findIndex(m => m.id === moduleId);
   if (idx !== -1) {
@@ -131,17 +126,14 @@ function saveContentToCustom(moduleId, content) {
   }
 }
 
-// Универсальное закрытие модалки
 function closeModal(modalEl) {
   if (modalEl) modalEl.classList.remove('active');
 }
 
-// Универсальное открытие модалки
 function openModal(modalEl) {
   if (modalEl) modalEl.classList.add('active');
 }
 
-// Копирование текста в буфер обмена
 async function copyToClipboard(text, successCallback) {
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -161,26 +153,31 @@ async function copyToClipboard(text, successCallback) {
 }
 
 // ============================================
-// ЗАГРУЗКА МОДУЛЕЙ (разбита на подфункции)
+// ЗАГРУЗКА МОДУЛЕЙ (с обработкой ошибок)
 // ============================================
 
 async function loadRegistryModules() {
-  const response = await fetch(REGISTRY_URL);
-  const data = await response.json();
-  const modules = await Promise.all(
-    data.modules.map(async (module) => {
-      try {
-        const htmlText = await fetchCode(module.url);
-        if (!htmlText) return null;
-        const manifest = parseAndValidateManifest(htmlText, false);
-        return { ...manifest, url: module.url, content: htmlText, isCustom: false, isLocal: false, isFolder: false };
-      } catch (error) {
-        console.error('Ошибка загрузки модуля:', module.url, error);
-        return null;
-      }
-    })
-  );
-  return modules.filter(m => m !== null);
+  try {
+    const response = await fetch(REGISTRY_URL);
+    const data = await response.json();
+    const modules = await Promise.all(
+      data.modules.map(async (module) => {
+        try {
+          const htmlText = await fetchCode(module.url);
+          if (!htmlText) return null;
+          const manifest = parseAndValidateManifest(htmlText, false);
+          return { ...manifest, url: module.url, content: htmlText, isCustom: false, isLocal: false, isFolder: false };
+        } catch (error) {
+          console.error('Ошибка загрузки модуля:', module.url, error);
+          return null;
+        }
+      })
+    );
+    return modules.filter(m => m !== null);
+  } catch (error) {
+    console.error('Ошибка загрузки registry:', error);
+    return []; // Возвращаем пустой массив, а не падаем
+  }
 }
 
 async function restoreLocalModules() {
@@ -188,7 +185,6 @@ async function restoreLocalModules() {
   for (const m of customModules.filter(m => m.isLocal && !m.isFolder)) {
     let content = m.content;
 
-    // Миграция: если content отсутствует, загружаем с URL
     if (!content && m.url) {
       content = await fetchCode(m.url);
       if (content) saveContentToCustom(m.id, content);
@@ -239,7 +235,7 @@ function cleanupBrokenModules() {
 }
 
 // ============================================
-// ИНИЦИАЛИЗАЦИЯ
+// ИНИЦИАЛИЗАЦИЯ (с обработкой ошибок)
 // ============================================
 
 async function init() {
@@ -255,6 +251,7 @@ async function init() {
     console.error('Критическая ошибка загрузки:', error);
     allModules = [];
   }
+  
   renderInstalledApps();
   setupEventListeners();
   updatePromptPreview();
@@ -606,8 +603,11 @@ async function addFolderModule() {
     }
 
     await saveFolderModule(manifest.id, manifest, files, mainHtml);
-    registerModule(manifest, mainHtml, { defaultDesc: 'Папка модуля', isFolder: true, url: createVirtualFS({ id: manifest.id, manifest, files, mainHtml }).url });
-    activeVirtualFS.set(manifest.id, createVirtualFS({ id: manifest.id, manifest, files, mainHtml }));
+    
+    // ✅ ИСПРАВЛЕНО: создаём VFS один раз
+    const vfs = createVirtualFS({ id: manifest.id, manifest, files, mainHtml });
+    activeVirtualFS.set(manifest.id, vfs);
+    registerModule(manifest, mainHtml, { defaultDesc: 'Папка модуля', isFolder: true, url: vfs.url });
 
     showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
     setTimeout(() => { closeModal(addModal); renderInstalledApps(); renderAllApps(); }, 1000);
