@@ -8,6 +8,7 @@ let selectedLocalFile = null;
 let selectedFolderFiles = null;
 const activeVirtualFS = new Map();
 
+// Безопасный помощник для поиска элементов
 const $ = (id) => document.getElementById(id);
 
 const homeScreen = $('home-screen');
@@ -48,7 +49,7 @@ async function init() {
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
-  updatePromptPreview(); // Инициализация промпта
+  updatePromptPreview();
 }
 
 // Обновление промпта в реальном времени
@@ -315,6 +316,34 @@ async function createAppFromText() {
   }
 }
 
+// --- КНОПКА ОЧИСТКИ КЭША ---
+async function refreshApp() {
+  const btn = $('refresh-btn');
+  if (btn) btn.textContent = '⏳';
+  
+  try {
+    // 1. Очищаем все кэши Service Worker
+    if ('caches' in window) {
+      const names = await caches.keys();
+      await Promise.all(names.map(name => caches.delete(name)));
+    }
+    
+    // 2. Перерегистрируем Service Worker
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(reg => reg.unregister()));
+    }
+    
+    // 3. Жёсткая перезагрузка
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  } catch (error) {
+    console.error('Ошибка очистки кэша:', error);
+    window.location.reload();
+  }
+}
+
 // --- ЛОГИКА ДОБАВЛЕНИЯ МОДУЛЯ (URL/ФАЙЛ/ПАПКА) ---
 function openAddModal() {
   if (!addModal) return;
@@ -476,13 +505,14 @@ async function addUrlModule() {
   } catch (error) { modalStatus.textContent = `❌ Ошибка: ${error.message}`; modalStatus.className = 'modal-status error'; }
 }
 
+// --- БЕЗОПАСНАЯ НАСТРОЙКА СОБЫТИЙ ---
 function setupEventListeners() {
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Создание приложения
+  // Создание приложения через AI
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -493,7 +523,10 @@ function setupEventListeners() {
   // Обновление промпта при вводе идеи
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
-  // Добавить модуль
+  // Кнопка очистки кэша
+  $('refresh-btn')?.addEventListener('click', refreshApp);
+
+  // Добавить модуль (URL/файл/папка)
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
