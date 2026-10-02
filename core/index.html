@@ -43,9 +43,10 @@
 
   <!-- Экран 3: Запущенное приложение -->
   <div id="app-screen" class="screen">
-    <header>
-      <button id="close-app-btn" class="btn">← Закрыть</button>
+    <header class="app-header">
+      <button id="close-app-btn" class="btn btn-back" title="Вернуться на главный экран">← Назад</button>
       <h1 id="current-app-name">Приложение</h1>
+      <div class="header-spacer"></div>
     </header>
     <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
   </div>
@@ -144,8 +145,6 @@
         <button class="modal-close" id="close-edit-btn">&times;</button>
       </div>
       <div class="modal-body">
-        
-        <!-- Превью приложения -->
         <div class="edit-preview">
           <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
           <div class="edit-preview-info">
@@ -154,24 +153,20 @@
           </div>
         </div>
 
-        <!-- Код приложения (скрыт по умолчанию) -->
         <div class="step-box">
           <button id="toggle-code-btn" class="btn btn-small">👁 Показать код приложения</button>
           <textarea id="edit-source-code" class="code-input" style="display: none; margin-top: 10px;" readonly></textarea>
         </div>
 
-        <!-- Описание изменений -->
         <div class="step-box">
           <h3>Что нужно изменить?</h3>
           <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмно-синим, увеличь шрифт, добавь кнопку сброса..."></textarea>
         </div>
 
-        <!-- Кнопка копирования промпта -->
         <div class="step-box">
           <button id="copy-edit-prompt-btn" class="btn btn-small">📋 Скопировать промпт для AI</button>
         </div>
 
-        <!-- Список AI -->
         <div class="step-box">
           <h3>Вставьте промпт в любой AI:</h3>
           <div class="ai-links">
@@ -188,13 +183,11 @@
           </div>
         </div>
 
-        <!-- Поле для вставки нового кода -->
         <div class="step-box">
           <h3>Вставьте исправленный HTML-код:</h3>
           <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте сюда код, который вернула нейросеть..."></textarea>
           <div id="edit-status" class="modal-status"></div>
         </div>
-
       </div>
       <div class="modal-footer">
         <button id="cancel-edit-btn" class="btn btn-secondary">Отмена</button>
