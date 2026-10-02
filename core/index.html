@@ -61,39 +61,34 @@
       <div class="modal-body">
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
-          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
+          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками..."></textarea>
         </div>
         <div class="step-box">
-          <h3>2. Готовый промпт (обновляется автоматически):</h3>
+          <h3>2. Готовый промпт:</h3>
           <div class="prompt-code-box">
             <textarea id="prompt-text" readonly></textarea>
           </div>
-          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать готовый промпт</button>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать промпт</button>
         </div>
         <div class="step-box">
-          <h3>3. Вставьте промпт в любой бесплатный AI:</h3>
+          <h3>3. Бесплатные AI:</h3>
           <div class="ai-links">
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Copilot</a>
             <a href="https://gemini.google.com" target="_blank" class="ai-link">Gemini</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
-            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
-            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
-            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Llama 3, очень быстро)</a>
-            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
-            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
           </div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте полученный HTML-код сюда:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте весь код index.html, который выдала нейросеть..."></textarea>
+          <h3>4. Вставьте HTML-код:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте код index.html..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="cancel-create-btn" class="btn btn-secondary">Отмена</button>
-        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать приложение</button>
+        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать</button>
       </div>
     </div>
   </div>
@@ -107,11 +102,11 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">Вставьте ссылку на HTML-файл или папку.<br>Пример: <code>https://username.github.io/my-module/</code></p>
+          <p class="modal-description">Ссылка на HTML или папку.<br>Пример: <code>https://.../my-module/</code></p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
-          <p class="modal-description">Выберите <b>один файл .html</b> с вашего компьютера.</p>
+          <p class="modal-description">Выберите <b>один файл .html</b>.</p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
           <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Выбрать файл .html</button>
           <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
@@ -152,40 +147,20 @@
             <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
           </div>
         </div>
-
         <div class="step-box">
           <button id="toggle-code-btn" class="btn btn-small">👁 Показать код приложения</button>
           <textarea id="edit-source-code" class="code-input" style="display: none; margin-top: 10px;" readonly></textarea>
         </div>
-
         <div class="step-box">
           <h3>Что нужно изменить?</h3>
-          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмно-синим, увеличь шрифт, добавь кнопку сброса..."></textarea>
+          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмным..."></textarea>
         </div>
-
         <div class="step-box">
           <button id="copy-edit-prompt-btn" class="btn btn-small">📋 Скопировать промпт для AI</button>
         </div>
-
-        <div class="step-box">
-          <h3>Вставьте промпт в любой AI:</h3>
-          <div class="ai-links">
-            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
-            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
-            <a href="https://gemini.google.com" target="_blank" class="ai-link">Gemini</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
-            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Copilot</a>
-            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral</a>
-            <a href="https://groq.com" target="_blank" class="ai-link">Groq</a>
-            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox</a>
-            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen</a>
-          </div>
-        </div>
-
         <div class="step-box">
           <h3>Вставьте исправленный HTML-код:</h3>
-          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте сюда код, который вернула нейросеть..."></textarea>
+          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте код от нейросети..."></textarea>
           <div id="edit-status" class="modal-status"></div>
         </div>
       </div>
@@ -196,7 +171,14 @@
     </div>
   </div>
 
-  <script src="db.js"></script>
-  <script src="app.js"></script>
+  <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
+  <script src="scripts/db.js"></script>
+<script src="scripts/state.js"></script>
+<script src="scripts/registry.js"></script>
+<script src="scripts/render.js"></script>
+<script src="scripts/create.js"></script>
+<script src="scripts/edit.js"></script>
+<script src="scripts/add.js"></script>
+<script src="scripts/app.js"></script>
 </body>
 </html>
