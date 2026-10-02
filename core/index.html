@@ -61,34 +61,40 @@
       <div class="modal-body">
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
-          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками..."></textarea>
+          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
         </div>
         <div class="step-box">
-          <h3>2. Готовый промпт:</h3>
+          <h3>2. Готовый промпт (обновляется автоматически):</h3>
           <div class="prompt-code-box">
             <textarea id="prompt-text" readonly></textarea>
           </div>
-          <button id="copy-prompt-btn" class="btn btn-small">📋 Копировать промпт</button>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт</button>
         </div>
         <div class="step-box">
-          <h3>3. Бесплатные AI:</h3>
+          <h3>3. Вставьте промпт в любую из этих бесплатных нейросетей:</h3>
+          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
           <div class="ai-links">
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
-            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Copilot</a>
-            <a href="https://gemini.google.com" target="_blank" class="ai-link">Gemini</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat (Отлично кодит)</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
+            <a href="https://gemini.google.com" target="_blank" class="ai-link">Google Gemini</a>
+            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
+            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Очень быстро)</a>
+            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
+            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
           </div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте HTML-код:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте код index.html..."></textarea>
+          <h3>4. Вставьте полученный от нейросети HTML-код сюда:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html, который сгенерировала нейросеть..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="cancel-create-btn" class="btn btn-secondary">Отмена</button>
-        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать</button>
+        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать приложение</button>
       </div>
     </div>
   </div>
@@ -102,11 +108,11 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">Ссылка на HTML или папку.<br>Пример: <code>https://.../my-module/</code></p>
+          <p class="modal-description">Вставьте ссылку на HTML-файл или папку.<br>Пример: <code>https://username.github.io/my-module/</code></p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
-          <p class="modal-description">Выберите <b>один файл .html</b>.</p>
+          <p class="modal-description">Выберите <b>один файл .html</b> с вашего компьютера.</p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
           <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Выбрать файл .html</button>
           <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
@@ -147,38 +153,59 @@
             <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
           </div>
         </div>
+
         <div class="step-box">
-          <button id="toggle-code-btn" class="btn btn-small">👁 Показать код приложения</button>
+          <button id="toggle-code-btn" class="btn btn-small">👁 Показать исходный код приложения</button>
           <textarea id="edit-source-code" class="code-input" style="display: none; margin-top: 10px;" readonly></textarea>
         </div>
+
         <div class="step-box">
-          <h3>Что нужно изменить?</h3>
-          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмным..."></textarea>
+          <h3>1. Что нужно изменить?</h3>
+          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмно-синим, увеличь шрифт, добавь кнопку сброса..."></textarea>
         </div>
+
         <div class="step-box">
-          <button id="copy-edit-prompt-btn" class="btn btn-small">📋 Скопировать промпт для AI</button>
+          <button id="copy-edit-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт для AI</button>
         </div>
+
         <div class="step-box">
-          <h3>Вставьте исправленный HTML-код:</h3>
-          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте код от нейросети..."></textarea>
+          <h3>2. Вставьте промпт в любую из этих нейросетей:</h3>
+          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный исправленный HTML-код.</p>
+          <div class="ai-links">
+            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
+            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat (Отлично кодит)</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
+            <a href="https://gemini.google.com" target="_blank" class="ai-link">Google Gemini</a>
+            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
+            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Очень быстро)</a>
+            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
+            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
+          </div>
+        </div>
+
+        <div class="step-box">
+          <h3>3. Вставьте исправленный HTML-код от нейросети сюда:</h3>
+          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте сюда обновленный код, который вернула нейросеть..."></textarea>
           <div id="edit-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
         <button id="cancel-edit-btn" class="btn btn-secondary">Отмена</button>
-        <button id="apply-edit-btn" class="btn btn-primary">📋 Создать копию</button>
+        <button id="apply-edit-btn" class="btn btn-primary">📋 Создать копию с изменениями</button>
       </div>
     </div>
   </div>
 
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
   <script src="scripts/db.js"></script>
-<script src="scripts/state.js"></script>
-<script src="scripts/registry.js"></script>
-<script src="scripts/render.js"></script>
-<script src="scripts/create.js"></script>
-<script src="scripts/edit.js"></script>
-<script src="scripts/add.js"></script>
-<script src="scripts/app.js"></script>
+  <script src="scripts/state.js"></script>
+  <script src="scripts/registry.js"></script>
+  <script src="scripts/render.js"></script>
+  <script src="scripts/create.js"></script>
+  <script src="scripts/edit.js"></script>
+  <script src="scripts/add.js"></script>
+  <script src="scripts/app.js"></script>
 </body>
 </html>
