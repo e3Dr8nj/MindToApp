@@ -267,6 +267,20 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
   }
   
+  // Кнопка шаринга — для пользовательских модулей с content
+  if (module.isCustom && module.content) {
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'share-btn';
+    shareBtn.textContent = '📤';
+    shareBtn.title = 'Поделиться';
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openShareModal(module);
+    });
+    card.appendChild(shareBtn);
+  }
+  
+  // Кнопка редактирования — для пользовательских модулей
   if (module.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
@@ -874,6 +888,17 @@ async function addUrlModule() {
 }
 
 function setupEventListeners() {
+
+  // Шаринг
+$('close-share-btn')?.addEventListener('click', closeShareModal);
+$('close-share-footer-btn')?.addEventListener('click', closeShareModal);
+$('copy-share-url-btn')?.addEventListener('click', copyShareURL);
+$('share-modal')?.addEventListener('click', (e) => { if (e.target === $('share-modal')) closeShareModal(); });
+
+// Сохранение внешнего приложения
+$('save-external-btn')?.addEventListener('click', saveExternalApp);
+
+
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
@@ -916,4 +941,232 @@ function setupEventListeners() {
   });
 }
 
+
+
+
+//----
+// ============================================
+// ШАРИНГ ПРИЛОЖЕНИЙ ЧЕРЕЗ URL
+// ============================================
+
+let currentShareModule = null;
+let externalAppCode = null;
+
+// Сжатие HTML в URL-строку
+function compressToURL(html) {
+  try {
+    const compressed = LZString.compressToEncodedURIComponent(html);
+    return compressed;
+  } catch (error) {
+    console.error('Ошибка сжатия:', error);
+    return null;
+  }
+}
+
+// Распаковка HTML из URL-строки
+function decompressFromURL(compressed) {
+  try {
+    const html = LZString.decompressFromEncodedURIComponent(compressed);
+    return html;
+  } catch (error) {
+    console.error('Ошибка распаковки:', error);
+    return null;
+  }
+}
+
+// Генерация ссылки для шаринга
+function generateShareURL(module) {
+  if (!module.content) return null;
+  
+  const compressed = compressToURL(module.content);
+  if (!compressed) return null;
+  
+  const baseURL = window.location.origin + window.location.pathname;
+  return `${baseURL}?app=${compressed}`;
+}
+
+// Открытие модалки шаринга
+function openShareModal(module) {
+  if (!module.content) {
+    alert('Не удалось получить код приложения для шаринга');
+    return;
+  }
+  
+  currentShareModule = module;
+  
+  const shareURL = generateShareURL(module);
+  if (!shareURL) {
+    alert('Не удалось создать ссылку для шаринга. Приложение слишком большое.');
+    return;
+  }
+  
+  // Заполняем превью
+  const sharePreviewIcon = $('share-preview-icon');
+  const sharePreviewName = $('share-preview-name');
+  const sharePreviewDesc = $('share-preview-desc');
+  const shareURLInput = $('share-url-input');
+  
+  if (sharePreviewIcon) sharePreviewIcon.textContent = module.icon;
+  if (sharePreviewName) sharePreviewName.textContent = module.name;
+  if (sharePreviewDesc) sharePreviewDesc.textContent = module.description || '';
+  if (shareURLInput) shareURLInput.value = shareURL;
+  
+  openModal($('share-modal'));
+}
+
+function closeShareModal() {
+  closeModal($('share-modal'));
+  currentShareModule = null;
+}
+
+function copyShareURL() {
+  const shareURLInput = $('share-url-input');
+  const copyBtn = $('copy-share-url-btn');
+  
+  if (!shareURLInput) return;
+  
+  shareURLInput.select();
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareURLInput.value).then(() => {
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+      }
+    });
+  } else {
+    document.execCommand('copy');
+    if (copyBtn) {
+      copyBtn.textContent = '✅ Скопировано!';
+      setTimeout(() => copyBtn.textContent = '📋 Копировать', 2000);
+    }
+  }
+}
+
+// Проверка URL на параметр ?app= при загрузке
+function checkForExternalApp() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const appParam = urlParams.get('app');
+  
+  if (!appParam) return;
+  
+  // Распаковываем код
+  const html = decompressFromURL(appParam);
+  if (!html) {
+    console.error('Не удалось распаковать приложение из URL');
+    return;
+  }
+  
+  // Валидация HTML
+  if (!html.includes('<html') && !html.includes('<!DOCTYPE')) {
+    console.error('Распакованный код не является HTML');
+    return;
+  }
+  
+  // Проверка размера (не более 500 КБ)
+  if (html.length > 500000) {
+    console.error('Приложение слишком большое');
+    return;
+  }
+  
+  // Сохраняем код для последующего сохранения
+  externalAppCode = html;
+  
+  // Парсим manifest
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    
+    if (manifestScript) {
+      const manifest = JSON.parse(manifestScript.textContent);
+      
+      // Показываем приложение
+      currentAppName.textContent = manifest.name || 'Внешнее приложение';
+      appFrame.src = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+      showScreen(appScreen);
+      
+      // Показываем баннер
+      const banner = $('external-app-banner');
+      if (banner) banner.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Ошибка парсинга manifest:', error);
+  }
+}
+
+// Сохранение внешнего приложения
+function saveExternalApp() {
+  if (!externalAppCode) return;
+  
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(externalAppCode, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    
+    if (!manifestScript) {
+      alert('Не найден manifest в приложении');
+      return;
+    }
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    
+    // Проверяем, не существует ли уже такое приложение
+    if (allModules.some(m => m.id === manifest.id)) {
+      if (!confirm(`Приложение "${manifest.name}" уже существует. Заменить его?`)) {
+        return;
+      }
+      // Удаляем старую версию
+      removeCustomModule(manifest.id);
+    }
+    
+    // Создаём новый модуль
+    const newModule = {
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || 'Сохранено из внешней ссылки',
+      content: externalAppCode,
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    };
+    
+    customModules.push(newModule);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+    
+    if (!installedModules.includes(manifest.id)) {
+      installedModules.push(manifest.id);
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+    
+    const blob = new Blob([externalAppCode], { type: 'text/html' });
+    allModules.push({
+      ...manifest,
+      content: externalAppCode,
+      url: URL.createObjectURL(blob),
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    });
+    
+    // Скрываем баннер
+    const banner = $('external-app-banner');
+    if (banner) banner.style.display = 'none';
+    
+    alert(`✅ Приложение "${manifest.name}" сохранено!`);
+    
+    // Переходим на главный экран
+    showScreen(homeScreen);
+    renderInstalledApps();
+    
+    // Очищаем URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    
+  } catch (error) {
+    console.error('Ошибка сохранения:', error);
+    alert('Ошибка при сохранении приложения');
+  }
+}
+//----
 init();

@@ -11,6 +11,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#667eea">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 </head>
 <body>
   <!-- Экран 1: Рабочий стол -->
@@ -49,6 +50,14 @@
       <div class="header-spacer"></div>
     </header>
     <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
+  </div>
+
+  <!-- Баннер для внешних приложений -->
+  <div id="external-app-banner" class="external-banner" style="display: none;">
+    <div class="banner-content">
+      <span>🎉 Это приложение получено по ссылке!</span>
+      <button id="save-external-btn" class="btn btn-primary btn-small">💾 Сохранить в мои приложения</button>
+    </div>
   </div>
 
   <!-- Модальное окно: Создание приложения через AI -->
@@ -192,6 +201,41 @@
       <div class="modal-footer">
         <button id="cancel-edit-btn" class="btn btn-secondary">Отмена</button>
         <button id="apply-edit-btn" class="btn btn-primary">📋 Создать копию</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Поделиться приложением -->
+  <div id="share-modal" class="modal">
+    <div class="modal-content modal-share">
+      <div class="modal-header">
+        <h2>📤 Поделиться приложением</h2>
+        <button class="modal-close" id="close-share-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="share-preview">
+          <div class="share-preview-icon" id="share-preview-icon">📱</div>
+          <div class="share-preview-info">
+            <div class="share-preview-name" id="share-preview-name">Название</div>
+            <div class="share-preview-desc" id="share-preview-desc">Описание</div>
+          </div>
+        </div>
+
+        <div class="step-box">
+          <h3>🔗 Прямая ссылка:</h3>
+          <div class="share-url-box">
+            <input type="text" id="share-url-input" readonly class="share-url-input">
+            <button id="copy-share-url-btn" class="btn btn-small">📋 Копировать</button>
+          </div>
+          <p class="share-hint">Отправьте эту ссылку друзьям. Они смогут открыть приложение одним кликом.</p>
+        </div>
+
+        <div class="share-warning">
+          ⚠️ <b>Внимание:</b> Ссылка содержит весь код приложения. Не делитесь приложениями, содержащими конфиденциальные данные.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>
