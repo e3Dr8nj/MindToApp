@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mind-to-app-v8';
+const CACHE_NAME = 'mind-to-app-v9';
 
 const urlsToCache = [
   '/MindToApp/core/',
@@ -12,6 +12,7 @@ const urlsToCache = [
   '/MindToApp/core/scripts/create.js',
   '/MindToApp/core/scripts/edit.js',
   '/MindToApp/core/scripts/add.js',
+  '/MindToApp/core/scripts/share.js',
   '/MindToApp/core/scripts/app.js'
 ];
 self.addEventListener('install', (event) => {
