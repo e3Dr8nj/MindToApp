@@ -88,10 +88,16 @@ function openBuilder() {
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
   
   showScreen($('builder-screen'));
+  
+  // Автопрокрутка к верху
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function closeBuilder() {
   showScreen(homeScreen);
+  
+  // Возврат наверх
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function copyBuilderPrompt() {
