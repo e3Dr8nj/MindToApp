@@ -89,15 +89,23 @@ function openBuilder() {
   
   showScreen($('builder-screen'));
   
-  // Автопрокрутка к верху
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Даём браузеру время обновить DOM, затем прокручиваем
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
 }
 
 function closeBuilder() {
   showScreen(homeScreen);
   
-  // Возврат наверх
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Даём браузеру время обновить DOM, затем прокручиваем
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
 }
 
 function copyBuilderPrompt() {
