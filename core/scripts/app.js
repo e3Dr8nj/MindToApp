@@ -97,6 +97,16 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
+  // Шаринг
+  $('close-share-btn')?.addEventListener('click', closeShareModal);
+  $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
+  $('open-gist-btn')?.addEventListener('click', openGistWithCode);
+  $('add-from-link-btn')?.addEventListener('click', addAppFromLink);
+  const shareModalEl = $('share-modal');
+  if (shareModalEl) {
+    shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });
+  }
+
   // Вкладки
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
@@ -104,7 +114,7 @@ function setupEventListeners() {
 
   // Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); }
+    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); }
   });
 }
 

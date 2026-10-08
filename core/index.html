@@ -198,6 +198,47 @@
     </div>
   </div>
 
+  <!-- Модальное окно: Поделиться приложением -->
+  <div id="share-modal" class="modal">
+    <div class="modal-content modal-share">
+      <div class="modal-header">
+        <h2>📤 Поделиться приложением</h2>
+        <button class="modal-close" id="close-share-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="share-preview">
+          <div class="share-preview-icon" id="share-preview-icon">📱</div>
+          <div class="share-preview-info">
+            <div class="share-preview-name" id="share-preview-name">Название</div>
+            <div class="share-preview-desc" id="share-preview-desc">Описание</div>
+          </div>
+        </div>
+        
+        <div class="step-box">
+          <h3>🚀 Способ 1: GitHub Gist (Рекомендуем)</h3>
+          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+            Нажмите кнопку ниже, чтобы открыть GitHub Gist с готовым кодом. 
+            Создайте "Secret Gist" и скопируйте ссылку на "Raw".
+          </p>
+          <button id="open-gist-btn" class="btn btn-primary" style="width: 100%;">📝 Открыть Gist с кодом</button>
+        </div>
+
+        <div class="step-box">
+          <h3>🔗 Способ 2: Добавить приложение по ссылке</h3>
+          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+            Если у вас уже есть ссылка на Raw HTML файл, вставьте её сюда.
+          </p>
+          <input type="url" id="share-url-input" placeholder="https://gist.githubusercontent.com/.../raw/..." class="url-input">
+          <button id="add-from-link-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">➕ Добавить по ссылке</button>
+          <div id="share-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
   <script src="scripts/db.js"></script>
   <script src="scripts/state.js"></script>
@@ -206,6 +247,7 @@
   <script src="scripts/create.js"></script>
   <script src="scripts/edit.js"></script>
   <script src="scripts/add.js"></script>
+  <script src="scripts/share.js"></script>
   <script src="scripts/app.js"></script>
 </body>
 </html>

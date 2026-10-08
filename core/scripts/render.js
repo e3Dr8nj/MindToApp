@@ -37,12 +37,29 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
   }
   
+  // Кнопка шаринга — для пользовательских модулей с контентом
+  if (module.isCustom && module.content) {
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'share-btn';
+    shareBtn.textContent = '📤';
+    shareBtn.title = 'Поделиться / Хостинг';
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openShareModal(module);
+    });
+    card.appendChild(shareBtn);
+  }
+  
+  // Кнопка редактирования
   if (module.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
     editBtn.textContent = '✏️';
     editBtn.title = 'Редактировать';
-    editBtn.addEventListener('click', (e) => { e.stopPropagation(); openEditModal(module); });
+    editBtn.addEventListener('click', (e) => { 
+      e.stopPropagation(); 
+      openEditModal(module); 
+    });
     card.appendChild(editBtn);
   }
   
@@ -54,6 +71,7 @@ function createAppCard(module, isInstalled) {
     deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); removeCustomModule(module.id); });
     card.appendChild(deleteBtn);
   }
+  
   return card;
 }
 
