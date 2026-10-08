@@ -108,7 +108,16 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">Вставьте ссылку на HTML-файл или папку.<br>Пример: <code>https://username.github.io/my-module/</code></p>
+          <p class="modal-description">
+            Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>
+            Поддерживаются любые форматы: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages и другие хостинги.
+          </p>
+          <p class="modal-description" style="margin-top: 5px;">
+            Примеры:<br>
+            • <code>https://username.github.io/my-app/</code><br>
+            • <code>https://gist.githubusercontent.com/.../raw/file.html</code><br>
+            • <code>https://gist.githubusercontent.com/.../raw/file.txt</code>
+          </p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
@@ -198,7 +207,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно: Поделиться приложением (УПРОЩЁННОЕ) -->
+  <!-- Модальное окно: Поделиться приложением -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
       <div class="modal-header">
