@@ -97,11 +97,11 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
-  // Шаринг
+  // Шаринг (обновлённые обработчики)
   $('close-share-btn')?.addEventListener('click', closeShareModal);
   $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
+  $('copy-app-code-btn')?.addEventListener('click', copyAppCode);
   $('open-gist-btn')?.addEventListener('click', openGistWithCode);
-  $('add-from-link-btn')?.addEventListener('click', addAppFromLink);
   const shareModalEl = $('share-modal');
   if (shareModalEl) {
     shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });

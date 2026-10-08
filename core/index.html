@@ -198,7 +198,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно: Поделиться приложением -->
+  <!-- Модальное окно: Поделиться приложением (УПРОЩЁННОЕ) -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
       <div class="modal-header">
@@ -215,22 +215,21 @@
         </div>
         
         <div class="step-box">
-          <h3>🚀 Способ 1: GitHub Gist (Рекомендуем)</h3>
+          <h3>📋 Скопировать HTML-код</h3>
           <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-            Нажмите кнопку ниже, чтобы открыть GitHub Gist с готовым кодом. 
-            Создайте "Secret Gist" и скопируйте ссылку на "Raw".
+            Скопируйте весь код приложения в буфер обмена, чтобы вставить его куда угодно: в чат, в редактор, в GitHub Gist.
           </p>
-          <button id="open-gist-btn" class="btn btn-primary" style="width: 100%;">📝 Открыть Gist с кодом</button>
+          <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
+          <div id="copy-code-status" class="modal-status"></div>
         </div>
 
         <div class="step-box">
-          <h3>🔗 Способ 2: Добавить приложение по ссылке</h3>
+          <h3>📝 Открыть GitHub Gist</h3>
           <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
-            Если у вас уже есть ссылка на Raw HTML файл, вставьте её сюда.
+            Код будет скопирован в буфер обмена, и откроется GitHub Gist. 
+            Вставьте код (Ctrl+V), выберите "Secret Gist" и нажмите "Create gist".
           </p>
-          <input type="url" id="share-url-input" placeholder="https://gist.githubusercontent.com/.../raw/..." class="url-input">
-          <button id="add-from-link-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">➕ Добавить по ссылке</button>
-          <div id="share-status" class="modal-status"></div>
+          <button id="open-gist-btn" class="btn btn-secondary" style="width: 100%;">📝 Открыть Gist с кодом</button>
         </div>
       </div>
       <div class="modal-footer">
