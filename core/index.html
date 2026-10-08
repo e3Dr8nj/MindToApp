@@ -101,15 +101,22 @@
       <div class="builder-block">
         <div class="builder-block-number">3</div>
         <h3 class="builder-block-title">🚀 Создайте приложение</h3>
-        <p class="builder-block-desc">Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".</p>
-        <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда весь HTML-код от нейросети..."></textarea>
+        <p class="builder-block-desc">Вставьте HTML-код от нейросети или загрузите по ссылке.</p>
+        <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда HTML-код или ссылку на Gist/Hastebin/Pastebin..."></textarea>
+        
+        <!-- НОВАЯ СТРОКА: Загрузка по ссылке -->
+        <div class="builder-url-loader">
+          <input type="url" id="builder-url-input" class="builder-url-input" placeholder="Или вставьте ссылку: gist.github.com, hastebin, pastebin...">
+          <button id="builder-load-url-btn" class="btn btn-secondary">🔗 Загрузить</button>
+        </div>
+        
         <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Создать приложение</button>
         <div id="builder-status-3" class="modal-status"></div>
       </div>
     </div>
   </div>
 
-  <!-- Модальное окно: Создание приложения через AI (оставляем для обратной совместимости) -->
+  <!-- Модальное окно: Создание приложения через AI (старая версия) -->
   <div id="create-modal" class="modal">
     <div class="modal-content modal-create">
       <div class="modal-header">

@@ -766,3 +766,71 @@ h1 { color: var(--heading-color); font-size: 24px; }
     left: 15px;
   }
 }
+/* ==========================================
+   СТРОКА ЗАГРУЗКИ ПО ССЫЛКЕ В КОНСТРУКТОРЕ
+   ========================================== */
+
+.builder-url-loader {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: stretch;
+}
+
+.builder-url-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  background: var(--code-input-bg);
+  color: var(--code-input-text);
+  font-family: 'Courier New', monospace;
+  transition: border-color 0.3s;
+  min-width: 0;
+}
+
+.builder-url-input:focus {
+  border-color: var(--input-focus-border);
+}
+
+.builder-url-input::placeholder {
+  color: var(--description-color);
+  font-family: inherit;
+}
+
+#builder-load-url-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#builder-load-url-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Адаптивность для строки загрузки */
+@media (max-width: 900px) {
+  .builder-url-loader {
+    flex-direction: column;
+  }
+  
+  #builder-load-url-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .builder-url-input {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+  
+  #builder-load-url-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

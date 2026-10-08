@@ -79,11 +79,13 @@ const BUILDER_PLATFORM_INSTRUCTION = `
 function openBuilder() {
   const ideaInput = $('builder-idea-input');
   const codeInput = $('builder-code-input');
+  const urlInput = $('builder-url-input');
   const status1 = $('builder-status-1');
   const status3 = $('builder-status-3');
   
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
+  if (urlInput) urlInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
   
@@ -236,21 +238,19 @@ function createFromBuilder() {
 }
 
 // ==========================================
-// УМНЫЙ ПАРСЕР ССЫЛОК
+// УМНЫЙ ПАРСЕР ССЫЛОК (с CORS-прокси)
 // ==========================================
+
+// CORS-прокси для обхода ограничений браузера
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 
 // Определяет сервис по URL
 function detectService(url) {
   if (!url) return null;
   const lower = url.toLowerCase();
   
-  // GitHub Gist
-  if (lower.includes('gist.github.com')) return 'gist';
-  
-  // Toptal Hastebin
+  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
   if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
-  
-  // Pastebin
   if (lower.includes('pastebin.com')) return 'pastebin';
   
   return null;
@@ -259,7 +259,7 @@ function detectService(url) {
 // Преобразует URL в Raw-формат
 function convertToRaw(url, service) {
   try {
-    // Проверяем, не Raw ли это уже
+    // Если уже Raw-ссылка — возвращаем как есть
     if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
       return url;
     }
@@ -270,13 +270,11 @@ function convertToRaw(url, service) {
     }
     
     if (service === 'hastebin') {
-      // https://www.toptal.com/developers/hastebin/abc123 → https://www.toptal.com/developers/hastebin/raw/abc123
       const match = url.match(/hastebin\/([^\/\?\#]+)/);
       if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
     }
     
     if (service === 'pastebin') {
-      // https://pastebin.com/abc123 → https://pastebin.com/raw/abc123
       const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
       if (match) return `https://pastebin.com/raw/${match[1]}`;
     }
@@ -288,7 +286,6 @@ function convertToRaw(url, service) {
   }
 }
 
-// Имя сервиса для отображения
 function getServiceName(service) {
   const names = {
     gist: 'GitHub Gist',
@@ -298,38 +295,54 @@ function getServiceName(service) {
   return names[service] || 'сервис';
 }
 
-// Главная функция: обрабатывает вставку ссылки
-async function handleSmartPaste(text, textarea, statusEl) {
-  if (!text || !textarea) return false;
+// Загрузка кода по ссылке с CORS-прокси
+async function loadCodeFromUrl() {
+  const urlInput = $('builder-url-input');
+  const codeInput = $('builder-code-input');
+  const statusEl = $('builder-status-3');
+  const loadBtn = $('builder-load-url-btn');
   
-  const trimmed = text.trim();
+  if (!urlInput || !codeInput || !statusEl) return;
   
-  // Проверяем, что это URL
-  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
-    return false;
+  let url = urlInput.value.trim();
+  if (!url) {
+    showStatus(statusEl, '❌ Вставьте ссылку', 'error');
+    return;
+  }
+  
+  // Добавляем https:// если нет протокола
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
   }
   
   // Определяем сервис
-  const service = detectService(trimmed);
+  const service = detectService(url);
   if (!service) {
-    // Неизвестный сервис — не трогаем
-    return false;
+    showStatus(statusEl, '❌ Неизвестный сервис. Поддерживаются: GitHub Gist, Hastebin, Pastebin.', 'error');
+    return;
   }
   
   // Преобразуем в Raw
-  const rawUrl = convertToRaw(trimmed, service);
+  const rawUrl = convertToRaw(url, service);
   if (!rawUrl) {
     showStatus(statusEl, '❌ Не удалось преобразовать ссылку', 'error');
-    return false;
+    return;
   }
   
-  // Показываем статус загрузки
+  // Блокируем кнопку на время загрузки
+  if (loadBtn) {
+    loadBtn.disabled = true;
+    loadBtn.textContent = '⏳ Загрузка...';
+  }
+  codeInput.style.opacity = '0.5';
+  
   showStatus(statusEl, `⏳ Загрузка с ${getServiceName(service)}...`, 'loading');
-  textarea.style.opacity = '0.5';
-  textarea.disabled = true;
   
   try {
-    const response = await fetch(rawUrl);
+    // Используем CORS-прокси
+    const proxyUrl = CORS_PROXY + encodeURIComponent(rawUrl);
+    const response = await fetch(proxyUrl);
+    
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const content = await response.text();
@@ -340,19 +353,23 @@ async function handleSmartPaste(text, textarea, statusEl) {
     }
     
     // Вставляем в поле
-    textarea.value = content;
-    textarea.style.opacity = '1';
-    textarea.disabled = false;
+    codeInput.value = content;
+    codeInput.style.opacity = '1';
     
     showStatus(statusEl, `✅ Загружено с ${getServiceName(service)}! Теперь нажмите "Создать приложение".`, 'success');
     
-    return true;
+    // Очищаем поле URL
+    urlInput.value = '';
+    
   } catch (error) {
     console.error('Ошибка загрузки:', error);
-    textarea.style.opacity = '1';
-    textarea.disabled = false;
+    codeInput.style.opacity = '1';
     showStatus(statusEl, `❌ Ошибка загрузки: ${error.message}. Попробуйте вставить код вручную.`, 'error');
-    return false;
+  } finally {
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = '🔗 Загрузить';
+    }
   }
 }
 
@@ -382,31 +399,17 @@ function setupEventListeners() {
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
+  $('builder-load-url-btn')?.addEventListener('click', loadCodeFromUrl);
   
-  // УМНЫЙ ПАРСЕР: слушаем вставку в поле кода конструктора
-  const builderCodeInput = $('builder-code-input');
-  const builderStatus3 = $('builder-status-3');
-  if (builderCodeInput) {
-    builderCodeInput.addEventListener('paste', async (e) => {
-      // Получаем вставленный текст из буфера обмена
-      const clipboardData = e.clipboardData || window.clipboardData;
-      if (!clipboardData) return;
-      
-      const pastedText = clipboardData.getData('text');
-      if (!pastedText) return;
-      
-      // Проверяем, является ли это URL поддерживаемого сервиса
-      const trimmed = pastedText.trim();
-      if ((trimmed.startsWith('http://') || trimmed.startsWith('https://')) && detectService(trimmed)) {
-        // Предотвращаем стандартную вставку
-        e.preventDefault();
-        // Запускаем умную загрузку
-        await handleSmartPaste(trimmed, builderCodeInput, builderStatus3);
-      }
-    });
-  }
+  // Enter в поле URL тоже загружает
+  $('builder-url-input')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      loadCodeFromUrl();
+    }
+  });
 
-  // Создание (старая модалка, оставлена для совместимости)
+  // Создание (старая модалка)
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
