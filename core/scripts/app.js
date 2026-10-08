@@ -79,13 +79,11 @@ const BUILDER_PLATFORM_INSTRUCTION = `
 function openBuilder() {
   const ideaInput = $('builder-idea-input');
   const codeInput = $('builder-code-input');
-  const urlInput = $('builder-url-input');
   const status1 = $('builder-status-1');
   const status3 = $('builder-status-3');
   
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
-  if (urlInput) urlInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
   
@@ -145,11 +143,8 @@ function copyBuilderPrompt() {
 function openSelectedAI() {
   const selectEl = $('builder-ai-select');
   if (!selectEl) return;
-  
   const url = selectEl.value;
-  if (url) {
-    window.open(url, '_blank');
-  }
+  if (url) window.open(url, '_blank');
 }
 
 function createFromBuilder() {
@@ -177,19 +172,11 @@ function createFromBuilder() {
     const doc = parser.parseFromString(code, 'text/html');
     const manifestScript = doc.getElementById('manifest');
     
-    if (!manifestScript) {
-      throw new Error('Не найден тег <script id="manifest"> в <head>');
-    }
+    if (!manifestScript) throw new Error('Не найден тег <script id="manifest"> в <head>');
     
     const manifest = JSON.parse(manifestScript.textContent);
-    
-    if (!manifest.id || !manifest.name || !manifest.icon) {
-      throw new Error('В manifest не хватает полей id, name или icon');
-    }
-    
-    if (allModules.some(m => m.id === manifest.id)) {
-      throw new Error('Приложение с таким ID уже существует');
-    }
+    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('В manifest не хватает полей id, name или icon');
+    if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
     
     const newModule = {
       id: manifest.id,
@@ -231,145 +218,8 @@ function createFromBuilder() {
         renderAllApps();
       }, 1000);
     }
-    
   } catch (error) {
     showStatus(statusEl, `❌ Ошибка: ${error.message}`, 'error');
-  }
-}
-
-// ==========================================
-// УМНЫЙ ПАРСЕР ССЫЛОК (с CORS-прокси)
-// ==========================================
-
-// CORS-прокси для обхода ограничений браузера
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-
-// Определяет сервис по URL
-function detectService(url) {
-  if (!url) return null;
-  const lower = url.toLowerCase();
-  
-  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
-  if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
-  if (lower.includes('pastebin.com')) return 'pastebin';
-  
-  return null;
-}
-
-// Преобразует URL в Raw-формат
-function convertToRaw(url, service) {
-  try {
-    // Если уже Raw-ссылка — возвращаем как есть
-    if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
-      return url;
-    }
-    
-    if (service === 'gist') {
-      // https://gist.github.com/user/abc123 → https://gist.githubusercontent.com/user/abc123/raw
-      return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
-    }
-    
-    if (service === 'hastebin') {
-      const match = url.match(/hastebin\/([^\/\?\#]+)/);
-      if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
-    }
-    
-    if (service === 'pastebin') {
-      const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
-      if (match) return `https://pastebin.com/raw/${match[1]}`;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Ошибка преобразования URL:', error);
-    return null;
-  }
-}
-
-function getServiceName(service) {
-  const names = {
-    gist: 'GitHub Gist',
-    hastebin: 'Hastebin',
-    pastebin: 'Pastebin'
-  };
-  return names[service] || 'сервис';
-}
-
-// Загрузка кода по ссылке с CORS-прокси
-async function loadCodeFromUrl() {
-  const urlInput = $('builder-url-input');
-  const codeInput = $('builder-code-input');
-  const statusEl = $('builder-status-3');
-  const loadBtn = $('builder-load-url-btn');
-  
-  if (!urlInput || !codeInput || !statusEl) return;
-  
-  let url = urlInput.value.trim();
-  if (!url) {
-    showStatus(statusEl, '❌ Вставьте ссылку', 'error');
-    return;
-  }
-  
-  // Добавляем https:// если нет протокола
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    url = 'https://' + url;
-  }
-  
-  // Определяем сервис
-  const service = detectService(url);
-  if (!service) {
-    showStatus(statusEl, '❌ Неизвестный сервис. Поддерживаются: GitHub Gist, Hastebin, Pastebin.', 'error');
-    return;
-  }
-  
-  // Преобразуем в Raw
-  const rawUrl = convertToRaw(url, service);
-  if (!rawUrl) {
-    showStatus(statusEl, '❌ Не удалось преобразовать ссылку', 'error');
-    return;
-  }
-  
-  // Блокируем кнопку на время загрузки
-  if (loadBtn) {
-    loadBtn.disabled = true;
-    loadBtn.textContent = '⏳ Загрузка...';
-  }
-  codeInput.style.opacity = '0.5';
-  
-  showStatus(statusEl, `⏳ Загрузка с ${getServiceName(service)}...`, 'loading');
-  
-  try {
-    // Используем CORS-прокси
-    const proxyUrl = CORS_PROXY + encodeURIComponent(rawUrl);
-    const response = await fetch(proxyUrl);
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const content = await response.text();
-    
-    // Проверяем, что это HTML
-    if (!content.includes('<html') && !content.includes('<!DOCTYPE')) {
-      throw new Error('По ссылке нет HTML-кода');
-    }
-    
-    // Вставляем в поле
-    codeInput.value = content;
-    codeInput.style.opacity = '1';
-    
-    showStatus(statusEl, `✅ Загружено с ${getServiceName(service)}! Теперь нажмите "Создать приложение".`, 'success');
-    
-    // Очищаем поле URL
-    urlInput.value = '';
-    
-  } catch (error) {
-    console.error('Ошибка загрузки:', error);
-    codeInput.style.opacity = '1';
-    showStatus(statusEl, `❌ Ошибка загрузки: ${error.message}. Попробуйте вставить код вручную.`, 'error');
-  } finally {
-    if (loadBtn) {
-      loadBtn.disabled = false;
-      loadBtn.textContent = '🔗 Загрузить';
-    }
   }
 }
 
@@ -399,15 +249,6 @@ function setupEventListeners() {
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
-  $('builder-load-url-btn')?.addEventListener('click', loadCodeFromUrl);
-  
-  // Enter в поле URL тоже загружает
-  $('builder-url-input')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      loadCodeFromUrl();
-    }
-  });
 
   // Создание (старая модалка)
   $('create-app-btn')?.addEventListener('click', openCreateModal);
