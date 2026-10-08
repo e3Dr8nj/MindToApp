@@ -20,7 +20,7 @@
       <div class="header-buttons">
         <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
         <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
-        <button id="create-app-btn" class="btn btn-primary">✨ Создать приложение</button>
+        <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
         <button id="add-custom-btn" class="btn">➕ Добавить</button>
         <button id="open-store-btn" class="btn">🛒 Магазин</button>
       </div>
@@ -52,7 +52,64 @@
     <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
   </div>
 
-  <!-- Модальное окно: Создание приложения через AI -->
+  <!-- Экран 4: Конструктор приложений -->
+  <div id="builder-screen" class="screen">
+    <header class="builder-header">
+      <button id="builder-back-btn" class="btn btn-back">← Назад</button>
+      <h1>🛠 Конструктор приложений</h1>
+      <div class="header-spacer"></div>
+    </header>
+    <div class="builder-container">
+      <!-- Блок 1: Идея -->
+      <div class="builder-block">
+        <div class="builder-block-number">1</div>
+        <h3 class="builder-block-title">💡 Опишите идею</h3>
+        <p class="builder-block-desc">Опишите, какое приложение вы хотите создать. Чем подробнее — тем лучше результат.</p>
+        <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage..."></textarea>
+        <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
+        <div id="builder-status-1" class="modal-status"></div>
+      </div>
+
+      <!-- Стрелка 1→2 -->
+      <div class="builder-arrow">→</div>
+
+      <!-- Блок 2: Нейросеть -->
+      <div class="builder-block">
+        <div class="builder-block-number">2</div>
+        <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
+        <p class="builder-block-desc">Вставьте скопированный промпт в любую нейросеть и дождитесь ответа.</p>
+        <select id="builder-ai-select" class="builder-select">
+          <option value="https://chat.qwenlm.ai">🌟 Qwen Chat (Отлично кодит)</option>
+          <option value="https://chat.deepseek.com">DeepSeek (Топ для кода)</option>
+          <option value="https://chat.openai.com">ChatGPT</option>
+          <option value="https://claude.ai">Claude</option>
+          <option value="https://gemini.google.com">Google Gemini</option>
+          <option value="https://copilot.microsoft.com">Microsoft Copilot</option>
+          <option value="https://chat.mistral.ai">Mistral Le Chat</option>
+          <option value="https://groq.com">Groq (Очень быстро)</option>
+          <option value="https://www.blackbox.ai">Blackbox AI</option>
+          <option value="https://www.phind.com">Phind</option>
+        </select>
+        <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
+        <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
+      </div>
+
+      <!-- Стрелка 2→3 -->
+      <div class="builder-arrow">→</div>
+
+      <!-- Блок 3: Код -->
+      <div class="builder-block">
+        <div class="builder-block-number">3</div>
+        <h3 class="builder-block-title">🚀 Создайте приложение</h3>
+        <p class="builder-block-desc">Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".</p>
+        <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда весь HTML-код от нейросети..."></textarea>
+        <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Создать приложение</button>
+        <div id="builder-status-3" class="modal-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Создание приложения через AI (оставляем для обратной совместимости) -->
   <div id="create-modal" class="modal">
     <div class="modal-content modal-create">
       <div class="modal-header">
