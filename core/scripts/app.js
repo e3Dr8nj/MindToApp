@@ -246,6 +246,7 @@ function setupEventListeners() {
   // Конструктор
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-back-btn')?.addEventListener('click', closeBuilder);
+  $('builder-close-btn')?.addEventListener('click', closeBuilder);
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
@@ -298,7 +299,7 @@ function setupEventListeners() {
 
   // Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); }
+    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); closeBuilder(); }
   });
 }
 

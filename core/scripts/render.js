@@ -1,3 +1,5 @@
+const builderScreen = $('builder-screen');
+
 function renderInstalledApps() {
   installedAppsContainer.innerHTML = '';
   if (installedModules.length === 0) {
@@ -63,7 +65,6 @@ function createAppCard(module, isInstalled) {
     card.appendChild(editBtn);
   }
   
-  // Кнопка удаления — только для пользовательских модулей
   if (module.isCustom) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
@@ -77,6 +78,8 @@ function createAppCard(module, isInstalled) {
 }
 
 function showScreen(screen) {
-  [homeScreen, storeScreen, appScreen].forEach(s => s.classList.remove('active'));
-  screen.classList.add('active');
+  [homeScreen, storeScreen, appScreen, builderScreen].forEach(s => {
+    if (s) s.classList.remove('active');
+  });
+  if (screen) screen.classList.add('active');
 }
