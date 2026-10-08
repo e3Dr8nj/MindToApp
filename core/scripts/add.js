@@ -8,11 +8,16 @@ function openAddModal() {
   selectedFolderFiles = null;
   if (selectedFolderInfo) selectedFolderInfo.textContent = '';
   if (folderInput) folderInput.value = '';
+  // Очищаем textarea для кода
+  const codeTextarea = $('code-input-textarea');
+  if (codeTextarea) codeTextarea.value = '';
   showStatus(modalStatus, '');
   switchTab('url');
 }
 
-function closeAddModal() { if (addModal) addModal.classList.remove('active'); }
+function closeAddModal() { 
+  if (addModal) addModal.classList.remove('active'); 
+}
 
 function switchTab(tab) {
   currentTab = tab;
@@ -28,6 +33,7 @@ function switchTab(tab) {
 async function addModule() {
   if (currentTab === 'folder') await addFolderModule();
   else if (currentTab === 'local') await addLocalFileModule();
+  else if (currentTab === 'code') await addCodeModule();
   else await addUrlModule();
 }
 
@@ -122,7 +128,84 @@ async function addUrlModule() {
   } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
 }
 
-// Обработчики input для файлов (остаются глобальными, так как привязаны к DOM)
+// НОВАЯ ФУНКЦИЯ: Добавление по прямому коду
+async function addCodeModule() {
+  const codeTextarea = $('code-input-textarea');
+  if (!codeTextarea) return showStatus(modalStatus, '❌ Поле кода не найдено', 'error');
+  
+  const code = codeTextarea.value.trim();
+  if (!code) return showStatus(modalStatus, '❌ Вставьте HTML-код', 'error');
+  
+  // Проверка что это похоже на HTML
+  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
+    return showStatus(modalStatus, '❌ Это не похоже на HTML-код', 'error');
+  }
+  
+  showStatus(modalStatus, '⏳ Анализ кода...', 'loading');
+  
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(code, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    
+    if (!manifestScript) {
+      throw new Error('Не найден тег <script id="manifest"> в <head>. Код должен содержать manifest.');
+    }
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    
+    if (!manifest.id || !manifest.name || !manifest.icon) {
+      throw new Error('В manifest не хватает обязательных полей: id, name или icon');
+    }
+    
+    if (allModules.some(m => m.id === manifest.id)) {
+      throw new Error(`Модуль с ID "${manifest.id}" уже существует. Измените ID в manifest.`);
+    }
+    
+    // Создаём новый модуль
+    const newModule = {
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || 'Добавлено из кода',
+      content: code,
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    };
+    
+    customModules.push(newModule);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+    
+    if (!installedModules.includes(manifest.id)) {
+      installedModules.push(manifest.id);
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+    
+    const blob = new Blob([code], { type: 'text/html' });
+    allModules.push({
+      ...manifest,
+      description: manifest.description || 'Добавлено из кода',
+      content: code,
+      url: URL.createObjectURL(blob),
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    });
+    
+    showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
+    setTimeout(() => {
+      closeAddModal();
+      renderInstalledApps();
+      renderAllApps();
+    }, 1000);
+    
+  } catch (error) {
+    showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error');
+  }
+}
+
+// Обработчики input для файлов
 if (localFileInput) {
   localFileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -155,4 +238,10 @@ if (folderInput) {
     if (selectedFolderInfo) selectedFolderInfo.textContent = `✅ Папка: ${root} (${files.length} файлов, ${size} МБ)`;
     showStatus(modalStatus, '');
   });
+}
+
+function showStatus(element, message, type = '') {
+  if (!element) return;
+  element.textContent = message;
+  element.className = `modal-status ${type}`.trim();
 }

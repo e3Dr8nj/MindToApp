@@ -133,10 +133,15 @@
           <div id="selected-folder-info" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
           <div class="folder-warning">⚠️ Работает в Chrome, Edge, Firefox. Не работает в Safari.</div>
         </div>
+        <div class="tab" data-tab="code" style="display: none;">
+          <p class="modal-description">Вставьте полный HTML-код приложения. Код должен содержать <code>&lt;script id="manifest"&gt;</code> в <code>&lt;head&gt;</code>.</p>
+          <textarea id="code-input-textarea" class="code-input" placeholder="Вставьте сюда HTML-код приложения..."></textarea>
+        </div>
         <div class="tab-switcher">
           <button class="tab-btn active" data-target="url">🔗 Ссылка</button>
           <button class="tab-btn" data-target="local">📄 Файл</button>
           <button class="tab-btn" data-target="folder">📁 Папка</button>
+          <button class="tab-btn" data-target="code">📋 Код</button>
         </div>
         <div id="modal-status" class="modal-status"></div>
       </div>
