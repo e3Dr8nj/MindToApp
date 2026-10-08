@@ -1,4 +1,5 @@
 async function init() {
+  initTheme(); // Инициализируем тему перед всем остальным
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
@@ -66,6 +67,9 @@ function setupEventListeners() {
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
+  // Тема
+  $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
+
   // Создание
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
@@ -97,7 +101,7 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
-  // Шаринг (обновлённые обработчики)
+  // Шаринг
   $('close-share-btn')?.addEventListener('click', closeShareModal);
   $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
   $('copy-app-code-btn')?.addEventListener('click', copyAppCode);

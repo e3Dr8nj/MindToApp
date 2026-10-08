@@ -18,6 +18,7 @@
     <header>
       <h1>🏠 Мои приложения</h1>
       <div class="header-buttons">
+        <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
         <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
         <button id="create-app-btn" class="btn btn-primary">✨ Создать приложение</button>
         <button id="add-custom-btn" class="btn">➕ Добавить</button>
@@ -72,7 +73,7 @@
         </div>
         <div class="step-box">
           <h3>3. Вставьте промпт в любую из этих бесплатных нейросетей:</h3>
-          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
           <div class="ai-links">
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
@@ -124,13 +125,13 @@
           <p class="modal-description">Выберите <b>один файл .html</b> с вашего компьютера.</p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
           <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Выбрать файл .html</button>
-          <div id="selected-file-name" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
+          <div id="selected-file-name" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
         </div>
         <div class="tab" data-tab="folder" style="display: none;">
           <p class="modal-description">Выберите <b>папку</b> с модулем (должен быть index.html).</p>
           <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
           <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📁 Выбрать папку</button>
-          <div id="selected-folder-info" style="color: #667eea; font-size: 14px; text-align: center; font-weight: 500;"></div>
+          <div id="selected-folder-info" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
           <div class="folder-warning">⚠️ Работает в Chrome, Edge, Firefox. Не работает в Safari.</div>
         </div>
         <div class="tab" data-tab="code" style="display: none;">
@@ -184,7 +185,7 @@
 
         <div class="step-box">
           <h3>2. Вставьте промпт в любую из этих нейросетей:</h3>
-          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный исправленный HTML-код.</p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный исправленный HTML-код.</p>
           <div class="ai-links">
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
@@ -230,7 +231,7 @@
         
         <div class="step-box">
           <h3>📋 Шаг 1: Скопировать код</h3>
-          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
             Скопируйте весь HTML-код приложения в буфер обмена.
           </p>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
@@ -239,7 +240,7 @@
 
         <div class="step-box">
           <h3>🌐 Шаг 2: Разместить и получить ссылку</h3>
-          <p style="font-size: 13px; color: #666; margin-bottom: 10px;">
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
             Откройте любой из этих бесплатных сервисов, вставьте код (Ctrl+V), сохраните и скопируйте полученную ссылку.
           </p>
           <div class="ai-links">
@@ -258,6 +259,7 @@
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
   <script src="scripts/db.js"></script>
   <script src="scripts/state.js"></script>
+  <script src="scripts/theme.js"></script>
   <script src="scripts/registry.js"></script>
   <script src="scripts/render.js"></script>
   <script src="scripts/create.js"></script>
