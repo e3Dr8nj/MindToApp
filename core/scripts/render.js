@@ -37,8 +37,8 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
   }
   
-  // Кнопка шаринга — для пользовательских модулей с контентом
-  if (module.isCustom && module.content) {
+  // Кнопка шаринга — для ВСЕХ модулей с контентом (и из магазина тоже)
+  if (module.content) {
     const shareBtn = document.createElement('button');
     shareBtn.className = 'share-btn';
     shareBtn.textContent = '📤';
@@ -50,7 +50,7 @@ function createAppCard(module, isInstalled) {
     card.appendChild(shareBtn);
   }
   
-  // Кнопка редактирования
+  // Кнопка редактирования — для всех модулей с контентом
   if (module.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
@@ -63,6 +63,7 @@ function createAppCard(module, isInstalled) {
     card.appendChild(editBtn);
   }
   
+  // Кнопка удаления — только для пользовательских модулей
   if (module.isCustom) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
