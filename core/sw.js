@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mind-to-app-v9';
+const CACHE_NAME = 'mind-to-app-v10';
 
 const urlsToCache = [
   '/MindToApp/core/',
