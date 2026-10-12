@@ -70,7 +70,6 @@ function openAIPanel() {
   
   aiPanel.style.display = 'block';
   
-  // Плавная прокрутка к панели
   setTimeout(() => {
     aiPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
