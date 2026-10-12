@@ -208,7 +208,7 @@ body[data-theme="discord"] {
 }
 
 /* ==========================================
-   БАЗОВЫЕ СТИЛИ (используют переменные)
+   БАЗОВЫЕ СТИЛИ
    ========================================== */
 
 body {
@@ -360,7 +360,9 @@ h1 { color: var(--heading-color); font-size: 24px; }
 .empty-state { text-align: center; color: var(--heading-color); padding: 60px 20px; }
 .empty-state p { font-size: 18px; margin-bottom: 20px; }
 
-#app-screen { padding: 0; display: flex; flex-direction: column; min-height: 100vh; }
+/* ВАЖНО: здесь НЕЛЬЗЯ задавать display: flex в базовом состоянии,
+   иначе ID-селектор переобьёт .screen и экран будет виден всегда */
+#app-screen { padding: 0; flex-direction: column; min-height: 100vh; }
 #app-screen.active { display: flex; }
 
 .app-header {
@@ -549,38 +551,36 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
-   КОНСТРУКТОР ПРИЛОЖЕНИЙ
+   ПАНЕЛЬ КОНСТРУКТОРА
    ========================================== */
 
-#builder-screen {
-  padding: 0;
-  min-height: 100vh;
+.builder-panel {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  animation: panelSlideDown 0.3s ease-out;
 }
 
-#builder-screen.active {
-  display: flex !important;
-  flex-direction: column;
+@keyframes panelSlideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.builder-header {
-  background: var(--app-header-bg);
-  padding: 10px 20px;
-  margin: 0;
-  box-shadow: 0 2px 8px var(--app-header-shadow);
-  flex-shrink: 0;
-  z-index: 100;
+.builder-panel-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 15px;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--input-border);
 }
 
-.builder-header h1 {
-  color: var(--app-header-text);
-  font-size: 18px;
+.builder-panel-header h2 {
+  color: var(--modal-heading-color);
+  font-size: 20px;
   margin: 0;
-  flex: 1;
-  text-align: center;
 }
 
 .builder-container {
@@ -588,20 +588,17 @@ h1 { color: var(--heading-color); font-size: 24px; }
   flex-direction: row;
   align-items: stretch;
   gap: 20px;
-  padding: 30px;
-  flex: 1;
-  overflow-y: auto;
 }
 
 .builder-block {
   flex: 1;
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 25px;
-  box-shadow: 0 4px 12px var(--card-shadow);
+  background: var(--edit-preview-bg);
+  border-radius: 12px;
+  padding: 25px 20px 20px;
   display: flex;
   flex-direction: column;
   position: relative;
+  min-width: 0;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -612,25 +609,25 @@ h1 { color: var(--heading-color); font-size: 24px; }
 
 .builder-block-number {
   position: absolute;
-  top: -15px;
-  left: 20px;
-  width: 36px;
-  height: 36px;
+  top: -14px;
+  left: 18px;
+  width: 32px;
+  height: 32px;
   background: var(--accent-color);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   box-shadow: 0 2px 8px var(--btn-back-shadow);
 }
 
 .builder-block-title {
   color: var(--modal-heading-color);
-  font-size: 18px;
-  margin: 10px 0 10px 0;
+  font-size: 17px;
+  margin: 5px 0 10px 0;
   font-weight: 600;
 }
 
@@ -645,11 +642,10 @@ h1 { color: var(--heading-color); font-size: 24px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 28px;
   color: var(--accent-color);
   font-weight: bold;
   flex-shrink: 0;
-  text-shadow: 0 2px 4px var(--btn-back-shadow);
 }
 
 .builder-select {
@@ -672,7 +668,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
 .builder-hint {
   margin-top: 15px;
   padding: 10px;
-  background: var(--edit-preview-bg);
+  background: var(--card-bg);
   border-radius: 8px;
   font-size: 12px;
   color: var(--description-color);
@@ -697,18 +693,16 @@ h1 { color: var(--heading-color); font-size: 24px; }
 @media (max-width: 900px) {
   .builder-container {
     flex-direction: column;
-    padding: 20px;
     gap: 30px;
   }
 
   .builder-arrow {
     transform: rotate(90deg);
-    font-size: 28px;
     margin: -10px 0;
   }
 
   .builder-block {
-    padding: 20px;
+    padding: 25px 18px 18px;
   }
 
   .builder-block-title {
@@ -743,84 +737,12 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .edit-preview-icon, .share-preview-icon { font-size: 36px; }
   .edit-preview-name, .share-preview-name { font-size: 16px; }
   
-  .builder-header {
-    padding: 8px 15px;
-  }
-
-  .builder-header h1 {
-    font-size: 16px;
-  }
-
-  .builder-container {
-    padding: 15px;
-    gap: 25px;
-  }
-
-  .builder-block {
-    padding: 15px;
-  }
-
+  .builder-panel { padding: 15px; }
+  .builder-panel-header { margin-bottom: 20px; }
+  .builder-panel-header h2 { font-size: 17px; }
+  .builder-block { padding: 22px 15px 15px; }
   .builder-block-number {
-    width: 30px;
-    height: 30px;
-    font-size: 15px;
-    top: -12px;
-    left: 15px;
-  }
-}
-/* ==========================================
-   ПАНЕЛЬ КОНСТРУКТОРА
-   ========================================== */
-
-.builder-panel {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 12px var(--card-shadow);
-  animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.builder-panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--input-border);
-}
-
-.builder-panel-header h2 {
-  color: var(--modal-heading-color);
-  font-size: 20px;
-  margin: 0;
-}
-
-.builder-panel .builder-container {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 20px;
-}
-
-@media (max-width: 900px) {
-  .builder-panel .builder-container {
-    flex-direction: column;
-  }
-
-  .builder-panel .builder-arrow {
-    transform: rotate(90deg);
-    margin: -10px 0;
+    width: 28px; height: 28px;
+    font-size: 14px; top: -12px; left: 15px;
   }
 }
