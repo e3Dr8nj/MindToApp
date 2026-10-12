@@ -715,6 +715,93 @@ h1 { color: var(--heading-color); font-size: 24px; }
   }
 }
 
+/* ==========================================
+   ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: ПАНЕЛЬ НЕЙРОСЕТЕЙ
+   ========================================== */
+
+.ai-panel {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  animation: panelSlideDown 0.3s ease-out;
+}
+
+.ai-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--input-border);
+}
+
+.ai-panel-header h2 {
+  color: var(--modal-heading-color);
+  font-size: 20px;
+  margin: 0;
+}
+
+.ai-panel-hint {
+  color: var(--description-color);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.ai-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.ai-panel-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  background: var(--ai-link-bg);
+  color: var(--ai-link-color);
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.ai-panel-link:hover {
+  background: var(--ai-link-hover-bg);
+  color: var(--ai-link-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--ai-link-hover-shadow);
+}
+
+.ai-panel-link.ai-available {
+  border-color: var(--share-btn-bg);
+}
+
+@media (max-width: 600px) {
+  .ai-panel {
+    padding: 15px;
+  }
+  
+  .ai-panel-header h2 {
+    font-size: 17px;
+  }
+  
+  .ai-panel-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .ai-panel-link {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 600px) {
   .app-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
   .app-icon { font-size: 36px; }

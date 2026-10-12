@@ -61,6 +61,29 @@ async function refreshApp() {
 }
 
 // ==========================================
+// ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: ПАНЕЛЬ НЕЙРОСЕТЕЙ
+// ==========================================
+
+function openAIPanel() {
+  const aiPanel = $('ai-panel');
+  if (!aiPanel) return;
+  
+  aiPanel.style.display = 'block';
+  
+  // Плавная прокрутка к панели
+  setTimeout(() => {
+    aiPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function closeAIPanel() {
+  const aiPanel = $('ai-panel');
+  if (aiPanel) {
+    aiPanel.style.display = 'none';
+  }
+}
+
+// ==========================================
 // КОНСТРУКТОР ПРИЛОЖЕНИЙ (ПАНЕЛЬ)
 // ==========================================
 
@@ -77,26 +100,21 @@ const BUILDER_PLATFORM_INSTRUCTION = `
 Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`;
 
 function openBuilder() {
-  const builderPanel = $('builder-panel');
   const ideaInput = $('builder-idea-input');
   const codeInput = $('builder-code-input');
   const status1 = $('builder-status-1');
   const status3 = $('builder-status-3');
   
-  if (!builderPanel) return;
-  
-  // Очищаем поля
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
   
-  // Показываем панель
-  builderPanel.style.display = 'block';
+  const builderPanel = $('builder-panel');
+  if (builderPanel) builderPanel.style.display = 'block';
   
-  // Плавная прокрутка к панели
   setTimeout(() => {
-    builderPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (builderPanel) builderPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
 }
 
@@ -256,6 +274,10 @@ function setupEventListeners() {
   // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
+  // Верхняя дополнительная область: панель нейросетей
+  $('ai-list-btn')?.addEventListener('click', openAIPanel);
+  $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
+
   // Конструктор (панель)
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
@@ -311,7 +333,14 @@ function setupEventListeners() {
 
   // Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); closeBuilder(); }
+    if (e.key === 'Escape') { 
+      closeCreateModal(); 
+      closeAddModal(); 
+      closeEditModal(); 
+      closeShareModal(); 
+      closeBuilder();
+      closeAIPanel();
+    }
   });
 }
 

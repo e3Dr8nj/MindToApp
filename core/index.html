@@ -20,13 +20,38 @@
       <div class="header-buttons">
         <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
         <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
+        <button id="ai-list-btn" class="btn">🤖 Нейросети</button>
         <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
         <button id="add-custom-btn" class="btn">➕ Добавить</button>
         <button id="open-store-btn" class="btn">🛒 Магазин</button>
       </div>
     </header>
     
-    <!-- Панель конструктора (раскрывается здесь) -->
+    <!-- ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: Панель нейросетей -->
+    <div id="ai-panel" class="ai-panel" style="display: none;">
+      <div class="ai-panel-header">
+        <h2>🤖 Бесплатные нейросети для создания приложений</h2>
+        <button id="ai-panel-close-btn" class="modal-close" title="Закрыть">&times;</button>
+      </div>
+      <p class="ai-panel-hint">⭐ — работают в РФ без VPN. Откройте любую, вставьте промпт из конструктора и получите HTML-код.</p>
+      <div class="ai-panel-grid">
+        <a href="https://chat.qwenlm.ai" target="_blank" class="ai-panel-link ai-available">⭐ Qwen Chat</a>
+        <a href="https://chat.deepseek.com" target="_blank" class="ai-panel-link ai-available">⭐ DeepSeek</a>
+        <a href="https://chat.openai.com" target="_blank" class="ai-panel-link">ChatGPT</a>
+        <a href="https://claude.ai" target="_blank" class="ai-panel-link">Claude</a>
+        <a href="https://gemini.google.com" target="_blank" class="ai-panel-link">Google Gemini</a>
+        <a href="https://chat.mistral.ai" target="_blank" class="ai-panel-link ai-available">⭐ Mistral Le Chat</a>
+        <a href="https://groq.com" target="_blank" class="ai-panel-link ai-available">⭐ Groq</a>
+        <a href="https://copilot.microsoft.com" target="_blank" class="ai-panel-link">Microsoft Copilot</a>
+        <a href="https://www.blackbox.ai" target="_blank" class="ai-panel-link ai-available">⭐ Blackbox AI</a>
+        <a href="https://www.phind.com" target="_blank" class="ai-panel-link ai-available">⭐ Phind</a>
+        <a href="https://gigachat.ru" target="_blank" class="ai-panel-link ai-available">⭐ GigaChat</a>
+        <a href="https://ya.ru/ai" target="_blank" class="ai-panel-link ai-available">⭐ YandexGPT</a>
+        <a href="https://lmarena.ai" target="_blank" class="ai-panel-link">LLM Arena</a>
+      </div>
+    </div>
+    
+    <!-- Панель конструктора -->
     <div id="builder-panel" class="builder-panel" style="display: none;">
       <div class="builder-panel-header">
         <h2>🛠 Конструктор приложений</h2>
