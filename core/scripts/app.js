@@ -67,19 +67,13 @@ async function refreshApp() {
 function openAIPanel() {
   const aiPanel = $('ai-panel');
   if (!aiPanel) return;
-  
   aiPanel.style.display = 'block';
-  
-  setTimeout(() => {
-    aiPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  setTimeout(() => { aiPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
 }
 
 function closeAIPanel() {
   const aiPanel = $('ai-panel');
-  if (aiPanel) {
-    aiPanel.style.display = 'none';
-  }
+  if (aiPanel) aiPanel.style.display = 'none';
 }
 
 // ==========================================
@@ -119,9 +113,7 @@ function openBuilder() {
 
 function closeBuilder() {
   const builderPanel = $('builder-panel');
-  if (builderPanel) {
-    builderPanel.style.display = 'none';
-  }
+  if (builderPanel) builderPanel.style.display = 'none';
 }
 
 function copyBuilderPrompt() {
@@ -130,7 +122,6 @@ function copyBuilderPrompt() {
   const copyBtn = $('builder-copy-prompt-btn');
   
   if (!ideaInput) return;
-  
   const idea = ideaInput.value.trim();
   if (!idea) {
     showStatus(statusEl, '❌ Сначала опишите идею приложения', 'error');
@@ -146,16 +137,12 @@ function copyBuilderPrompt() {
         setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт', 2000);
       }
       showStatus(statusEl, '✅ Промпт скопирован! Теперь вставьте его в нейросеть.', 'success');
-    }).catch(() => {
-      showStatus(statusEl, '❌ Не удалось скопировать', 'error');
-    });
+    }).catch(() => { showStatus(statusEl, '❌ Не удалось скопировать', 'error'); });
   } else {
     const textarea = document.createElement('textarea');
     textarea.value = fullPrompt;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
+    textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+    document.body.appendChild(textarea); textarea.select();
     try {
       document.execCommand('copy');
       if (copyBtn) {
@@ -163,9 +150,7 @@ function copyBuilderPrompt() {
         setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт', 2000);
       }
       showStatus(statusEl, '✅ Промпт скопирован! Теперь вставьте его в нейросеть.', 'success');
-    } catch (e) {
-      showStatus(statusEl, '❌ Не удалось скопировать', 'error');
-    }
+    } catch (e) { showStatus(statusEl, '❌ Не удалось скопировать', 'error'); }
     document.body.removeChild(textarea);
   }
 }
@@ -183,17 +168,9 @@ function createFromBuilder() {
   const createBtn = $('builder-create-btn');
   
   if (!codeInput || !statusEl) return;
-  
   const code = codeInput.value.trim();
-  if (!code) {
-    showStatus(statusEl, '❌ Вставьте HTML-код от нейросети', 'error');
-    return;
-  }
-  
-  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
-    showStatus(statusEl, '❌ Это не похоже на HTML-код', 'error');
-    return;
-  }
+  if (!code) { showStatus(statusEl, '❌ Вставьте HTML-код от нейросети', 'error'); return; }
+  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) { showStatus(statusEl, '❌ Это не похоже на HTML-код', 'error'); return; }
   
   showStatus(statusEl, '⏳ Анализ кода...', 'loading');
   
@@ -201,7 +178,6 @@ function createFromBuilder() {
     const parser = new DOMParser();
     const doc = parser.parseFromString(code, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
     if (!manifestScript) throw new Error('Не найден тег <script id="manifest"> в <head>');
     
     const manifest = JSON.parse(manifestScript.textContent);
@@ -209,36 +185,21 @@ function createFromBuilder() {
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
     
     const newModule = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
+      id: manifest.id, name: manifest.name, icon: manifest.icon,
       description: manifest.description || 'Создано через конструктор',
-      content: code,
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
+      content: code, isCustom: true, isLocal: true, isFolder: false
     };
     
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
     if (!installedModules.includes(manifest.id)) {
       installedModules.push(manifest.id);
       localStorage.setItem('installedModules', JSON.stringify(installedModules));
     }
     
-    const blob = new Blob([code], { type: 'text/html' });
-    allModules.push({
-      ...manifest,
-      content: code,
-      url: URL.createObjectURL(blob),
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    });
+    allModules.push({ ...manifest, content: code, url: URL.createObjectURL(new Blob([code], { type: 'text/html' })), isCustom: true, isLocal: true, isFolder: false });
     
     showStatus(statusEl, '✅ Приложение успешно создано!', 'success');
-    
     if (createBtn) {
       createBtn.textContent = '✅ Создано!';
       setTimeout(() => {
@@ -296,12 +257,12 @@ function setupEventListeners() {
   // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Редактирование
+  // Редактирование (ОБНОВЛЕННЫЕ ОБРАБОТЧИКИ)
   $('close-edit-btn')?.addEventListener('click', closeEditModal);
   $('cancel-edit-btn')?.addEventListener('click', closeEditModal);
   $('toggle-code-btn')?.addEventListener('click', toggleCodeVisibility);
+  $('copy-code-btn')?.addEventListener('click', copyCurrentCode);
   $('copy-edit-prompt-btn')?.addEventListener('click', copyEditPrompt);
-  $('apply-edit-btn')?.addEventListener('click', applyEditChanges);
   editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
 
   // Добавление
@@ -333,12 +294,7 @@ function setupEventListeners() {
   // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
-      closeCreateModal(); 
-      closeAddModal(); 
-      closeEditModal(); 
-      closeShareModal(); 
-      closeBuilder();
-      closeAIPanel();
+      closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); closeBuilder(); closeAIPanel(); 
     }
   });
 }
