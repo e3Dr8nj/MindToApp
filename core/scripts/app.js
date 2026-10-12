@@ -61,7 +61,7 @@ async function refreshApp() {
 }
 
 // ==========================================
-// КОНСТРУКТОР ПРИЛОЖЕНИЙ
+// КОНСТРУКТОР ПРИЛОЖЕНИЙ (ПАНЕЛЬ)
 // ==========================================
 
 const BUILDER_PLATFORM_INSTRUCTION = `
@@ -77,35 +77,34 @@ const BUILDER_PLATFORM_INSTRUCTION = `
 Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`;
 
 function openBuilder() {
+  const builderPanel = $('builder-panel');
   const ideaInput = $('builder-idea-input');
   const codeInput = $('builder-code-input');
   const status1 = $('builder-status-1');
   const status3 = $('builder-status-3');
   
+  if (!builderPanel) return;
+  
+  // Очищаем поля
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
   
-  showScreen($('builder-screen'));
+  // Показываем панель
+  builderPanel.style.display = 'block';
   
-  // Даём браузеру время обновить DOM, затем прокручиваем
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
+  // Плавная прокрутка к панели
+  setTimeout(() => {
+    builderPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 function closeBuilder() {
-  showScreen(homeScreen);
-  
-  // Даём браузеру время обновить DOM, затем прокручиваем
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
+  const builderPanel = $('builder-panel');
+  if (builderPanel) {
+    builderPanel.style.display = 'none';
+  }
 }
 
 function copyBuilderPrompt() {
@@ -257,9 +256,8 @@ function setupEventListeners() {
   // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
-  // Конструктор
+  // Конструктор (панель)
   $('builder-btn')?.addEventListener('click', openBuilder);
-  $('builder-back-btn')?.addEventListener('click', closeBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);

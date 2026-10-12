@@ -768,3 +768,59 @@ h1 { color: var(--heading-color); font-size: 24px; }
     left: 15px;
   }
 }
+/* ==========================================
+   ПАНЕЛЬ КОНСТРУКТОРА
+   ========================================== */
+
+.builder-panel {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.builder-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--input-border);
+}
+
+.builder-panel-header h2 {
+  color: var(--modal-heading-color);
+  font-size: 20px;
+  margin: 0;
+}
+
+.builder-panel .builder-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .builder-panel .builder-container {
+    flex-direction: column;
+  }
+
+  .builder-panel .builder-arrow {
+    transform: rotate(90deg);
+    margin: -10px 0;
+  }
+}
