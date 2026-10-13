@@ -67,6 +67,9 @@ body {
   --btn-back-bg: #667eea;
   --btn-back-hover-bg: #5568d3;
   --btn-back-shadow: rgba(102, 126, 234, 0.3);
+  --toast-success-bg: #2ecc71;
+  --toast-error-bg: #e74c3c;
+  --toast-info-bg: #667eea;
 }
 
 /* ==========================================
@@ -136,6 +139,9 @@ body[data-theme="cyberpunk"] {
   --btn-back-bg: #ff00ff;
   --btn-back-hover-bg: #cc00cc;
   --btn-back-shadow: rgba(255, 0, 255, 0.5);
+  --toast-success-bg: #00ff9f;
+  --toast-error-bg: #ff0066;
+  --toast-info-bg: #00ccff;
 }
 
 /* ==========================================
@@ -205,6 +211,9 @@ body[data-theme="discord"] {
   --btn-back-bg: #5865f2;
   --btn-back-hover-bg: #4752c4;
   --btn-back-shadow: rgba(88, 101, 242, 0.4);
+  --toast-success-bg: #43b581;
+  --toast-error-bg: #f04747;
+  --toast-info-bg: #5865f2;
 }
 
 /* ==========================================
@@ -768,7 +777,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
   align-items: center;
   padding: 20px 0;
   z-index: 500;
-  gap: 15px;
+  gap: 12px;
 }
 
 .sidebar-btn {
@@ -779,14 +788,16 @@ h1 { color: var(--heading-color); font-size: 24px; }
   background: var(--accent-color);
   color: white;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   transition: all 0.2s;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .sidebar-btn:hover {
@@ -798,30 +809,41 @@ h1 { color: var(--heading-color); font-size: 24px; }
   transform: scale(0.95);
 }
 
+.sidebar-create-btn {
+  background: var(--share-btn-bg);
+}
+
+.sidebar-create-btn:hover {
+  background: var(--share-btn-hover-bg);
+}
+
 .sidebar-arrow {
-  font-size: 24px;
+  font-size: 22px;
   color: var(--accent-color);
   font-weight: bold;
-  margin: 5px 0;
+  margin: 2px 0;
   animation: bounceArrow 2s infinite;
 }
 
 @keyframes bounceArrow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(5px); }
+  50% { transform: translateY(4px); }
 }
 
 .sidebar-ai-wrapper {
   position: relative;
+  /* Расширяем hover-зону вправо, чтобы курсор не терялся при переходе к dropdown */
+  padding-right: 200px;
+  margin-right: -200px;
 }
 
 .sidebar-ai-dropdown {
   position: absolute;
-  left: 70px;
+  left: 62px; /* Впритык к правому краю кнопки (без зазора) */
   top: 0;
   background: var(--card-bg);
   border-radius: 12px;
-  box-shadow: 0 4px 12px var(--card-shadow);
+  box-shadow: 0 4px 16px var(--card-shadow);
   padding: 10px;
   display: none;
   flex-direction: column;
@@ -865,6 +887,68 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
+   TOAST УВЕДОМЛЕНИЯ
+   ========================================== */
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--toast-info-bg);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-weight: 500;
+  animation: toastSlideIn 0.3s ease-out;
+  max-width: 320px;
+  pointer-events: auto;
+}
+
+.toast.success {
+  background: var(--toast-success-bg);
+}
+
+.toast.error {
+  background: var(--toast-error-bg);
+}
+
+.toast.fade-out {
+  animation: toastFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastFadeOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* ==========================================
    АДАПТИВНОСТЬ
    ========================================== */
 
@@ -901,15 +985,20 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .sidebar-btn {
     width: 50px;
     height: 50px;
-    font-size: 10px;
+    font-size: 9px;
   }
   
   .sidebar-arrow {
-    font-size: 20px;
+    font-size: 18px;
+  }
+  
+  .sidebar-ai-wrapper {
+    padding-right: 180px;
+    margin-right: -180px;
   }
   
   .sidebar-ai-dropdown {
-    left: 55px;
+    left: 52px;
     min-width: 160px;
   }
   
@@ -951,5 +1040,16 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .ai-panel-link {
     padding: 10px 12px;
     font-size: 13px;
+  }
+  
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 70px;
+  }
+  
+  .toast {
+    font-size: 13px;
+    padding: 10px 14px;
   }
 }

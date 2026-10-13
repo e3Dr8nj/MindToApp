@@ -61,6 +61,125 @@ async function refreshApp() {
 }
 
 // ==========================================
+// TOAST УВЕДОМЛЕНИЯ
+// ==========================================
+
+function showToast(message, type = 'info', duration = 3000) {
+  const container = $('toast-container');
+  if (!container) return;
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, duration);
+}
+
+// ==========================================
+// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА
+// ==========================================
+
+async function createFromClipboard() {
+  const createBtn = $('sidebar-create-btn');
+  
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
+    return;
+  }
+  
+  try {
+    if (createBtn) {
+      createBtn.textContent = '⏳';
+      createBtn.disabled = true;
+    }
+    
+    showToast('📋 Чтение буфера обмена...', 'info', 2000);
+    
+    const code = await navigator.clipboard.readText();
+    
+    if (!code || !code.trim()) {
+      showToast('❌ Буфер обмена пуст', 'error');
+      return;
+    }
+    
+    const trimmedCode = code.trim();
+    
+    if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
+      showToast('❌ В буфере нет HTML-кода', 'error');
+      return;
+    }
+    
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(trimmedCode, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    
+    if (!manifestScript) {
+      showToast('❌ Не найден manifest в коде', 'error');
+      return;
+    }
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    
+    if (!manifest.id || !manifest.name || !manifest.icon) {
+      showToast('❌ В manifest не хватает полей', 'error');
+      return;
+    }
+    
+    if (allModules.some(m => m.id === manifest.id)) {
+      showToast('❌ Приложение с таким ID уже есть', 'error');
+      return;
+    }
+    
+    const newModule = {
+      id: manifest.id,
+      name: manifest.name,
+      icon: manifest.icon,
+      description: manifest.description || 'Создано из буфера',
+      content: trimmedCode,
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    };
+    
+    customModules.push(newModule);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+    
+    if (!installedModules.includes(manifest.id)) {
+      installedModules.push(manifest.id);
+      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+    }
+    
+    allModules.push({
+      ...manifest,
+      content: trimmedCode,
+      url: URL.createObjectURL(new Blob([trimmedCode], { type: 'text/html' })),
+      isCustom: true,
+      isLocal: true,
+      isFolder: false
+    });
+    
+    showToast(`✅ "${manifest.name}" создано!`, 'success', 3000);
+    renderInstalledApps();
+    renderAllApps();
+    
+  } catch (error) {
+    console.error('Ошибка создания из буфера:', error);
+    showToast(`❌ Ошибка: ${error.message}`, 'error');
+  } finally {
+    if (createBtn) {
+      createBtn.innerHTML = '🚀 Создать';
+      createBtn.disabled = false;
+    }
+  }
+}
+
+// ==========================================
 // ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: ПАНЕЛЬ НЕЙРОСЕТЕЙ
 // ==========================================
 
@@ -293,8 +412,9 @@ function setupEventListeners() {
             btn.innerHTML = originalText;
           }, 2000);
         }
+        showToast('✅ Промпт-инструкция скопирована', 'success');
       }).catch(() => {
-        alert('❌ Не удалось скопировать промпт');
+        showToast('❌ Не удалось скопировать промпт', 'error');
       });
     } else {
       const textarea = document.createElement('textarea');
@@ -313,12 +433,16 @@ function setupEventListeners() {
             btn.innerHTML = originalText;
           }, 2000);
         }
+        showToast('✅ Промпт-инструкция скопирована', 'success');
       } catch (e) {
-        alert('❌ Не удалось скопировать промпт');
+        showToast('❌ Не удалось скопировать промпт', 'error');
       }
       document.body.removeChild(textarea);
     }
   });
+
+  // Сайдбар: создание из буфера обмена
+  $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
   // Escape
   document.addEventListener('keydown', (e) => {
