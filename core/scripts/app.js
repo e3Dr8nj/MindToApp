@@ -1,5 +1,6 @@
 async function init() {
   initTheme();
+  initCustomThemes();
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
@@ -444,11 +445,7 @@ function setupEventListeners() {
   // Сайдбар: создание из буфера обмена
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
-  // ==========================================
-  // УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЬСКИМИ ТЕМАМИ
-  // ==========================================
-
-  // Открытие модалки управления темами
+  // Управление темами
   $('manage-themes-btn')?.addEventListener('click', () => {
     const modal = $('themes-modal');
     if (modal) {
@@ -457,7 +454,6 @@ function setupEventListeners() {
     }
   });
 
-  // Закрытие модалки управления темами
   $('close-themes-btn')?.addEventListener('click', () => {
     const modal = $('themes-modal');
     if (modal) modal.classList.remove('active');
@@ -468,25 +464,22 @@ function setupEventListeners() {
     if (modal) modal.classList.remove('active');
   });
 
-  // Добавление темы
-  $('add-theme-btn')?.addEventListener('click', openAddThemeModal);
-
-  // Закрытие модалки добавления темы
-  $('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-  $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-
-  // Копирование шаблона темы
-  $('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
-
-  // Отправка новой темы
-  $('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
-
-  // Закрытие модалок по клику на фон
   $('themes-modal')?.addEventListener('click', (e) => {
     if (e.target === $('themes-modal')) {
       $('themes-modal').classList.remove('active');
     }
   });
+
+  // Добавление темы
+  $('add-theme-btn')?.addEventListener('click', openAddThemeModal);
+
+  $('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
+
+  $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
+
+  $('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
+
+  $('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
 
   $('add-theme-modal')?.addEventListener('click', (e) => {
     if (e.target === $('add-theme-modal')) {
@@ -494,7 +487,7 @@ function setupEventListeners() {
     }
   });
 
-  // Escape: закрытие всех модалок и панелей
+  // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
       closeCreateModal(); 

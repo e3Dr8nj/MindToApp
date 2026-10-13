@@ -91,27 +91,6 @@ function saveCustomThemes(themes) {
   localStorage.setItem('customThemes', JSON.stringify(themes));
 }
 
-// Применение пользовательской темы
-function applyCustomTheme(theme) {
-  // Удаляем старый стиль пользовательской темы
-  const oldStyle = document.getElementById('custom-theme-style');
-  if (oldStyle) oldStyle.remove();
-  
-  // Создаём новый стиль
-  const style = document.createElement('style');
-  style.id = 'custom-theme-style';
-  
-  // Генерируем CSS
-  let css = `body[data-theme="${theme.id}"] {\n`;
-  for (const [key, value] of Object.entries(theme.variables)) {
-    css += `  ${key}: ${value};\n`;
-  }
-  css += `}`;
-  
-  style.textContent = css;
-  document.head.appendChild(style);
-}
-
 // Применение всех пользовательских тем (при загрузке)
 function applyAllCustomThemes() {
   const themes = loadCustomThemes();
@@ -374,4 +353,6 @@ function initCustomThemes() {
   
   // Применяем все темы
   applyAllCustomThemes();
+  
+  console.log(`🎨 Загружено пользовательских тем: ${themes.length}`);
 }
