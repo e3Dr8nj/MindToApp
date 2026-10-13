@@ -27,6 +27,7 @@ function applyTheme(themeName) {
   }
   
   currentTheme = themeName;
+  // ВАЖНО: всегда устанавливаем атрибут data-theme (даже для light)
   document.body.setAttribute('data-theme', themeName);
   localStorage.setItem('mindtoapp_theme', themeName);
   

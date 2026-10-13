@@ -1,5 +1,5 @@
 /* СВЕТЛАЯ ТЕМА */
-body {
+body[data-theme="light"] {
   --bg-gradient-start: #667eea;
   --bg-gradient-end: #764ba2;
   --text-color: #333;
