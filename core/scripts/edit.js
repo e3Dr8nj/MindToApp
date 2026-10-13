@@ -1,5 +1,5 @@
 // ==========================================
-// РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ
+// РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ (КОПИРОВАНИЕ)
 // ==========================================
 
 const EDIT_PROMPT_INSTRUCTION = `КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:
@@ -12,31 +12,37 @@ const EDIT_PROMPT_INSTRUCTION = `КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛ�
 
 Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`;
 
-// Копирование кода + инструкции сразу из карточки
+// ГЛАВНАЯ ФУНКЦИЯ: Копирование кода + инструкции прямо из карточки
 function copyCodeWithInstruction(module, buttonElement) {
   if (!module || !module.content) {
-    alert('Не удалось получить код приложения');
+    console.error('Нет кода для копирования');
     return;
   }
   
-  const fullPrompt = EDIT_PROMPT_INSTRUCTION + '\n\n' + module.content;
+  // ИЗМЕНЕНО: сначала код, потом инструкция
+  const fullPrompt = module.content + '\n\n' + EDIT_PROMPT_INSTRUCTION;
   
+  const onSuccess = () => {
+    if (buttonElement) {
+      const originalText = buttonElement.textContent;
+      buttonElement.textContent = '✅';
+      buttonElement.title = 'Скопировано!';
+      setTimeout(() => {
+        buttonElement.textContent = originalText;
+        buttonElement.title = 'Редактировать';
+      }, 2000);
+    }
+  };
+
+  const onError = (err) => {
+    console.error('Ошибка копирования:', err);
+    alert('❌ Не удалось скопировать код');
+  };
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(fullPrompt).then(() => {
-      // Визуальная обратная связь
-      if (buttonElement) {
-        const originalText = buttonElement.textContent;
-        buttonElement.textContent = '✅';
-        buttonElement.title = 'Скопировано!';
-        setTimeout(() => {
-          buttonElement.textContent = originalText;
-          buttonElement.title = 'Редактировать';
-        }, 2000);
-      }
-    }).catch(() => {
-      alert('❌ Не удалось скопировать');
-    });
+    navigator.clipboard.writeText(fullPrompt).then(onSuccess).catch(onError);
   } else {
+    // Fallback для старых браузеров
     const textarea = document.createElement('textarea');
     textarea.value = fullPrompt;
     textarea.style.position = 'fixed';
@@ -45,17 +51,9 @@ function copyCodeWithInstruction(module, buttonElement) {
     textarea.select();
     try {
       document.execCommand('copy');
-      if (buttonElement) {
-        const originalText = buttonElement.textContent;
-        buttonElement.textContent = '✅';
-        buttonElement.title = 'Скопировано!';
-        setTimeout(() => {
-          buttonElement.textContent = originalText;
-          buttonElement.title = 'Редактировать';
-        }, 2000);
-      }
+      onSuccess();
     } catch (e) {
-      alert('❌ Не удалось скопировать');
+      onError(e);
     }
     document.body.removeChild(textarea);
   }
