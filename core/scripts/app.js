@@ -257,14 +257,6 @@ function setupEventListeners() {
   // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Редактирование (ОБНОВЛЕННЫЕ ОБРАБОТЧИКИ)
-  $('close-edit-btn')?.addEventListener('click', closeEditModal);
-  $('cancel-edit-btn')?.addEventListener('click', closeEditModal);
-  $('toggle-code-btn')?.addEventListener('click', toggleCodeVisibility);
-  $('copy-code-btn')?.addEventListener('click', copyCurrentCode);
-  $('copy-edit-prompt-btn')?.addEventListener('click', copyEditPrompt);
-  editModal?.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
-
   // Добавление
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
@@ -294,7 +286,7 @@ function setupEventListeners() {
   // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
-      closeCreateModal(); closeAddModal(); closeEditModal(); closeShareModal(); closeBuilder(); closeAIPanel(); 
+      closeCreateModal(); closeAddModal(); closeShareModal(); closeBuilder(); closeAIPanel(); 
     }
   });
 }

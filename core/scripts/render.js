@@ -1,5 +1,3 @@
-const builderScreen = $('builder-screen');
-
 function renderInstalledApps() {
   installedAppsContainer.innerHTML = '';
   if (installedModules.length === 0) {
@@ -39,7 +37,7 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
   }
   
-  // Кнопка шаринга — для ВСЕХ модулей с контентом (и из магазина тоже)
+  // Кнопка шаринга
   if (module.content) {
     const shareBtn = document.createElement('button');
     shareBtn.className = 'share-btn';
@@ -52,7 +50,7 @@ function createAppCard(module, isInstalled) {
     card.appendChild(shareBtn);
   }
   
-  // Кнопка редактирования — для всех модулей с контентом
+  // Кнопка редактирования — теперь сразу копирует код + инструкцию
   if (module.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
@@ -60,7 +58,7 @@ function createAppCard(module, isInstalled) {
     editBtn.title = 'Редактировать';
     editBtn.addEventListener('click', (e) => { 
       e.stopPropagation(); 
-      openEditModal(module); 
+      copyCodeWithInstruction(module, editBtn);
     });
     card.appendChild(editBtn);
   }
@@ -78,7 +76,7 @@ function createAppCard(module, isInstalled) {
 }
 
 function showScreen(screen) {
-  [homeScreen, storeScreen, appScreen, builderScreen].forEach(s => {
+  [homeScreen, storeScreen, appScreen, $('builder-screen')].forEach(s => {
     if (s) s.classList.remove('active');
   });
   if (screen) screen.classList.add('active');

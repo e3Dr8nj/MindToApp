@@ -53,20 +53,15 @@
         <button id="builder-close-btn" class="modal-close" title="Закрыть">&times;</button>
       </div>
       <div class="builder-container">
-        <!-- Блок 1: Идея -->
         <div class="builder-block">
           <div class="builder-block-number">1</div>
           <h3 class="builder-block-title">💡 Опишите идею</h3>
           <p class="builder-block-desc">Опишите, какое приложение вы хотите создать. Чем подробнее — тем лучше результат.</p>
-          <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage..."></textarea>
+          <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории..."></textarea>
           <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
           <div id="builder-status-1" class="modal-status"></div>
         </div>
-
-        <!-- Стрелка 1→2 -->
         <div class="builder-arrow">→</div>
-
-        <!-- Блок 2: Нейросеть -->
         <div class="builder-block">
           <div class="builder-block-number">2</div>
           <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
@@ -84,11 +79,7 @@
           <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
           <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
         </div>
-
-        <!-- Стрелка 2→3 -->
         <div class="builder-arrow">→</div>
-
-        <!-- Блок 3: Код -->
         <div class="builder-block">
           <div class="builder-block-number">3</div>
           <h3 class="builder-block-title">🚀 Создайте приложение</h3>
@@ -137,18 +128,18 @@
       <div class="modal-body">
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
-          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
+          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками..."></textarea>
         </div>
         <div class="step-box">
-          <h3>2. Готовый промпт (обновляется автоматически):</h3>
+          <h3>2. Готовый промпт:</h3>
           <div class="prompt-code-box">
             <textarea id="prompt-text" readonly></textarea>
           </div>
           <button id="copy-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт</button>
         </div>
         <div class="step-box">
-          <h3>3. Вставьте промпт в любую из этих бесплатных нейросетей:</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
+          <h3>3. Бесплатные AI:</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Вставьте промпт, скопируйте ответ.</p>
           <div class="ai-links">
             <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
             <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
@@ -161,8 +152,8 @@
           </div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте полученный от нейросети HTML-код сюда:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html, который сгенерировала нейросеть..."></textarea>
+          <h3>4. Вставьте HTML-код:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
@@ -182,16 +173,7 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">
-            Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>
-            Поддерживаются любые форматы: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages и другие хостинги.
-          </p>
-          <p class="modal-description" style="margin-top: 5px;">
-            Примеры:<br>
-            • <code>https://username.github.io/my-app/</code><br>
-            • <code>https://gist.githubusercontent.com/.../raw/file.html</code><br>
-            • <code>https://gist.githubusercontent.com/.../raw/file.txt</code>
-          </p>
+          <p class="modal-description">Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw) и другие.</p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
@@ -226,64 +208,6 @@
     </div>
   </div>
 
-  <!-- Модальное окно: Редактирование приложения -->
-  <div id="edit-modal" class="modal">
-    <div class="modal-content modal-edit">
-      <div class="modal-header">
-        <h2 id="edit-modal-title">✏️ Редактировать</h2>
-        <button class="modal-close" id="close-edit-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="edit-preview">
-          <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
-          <div class="edit-preview-info">
-            <div class="edit-preview-name" id="edit-preview-name">Название</div>
-            <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
-          </div>
-        </div>
-
-        <div class="step-box">
-          <button id="toggle-code-btn" class="btn btn-small">👁 Показать исходный код приложения</button>
-          <textarea id="edit-source-code" class="code-input" style="display: none; margin-top: 10px;" readonly></textarea>
-        </div>
-
-        <div class="step-box">
-          <h3>1. Что нужно изменить?</h3>
-          <textarea id="edit-changes-input" class="idea-input" placeholder="Например: Сделай фон тёмно-синим, увеличь шрифт, добавь кнопку сброса..."></textarea>
-        </div>
-
-        <div class="step-box">
-          <button id="copy-edit-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт для AI</button>
-        </div>
-
-        <div class="step-box">
-          <h3>2. Вставьте промпт в любую из этих нейросетей:</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный исправленный HTML-код.</p>
-          <div class="ai-links">
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
-            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
-            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
-            <a href="https://gemini.google.com" target="_blank" class="ai-link">Google Gemini</a>
-            <a href="https://groq.com" target="_blank" class="ai-link">Groq</a>
-            <a href="https://www.perplexity.ai" target="_blank" class="ai-link">Perplexity</a>
-            <a href="https://lmarena.ai" target="_blank" class="ai-link">LM Arena</a>
-          </div>
-        </div>
-
-        <div class="step-box">
-          <h3>3. Вставьте исправленный HTML-код от нейросети сюда:</h3>
-          <textarea id="edit-new-code-input" class="code-input" placeholder="Вставьте сюда обновленный код, который вернула нейросеть..."></textarea>
-          <div id="edit-status" class="modal-status"></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="cancel-edit-btn" class="btn btn-secondary">Отмена</button>
-        <button id="apply-edit-btn" class="btn btn-primary">📋 Создать копию с изменениями</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Модальное окно: Поделиться приложением -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
@@ -299,24 +223,18 @@
             <div class="share-preview-desc" id="share-preview-desc">Описание</div>
           </div>
         </div>
-        
         <div class="step-box">
           <h3>📋 Шаг 1: Скопировать код</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Скопируйте весь HTML-код приложения в буфер обмена.
-          </p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Скопируйте весь HTML-код приложения в буфер обмена.</p>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
-
         <div class="step-box">
           <h3>🌐 Шаг 2: Разместить и получить ссылку</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Откройте любой из этих бесплатных сервисов, вставьте код (Ctrl+V), сохраните и скопируйте полученную ссылку.
-          </p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте любой из этих сервисов, вставьте код (Ctrl+V), сохраните и скопируйте ссылку.</p>
           <div class="ai-links">
             <a href="https://gist.github.com" target="_blank" class="ai-link">GitHub Gist</a>
-            <a href="https://privatebin.net/" target="_blank" class="ai-link">PrivateBin (Шифрование)</a>
+            <a href="https://privatebin.net/" target="_blank" class="ai-link">PrivateBin</a>
             <a href="https://www.toptal.com/developers/hastebin" target="_blank" class="ai-link">Toptal Hastebin</a>
           </div>
         </div>
