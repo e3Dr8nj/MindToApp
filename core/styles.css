@@ -752,6 +752,119 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
+   САЙДБАР
+   ========================================== */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 80px;
+  height: 100vh;
+  background: var(--card-bg);
+  box-shadow: 2px 0 8px var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  z-index: 500;
+  gap: 15px;
+}
+
+.sidebar-btn {
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent-color);
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.sidebar-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.05);
+}
+
+.sidebar-btn:active {
+  transform: scale(0.95);
+}
+
+.sidebar-arrow {
+  font-size: 24px;
+  color: var(--accent-color);
+  font-weight: bold;
+  margin: 5px 0;
+  animation: bounceArrow 2s infinite;
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+.sidebar-ai-wrapper {
+  position: relative;
+}
+
+.sidebar-ai-dropdown {
+  position: absolute;
+  left: 70px;
+  top: 0;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--card-shadow);
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+  z-index: 600;
+}
+
+.sidebar-ai-wrapper:hover .sidebar-ai-dropdown {
+  display: flex;
+}
+
+.sidebar-ai-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--ai-link-bg);
+  color: var(--ai-link-color);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.sidebar-ai-link:hover {
+  background: var(--ai-link-hover-bg);
+  color: var(--ai-link-hover-color);
+  transform: translateX(3px);
+}
+
+.sidebar-ai-link.ai-available {
+  border-color: var(--share-btn-bg);
+}
+
+/* Сдвиг основного контента вправо */
+.main-content {
+  margin-left: 80px;
+  min-height: 100vh;
+}
+
+/* ==========================================
    АДАПТИВНОСТЬ
    ========================================== */
 
@@ -777,6 +890,31 @@ h1 { color: var(--heading-color); font-size: 24px; }
   #builder-idea-input,
   #builder-code-input {
     min-height: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  
+  .sidebar-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 10px;
+  }
+  
+  .sidebar-arrow {
+    font-size: 20px;
+  }
+  
+  .sidebar-ai-dropdown {
+    left: 55px;
+    min-width: 160px;
+  }
+  
+  .main-content {
+    margin-left: 60px;
   }
 }
 
@@ -813,73 +951,5 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .ai-panel-link {
     padding: 10px 12px;
     font-size: 13px;
-  }
-}
-/* ==========================================
-   САЙДБАР
-   ========================================== */
-
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 80px;
-  height: 100vh;
-  background: var(--card-bg);
-  box-shadow: 2px 0 8px var(--card-shadow);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  z-index: 500;
-}
-
-.sidebar-btn {
-  width: 60px;
-  height: 60px;
-  border: none;
-  border-radius: 12px;
-  background: var(--accent-color);
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  transition: all 0.2s;
-}
-
-.sidebar-btn:hover {
-  background: var(--accent-hover);
-  transform: scale(1.05);
-}
-
-.sidebar-btn:active {
-  transform: scale(0.95);
-}
-
-/* Сдвиг основного контента вправо */
-.main-content {
-  margin-left: 80px;
-  min-height: 100vh;
-}
-
-/* Адаптивность для сайдбара */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
-  
-  .sidebar-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 10px;
-  }
-  
-  .main-content {
-    margin-left: 60px;
   }
 }

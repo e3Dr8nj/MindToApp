@@ -234,10 +234,6 @@ function setupEventListeners() {
   // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
-  // Верхняя дополнительная область: панель нейросетей
-  $('ai-list-btn')?.addEventListener('click', openAIPanel);
-  $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
-
   // Конструктор (панель)
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
