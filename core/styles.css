@@ -835,3 +835,55 @@ h1 { color: var(--heading-color); font-size: 24px; }
     padding: 10px 14px;
   }
 }
+/* ==========================================
+   УПРАВЛЕНИЕ ТЕМАМИ
+   ========================================== */
+
+.themes-list, .custom-themes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.theme-item, .custom-theme-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  border: 2px solid var(--input-border);
+}
+
+.custom-theme-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+}
+
+.custom-theme-name {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.delete-theme-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: var(--delete-btn-bg);
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.delete-theme-btn:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}

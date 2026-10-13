@@ -352,5 +352,89 @@
   <script src="scripts/add.js"></script>
   <script src="scripts/share.js"></script>
   <script src="scripts/app.js"></script>
+  <!-- В хедере добавляем кнопку -->
+<button id="manage-themes-btn" class="btn">🎨 Темы</button>
+
+<!-- Модалка управления темами -->
+<div id="themes-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🎨 Управление темами</h2>
+      <button class="modal-close" id="close-themes-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="step-box">
+        <h3>Системные темы</h3>
+        <div class="themes-list">
+          <div class="theme-item">
+            <span>☀️ Светлая</span>
+            <button class="btn btn-small" onclick="applyTheme('light')">Применить</button>
+          </div>
+          <div class="theme-item">
+            <span>🌆 Киберпанк</span>
+            <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Применить</button>
+          </div>
+          <div class="theme-item">
+            <span>💬 Дискорд</span>
+            <button class="btn btn-small" onclick="applyTheme('discord')">Применить</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="step-box">
+        <h3>Пользовательские темы</h3>
+        <div id="custom-themes-list" class="custom-themes-list"></div>
+        <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Добавить свою тему</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="close-themes-footer-btn" class="btn btn-secondary">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка добавления темы -->
+<div id="add-theme-modal" class="modal">
+  <div class="modal-content modal-create">
+    <div class="modal-header">
+      <h2>➕ Добавить свою тему</h2>
+      <button class="modal-close" id="close-add-theme-btn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="step-box">
+        <h3>1. Скопируйте шаблон темы</h3>
+        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+          Это CSS-шаблон с переменными. Отправьте его ИИ и попросите изменить цвета.
+        </p>
+        <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Скопировать шаблон</button>
+      </div>
+      
+      <div class="step-box">
+        <h3>2. Отправьте шаблон в нейросеть</h3>
+        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+          Попросите ИИ изменить цвета, например: "Сделай тему в зелёных тонах" или "Добавь неоновые эффекты".
+        </p>
+        <div class="ai-links">
+          <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
+          <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
+          <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
+          <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+        </div>
+      </div>
+      
+      <div class="step-box">
+        <h3>3. Вставьте результат</h3>
+        <input type="text" id="theme-name-input" class="url-input" placeholder="Название темы (например: Зелёная неон)" style="margin-bottom: 10px;">
+        <textarea id="theme-css-input" class="code-input" placeholder="Вставьте сюда CSS-код темы от ИИ..." style="height: 250px;"></textarea>
+        <div id="add-theme-status" class="modal-status"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel-add-theme-btn" class="btn btn-secondary">Отмена</button>
+      <button id="submit-theme-btn" class="btn btn-primary">Добавить тему</button>
+    </div>
+  </div>
+</div>
 </body>
+
 </html>

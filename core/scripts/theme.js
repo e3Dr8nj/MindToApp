@@ -69,7 +69,11 @@ function updateThemeButton() {
 }
 
 // Инициализация темы при загрузке
+
 function initTheme() {
+  // Сначала инициализируем пользовательские темы
+  initCustomThemes();
+  
   console.log(`🎨 Инициализация темы: ${currentTheme}`);
   applyTheme(currentTheme);
 }
