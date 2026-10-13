@@ -283,10 +283,55 @@ function setupEventListeners() {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
 
+  // Сайдбар: копирование промпт-инструкции
+  $('sidebar-prompt-btn')?.addEventListener('click', () => {
+    const promptText = EDIT_PROMPT_INSTRUCTION;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(promptText).then(() => {
+        const btn = $('sidebar-prompt-btn');
+        if (btn) {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✅';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+          }, 2000);
+        }
+      }).catch(() => {
+        alert('❌ Не удалось скопировать промпт');
+      });
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = promptText;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        const btn = $('sidebar-prompt-btn');
+        if (btn) {
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✅';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+          }, 2000);
+        }
+      } catch (e) {
+        alert('❌ Не удалось скопировать промпт');
+      }
+      document.body.removeChild(textarea);
+    }
+  });
+
   // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
-      closeCreateModal(); closeAddModal(); closeShareModal(); closeBuilder(); closeAIPanel(); 
+      closeCreateModal(); 
+      closeAddModal(); 
+      closeShareModal(); 
+      closeBuilder(); 
+      closeAIPanel(); 
     }
   });
 }

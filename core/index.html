@@ -13,109 +13,119 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
 </head>
 <body>
-  <!-- Экран 1: Рабочий стол -->
-  <div id="home-screen" class="screen active">
-    <header>
-      <h1>🏠 Мои приложения</h1>
-      <div class="header-buttons">
-        <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
-        <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
-        <button id="ai-list-btn" class="btn">🤖 Нейросети</button>
-        <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
-        <button id="add-custom-btn" class="btn">➕ Добавить</button>
-        <button id="open-store-btn" class="btn">🛒 Магазин</button>
-      </div>
-    </header>
-    
-    <!-- ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: Панель нейросетей -->
-    <div id="ai-panel" class="ai-panel" style="display: none;">
-      <div class="ai-panel-header">
-        <h2>🤖 Бесплатные нейросети для создания приложений</h2>
-        <button id="ai-panel-close-btn" class="modal-close" title="Закрыть">&times;</button>
-      </div>
-      <p class="ai-panel-hint">⭐ — работают в РФ без VPN. Откройте любую, вставьте промпт из конструктора и получите HTML-код.</p>
-      <div class="ai-panel-grid">
-        <a href="https://chat.qwenlm.ai" target="_blank" class="ai-panel-link ai-available">⭐ Qwen Chat</a>
-        <a href="https://chat.deepseek.com" target="_blank" class="ai-panel-link ai-available">⭐ DeepSeek</a>
-        <a href="https://groq.com" target="_blank" class="ai-panel-link ai-available">⭐ Groq</a>
-        <a href="https://chat.openai.com" target="_blank" class="ai-panel-link">ChatGPT</a>
-        <a href="https://gemini.google.com" target="_blank" class="ai-panel-link">Google Gemini</a>
-        <a href="https://claude.ai" target="_blank" class="ai-panel-link">Claude</a>
-        <a href="https://www.perplexity.ai" target="_blank" class="ai-panel-link">Perplexity</a>
-        <a href="https://lmarena.ai" target="_blank" class="ai-panel-link">LM Arena</a>
-      </div>
-    </div>
-    
-    <!-- Панель конструктора -->
-    <div id="builder-panel" class="builder-panel" style="display: none;">
-      <div class="builder-panel-header">
-        <h2>🛠 Конструктор приложений</h2>
-        <button id="builder-close-btn" class="modal-close" title="Закрыть">&times;</button>
-      </div>
-      <div class="builder-container">
-        <div class="builder-block">
-          <div class="builder-block-number">1</div>
-          <h3 class="builder-block-title">💡 Опишите идею</h3>
-          <p class="builder-block-desc">Опишите, какое приложение вы хотите создать. Чем подробнее — тем лучше результат.</p>
-          <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории..."></textarea>
-          <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
-          <div id="builder-status-1" class="modal-status"></div>
-        </div>
-        <div class="builder-arrow">→</div>
-        <div class="builder-block">
-          <div class="builder-block-number">2</div>
-          <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
-          <p class="builder-block-desc">Вставьте скопированный промпт в любую нейросеть и дождитесь ответа.</p>
-          <select id="builder-ai-select" class="builder-select">
-            <option value="https://chat.qwenlm.ai">🌟 Qwen Chat (Отлично кодит)</option>
-            <option value="https://chat.deepseek.com">DeepSeek (Топ для кода)</option>
-            <option value="https://chat.openai.com">ChatGPT</option>
-            <option value="https://claude.ai">Claude</option>
-            <option value="https://gemini.google.com">Google Gemini</option>
-            <option value="https://groq.com">Groq (Очень быстро)</option>
-            <option value="https://www.perplexity.ai">Perplexity</option>
-            <option value="https://lmarena.ai">LM Arena</option>
-          </select>
-          <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
-          <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
-        </div>
-        <div class="builder-arrow">→</div>
-        <div class="builder-block">
-          <div class="builder-block-number">3</div>
-          <h3 class="builder-block-title">🚀 Создайте приложение</h3>
-          <p class="builder-block-desc">Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".</p>
-          <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда весь HTML-код от нейросети..."></textarea>
-          <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Создать приложение</button>
-          <div id="builder-status-3" class="modal-status"></div>
-        </div>
-      </div>
-    </div>
-    
-    <div id="installed-apps" class="app-grid"></div>
-    <div id="empty-state" class="empty-state" style="display: none;">
-      <p>У вас пока нет установленных приложений</p>
-      <button id="go-to-store-btn" class="btn btn-primary">Перейти в магазин</button>
-    </div>
+  <!-- САЙДБАР -->
+  <div id="sidebar" class="sidebar">
+    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Скопировать промпт-инструкцию">
+      📋 prompt
+    </button>
   </div>
 
-  <!-- Экран 2: Магазин -->
-  <div id="store-screen" class="screen">
-    <header>
-      <button id="back-to-home-btn" class="btn">← Назад</button>
-      <h1>🛒 Магазин модулей</h1>
-      <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
-    </header>
-    <div id="all-apps" class="app-grid"></div>
-  </div>
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div id="main-content" class="main-content">
+    <!-- Экран 1: Рабочий стол -->
+    <div id="home-screen" class="screen active">
+      <header>
+        <h1>🏠 Мои приложения</h1>
+        <div class="header-buttons">
+          <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
+          <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
+          <button id="ai-list-btn" class="btn">🤖 Нейросети</button>
+          <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
+          <button id="add-custom-btn" class="btn">➕ Добавить</button>
+          <button id="open-store-btn" class="btn">🛒 Магазин</button>
+        </div>
+      </header>
+      
+      <!-- ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: Панель нейросетей -->
+      <div id="ai-panel" class="ai-panel" style="display: none;">
+        <div class="ai-panel-header">
+          <h2>🤖 Бесплатные нейросети для создания приложений</h2>
+          <button id="ai-panel-close-btn" class="modal-close" title="Закрыть">&times;</button>
+        </div>
+        <p class="ai-panel-hint">⭐ — работают в РФ без VPN. Откройте любую, вставьте промпт из конструктора и получите HTML-код.</p>
+        <div class="ai-panel-grid">
+          <a href="https://chat.qwenlm.ai" target="_blank" class="ai-panel-link ai-available">⭐ Qwen Chat</a>
+          <a href="https://chat.deepseek.com" target="_blank" class="ai-panel-link ai-available">⭐ DeepSeek</a>
+          <a href="https://groq.com" target="_blank" class="ai-panel-link ai-available">⭐ Groq</a>
+          <a href="https://chat.openai.com" target="_blank" class="ai-panel-link">ChatGPT</a>
+          <a href="https://gemini.google.com" target="_blank" class="ai-panel-link">Google Gemini</a>
+          <a href="https://claude.ai" target="_blank" class="ai-panel-link">Claude</a>
+          <a href="https://www.perplexity.ai" target="_blank" class="ai-panel-link">Perplexity</a>
+          <a href="https://lmarena.ai" target="_blank" class="ai-panel-link">LM Arena</a>
+        </div>
+      </div>
+      
+      <!-- Панель конструктора -->
+      <div id="builder-panel" class="builder-panel" style="display: none;">
+        <div class="builder-panel-header">
+          <h2>🛠 Конструктор приложений</h2>
+          <button id="builder-close-btn" class="modal-close" title="Закрыть">&times;</button>
+        </div>
+        <div class="builder-container">
+          <div class="builder-block">
+            <div class="builder-block-number">1</div>
+            <h3 class="builder-block-title">💡 Опишите идею</h3>
+            <p class="builder-block-desc">Опишите, какое приложение вы хотите создать. Чем подробнее — тем лучше результат.</p>
+            <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage..."></textarea>
+            <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
+            <div id="builder-status-1" class="modal-status"></div>
+          </div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-block">
+            <div class="builder-block-number">2</div>
+            <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
+            <p class="builder-block-desc">Вставьте скопированный промпт в любую нейросеть и дождитесь ответа.</p>
+            <select id="builder-ai-select" class="builder-select">
+              <option value="https://chat.qwenlm.ai">🌟 Qwen Chat (Отлично кодит)</option>
+              <option value="https://chat.deepseek.com">DeepSeek (Топ для кода)</option>
+              <option value="https://chat.openai.com">ChatGPT</option>
+              <option value="https://claude.ai">Claude</option>
+              <option value="https://gemini.google.com">Google Gemini</option>
+              <option value="https://groq.com">Groq (Очень быстро)</option>
+              <option value="https://www.perplexity.ai">Perplexity</option>
+              <option value="https://lmarena.ai">LM Arena</option>
+            </select>
+            <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
+            <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
+          </div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-block">
+            <div class="builder-block-number">3</div>
+            <h3 class="builder-block-title">🚀 Создайте приложение</h3>
+            <p class="builder-block-desc">Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".</p>
+            <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда весь HTML-код от нейросети..."></textarea>
+            <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Создать приложение</button>
+            <div id="builder-status-3" class="modal-status"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="installed-apps" class="app-grid"></div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <p>У вас пока нет установленных приложений</p>
+        <button id="go-to-store-btn" class="btn btn-primary">Перейти в магазин</button>
+      </div>
+    </div>
 
-  <!-- Экран 3: Запущенное приложение -->
-  <div id="app-screen" class="screen">
-    <header class="app-header">
-      <button id="close-app-btn" class="btn btn-back" title="Вернуться на главный экран">← Назад</button>
-      <h1 id="current-app-name">Приложение</h1>
-      <div class="header-spacer"></div>
-    </header>
-    <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
+    <!-- Экран 2: Магазин -->
+    <div id="store-screen" class="screen">
+      <header>
+        <button id="back-to-home-btn" class="btn">← Назад</button>
+        <h1>🛒 Магазин модулей</h1>
+        <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
+      </header>
+      <div id="all-apps" class="app-grid"></div>
+    </div>
+
+    <!-- Экран 3: Запущенное приложение -->
+    <div id="app-screen" class="screen">
+      <header class="app-header">
+        <button id="close-app-btn" class="btn btn-back" title="Вернуться на главный экран">← Назад</button>
+        <h1 id="current-app-name">Приложение</h1>
+        <div class="header-spacer"></div>
+      </header>
+      <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
+    </div>
   </div>
 
   <!-- Модальное окно: Создание приложения через AI -->
@@ -128,32 +138,34 @@
       <div class="modal-body">
         <div class="step-box">
           <h3>1. Опишите свою идею:</h3>
-          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками..."></textarea>
+          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
         </div>
         <div class="step-box">
-          <h3>2. Готовый промпт:</h3>
+          <h3>2. Готовый промпт (обновляется автоматически):</h3>
           <div class="prompt-code-box">
             <textarea id="prompt-text" readonly></textarea>
           </div>
           <button id="copy-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт</button>
         </div>
         <div class="step-box">
-          <h3>3. Бесплатные AI:</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Вставьте промпт, скопируйте ответ.</p>
+          <h3>3. Вставьте промпт в любую из этих бесплатных нейросетей:</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
           <div class="ai-links">
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
             <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
             <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat (Отлично кодит)</a>
+            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
             <a href="https://gemini.google.com" target="_blank" class="ai-link">Google Gemini</a>
-            <a href="https://groq.com" target="_blank" class="ai-link">Groq</a>
-            <a href="https://www.perplexity.ai" target="_blank" class="ai-link">Perplexity</a>
-            <a href="https://lmarena.ai" target="_blank" class="ai-link">LM Arena</a>
+            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
+            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Очень быстро)</a>
+            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
+            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
           </div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте HTML-код:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html..."></textarea>
+          <h3>4. Вставьте полученный от нейросети HTML-код сюда:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html, который сгенерировала нейросеть..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
@@ -173,7 +185,16 @@
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
-          <p class="modal-description">Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw) и другие.</p>
+          <p class="modal-description">
+            Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>
+            Поддерживаются любые форматы: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages и другие хостинги.
+          </p>
+          <p class="modal-description" style="margin-top: 5px;">
+            Примеры:<br>
+            • <code>https://username.github.io/my-app/</code><br>
+            • <code>https://gist.githubusercontent.com/.../raw/file.html</code><br>
+            • <code>https://gist.githubusercontent.com/.../raw/file.txt</code>
+          </p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
@@ -208,6 +229,41 @@
     </div>
   </div>
 
+  <!-- Модальное окно: Редактирование приложения -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content modal-edit">
+      <div class="modal-header">
+        <h2 id="edit-modal-title">✏️ Редактировать</h2>
+        <button class="modal-close" id="close-edit-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-preview">
+          <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
+          <div class="edit-preview-info">
+            <div class="edit-preview-name" id="edit-preview-name">Название</div>
+            <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
+          </div>
+        </div>
+
+        <div class="step-box">
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button id="toggle-code-btn" class="btn btn-secondary" style="flex: 1;">👁 Показать код</button>
+            <button id="copy-code-btn" class="btn btn-primary" style="flex: 1;">📋 Копировать код</button>
+          </div>
+          <textarea id="edit-source-code" class="code-input" style="display: none;" readonly></textarea>
+        </div>
+
+        <div class="step-box">
+          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Копировать код + инструкцию для AI</button>
+          <div id="edit-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-edit-btn" class="btn btn-secondary" style="width: 100%;">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Модальное окно: Поделиться приложением -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
@@ -223,18 +279,24 @@
             <div class="share-preview-desc" id="share-preview-desc">Описание</div>
           </div>
         </div>
+        
         <div class="step-box">
           <h3>📋 Шаг 1: Скопировать код</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Скопируйте весь HTML-код приложения в буфер обмена.</p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+            Скопируйте весь HTML-код приложения в буфер обмена.
+          </p>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
+
         <div class="step-box">
           <h3>🌐 Шаг 2: Разместить и получить ссылку</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте любой из этих сервисов, вставьте код (Ctrl+V), сохраните и скопируйте ссылку.</p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+            Откройте любой из этих бесплатных сервисов, вставьте код (Ctrl+V), сохраните и скопируйте полученную ссылку.
+          </p>
           <div class="ai-links">
             <a href="https://gist.github.com" target="_blank" class="ai-link">GitHub Gist</a>
-            <a href="https://privatebin.net/" target="_blank" class="ai-link">PrivateBin</a>
+            <a href="https://privatebin.net/" target="_blank" class="ai-link">PrivateBin (Шифрование)</a>
             <a href="https://www.toptal.com/developers/hastebin" target="_blank" class="ai-link">Toptal Hastebin</a>
           </div>
         </div>
