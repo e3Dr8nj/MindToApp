@@ -1,6 +1,9 @@
 async function init() {
-  initTheme();
+  // СНАЧАЛА загружаем пользовательские темы (добавляем их в THEMES)
   initCustomThemes();
+  // ПОТОМ применяем текущую тему (теперь она точно есть в THEMES)
+  initTheme();
+  
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();

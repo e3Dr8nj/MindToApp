@@ -21,9 +21,11 @@ let currentTheme = localStorage.getItem('mindtoapp_theme') || 'light';
 
 // Применение темы
 function applyTheme(themeName) {
+  // Защита: если тема не найдена, переключаемся на light
   if (!THEMES[themeName]) {
-    console.error('Неизвестная тема:', themeName);
-    return;
+    console.warn(`⚠️ Тема "${themeName}" не найдена, переключаемся на light`);
+    themeName = 'light';
+    localStorage.setItem('mindtoapp_theme', 'light');
   }
   
   if (!document.body) {
