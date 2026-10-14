@@ -83,7 +83,7 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
-// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА
+// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА (С ПОДДЕРЖКОЙ ССЫЛОК)
 // ==========================================
 
 async function createFromClipboard() {
@@ -102,15 +102,54 @@ async function createFromClipboard() {
     
     showToast('📋 Чтение буфера обмена...', 'info', 2000);
     
-    const code = await navigator.clipboard.readText();
+    const clipboardContent = await navigator.clipboard.readText();
     
-    if (!code || !code.trim()) {
+    if (!clipboardContent || !clipboardContent.trim()) {
       showToast('❌ Буфер обмена пуст', 'error');
       return;
     }
     
-    const trimmedCode = code.trim();
+    let trimmedCode = clipboardContent.trim();
     
+    // Проверяем, является ли это URL
+    if (trimmedCode.startsWith('http://') || trimmedCode.startsWith('https://')) {
+      showToast('🔗 Обнаружена ссылка, загружаю...', 'info', 2000);
+      
+      // Определяем сервис
+      const service = detectService(trimmedCode);
+      if (!service) {
+        showToast('❌ Неизвестный сервис. Поддерживаются: GitHub Gist, Hastebin, Pastebin', 'error');
+        return;
+      }
+      
+      // Преобразуем в Raw URL
+      const rawUrl = convertToRaw(trimmedCode, service);
+      if (!rawUrl) {
+        showToast('❌ Не удалось преобразовать ссылку', 'error');
+        return;
+      }
+      
+      // Загружаем через CORS-прокси
+      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+      const proxyUrl = CORS_PROXY + encodeURIComponent(rawUrl);
+      
+      const response = await fetch(proxyUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      trimmedCode = await response.text();
+      
+      // Проверяем, что это HTML
+      if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
+        showToast('❌ По ссылке нет HTML-кода', 'error');
+        return;
+      }
+      
+      showToast(`✅ Загружено с ${getServiceName(service)}`, 'success', 2000);
+    }
+    
+    // Проверяем, что это HTML
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
       showToast('❌ В буфере нет HTML-кода', 'error');
       return;
@@ -178,6 +217,62 @@ async function createFromClipboard() {
       createBtn.disabled = false;
     }
   }
+}
+
+// ==========================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ПО ССЫЛКЕ
+// ==========================================
+
+// Определяет сервис по URL
+function detectService(url) {
+  if (!url) return null;
+  const lower = url.toLowerCase();
+  
+  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
+  if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
+  if (lower.includes('pastebin.com')) return 'pastebin';
+  
+  return null;
+}
+
+// Преобразует URL в Raw-формат
+function convertToRaw(url, service) {
+  try {
+    // Если уже Raw-ссылка — возвращаем как есть
+    if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
+      return url;
+    }
+    
+    if (service === 'gist') {
+      // https://gist.github.com/user/abc123 → https://gist.githubusercontent.com/user/abc123/raw
+      return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
+    }
+    
+    if (service === 'hastebin') {
+      const match = url.match(/hastebin\/([^\/\?\#]+)/);
+      if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
+    }
+    
+    if (service === 'pastebin') {
+      const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
+      if (match) return `https://pastebin.com/raw/${match[1]}`;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Ошибка преобразования URL:', error);
+    return null;
+  }
+}
+
+// Имя сервиса для отображения
+function getServiceName(service) {
+  const names = {
+    gist: 'GitHub Gist',
+    hastebin: 'Hastebin',
+    pastebin: 'Pastebin'
+  };
+  return names[service] || 'сервис';
 }
 
 // ==========================================
@@ -442,7 +537,7 @@ function setupEventListeners() {
     }
   });
 
-  // Сайдбар: создание из буфера обмена
+  // Сайдбар: создание из буфера обмена (теперь с поддержкой ссылок)
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
   // Управление темами
