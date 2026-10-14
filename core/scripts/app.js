@@ -83,6 +83,57 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ПО ССЫЛКЕ
+// ==========================================
+
+function detectService(url) {
+  if (!url) return null;
+  const lower = url.toLowerCase();
+  
+  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
+  if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
+  if (lower.includes('pastebin.com')) return 'pastebin';
+  
+  return null;
+}
+
+function convertToRaw(url, service) {
+  try {
+    if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
+      return url;
+    }
+    
+    if (service === 'gist') {
+      return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
+    }
+    
+    if (service === 'hastebin') {
+      const match = url.match(/hastebin\/([^\/\?\#]+)/);
+      if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
+    }
+    
+    if (service === 'pastebin') {
+      const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
+      if (match) return `https://pastebin.com/raw/${match[1]}`;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Ошибка преобразования URL:', error);
+    return null;
+  }
+}
+
+function getServiceName(service) {
+  const names = {
+    gist: 'GitHub Gist',
+    hastebin: 'Hastebin',
+    pastebin: 'Pastebin'
+  };
+  return names[service] || 'сервис';
+}
+
+// ==========================================
 // СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА (С ПОДДЕРЖКОЙ ССЫЛОК)
 // ==========================================
 
@@ -115,21 +166,18 @@ async function createFromClipboard() {
     if (trimmedCode.startsWith('http://') || trimmedCode.startsWith('https://')) {
       showToast('🔗 Обнаружена ссылка, загружаю...', 'info', 2000);
       
-      // Определяем сервис
       const service = detectService(trimmedCode);
       if (!service) {
         showToast('❌ Неизвестный сервис. Поддерживаются: GitHub Gist, Hastebin, Pastebin', 'error');
         return;
       }
       
-      // Преобразуем в Raw URL
       const rawUrl = convertToRaw(trimmedCode, service);
       if (!rawUrl) {
         showToast('❌ Не удалось преобразовать ссылку', 'error');
         return;
       }
       
-      // Загружаем через CORS-прокси
       const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
       const proxyUrl = CORS_PROXY + encodeURIComponent(rawUrl);
       
@@ -140,7 +188,6 @@ async function createFromClipboard() {
       
       trimmedCode = await response.text();
       
-      // Проверяем, что это HTML
       if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
         showToast('❌ По ссылке нет HTML-кода', 'error');
         return;
@@ -149,7 +196,6 @@ async function createFromClipboard() {
       showToast(`✅ Загружено с ${getServiceName(service)}`, 'success', 2000);
     }
     
-    // Проверяем, что это HTML
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
       showToast('❌ В буфере нет HTML-кода', 'error');
       return;
@@ -217,62 +263,6 @@ async function createFromClipboard() {
       createBtn.disabled = false;
     }
   }
-}
-
-// ==========================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ПО ССЫЛКЕ
-// ==========================================
-
-// Определяет сервис по URL
-function detectService(url) {
-  if (!url) return null;
-  const lower = url.toLowerCase();
-  
-  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
-  if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
-  if (lower.includes('pastebin.com')) return 'pastebin';
-  
-  return null;
-}
-
-// Преобразует URL в Raw-формат
-function convertToRaw(url, service) {
-  try {
-    // Если уже Raw-ссылка — возвращаем как есть
-    if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
-      return url;
-    }
-    
-    if (service === 'gist') {
-      // https://gist.github.com/user/abc123 → https://gist.githubusercontent.com/user/abc123/raw
-      return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
-    }
-    
-    if (service === 'hastebin') {
-      const match = url.match(/hastebin\/([^\/\?\#]+)/);
-      if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
-    }
-    
-    if (service === 'pastebin') {
-      const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
-      if (match) return `https://pastebin.com/raw/${match[1]}`;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Ошибка преобразования URL:', error);
-    return null;
-  }
-}
-
-// Имя сервиса для отображения
-function getServiceName(service) {
-  const names = {
-    gist: 'GitHub Gist',
-    hastebin: 'Hastebin',
-    pastebin: 'Pastebin'
-  };
-  return names[service] || 'сервис';
 }
 
 // ==========================================
@@ -440,23 +430,19 @@ function showStatus(element, message, type = '') {
 // ==========================================
 
 function setupEventListeners() {
-  // Навигация
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
-  // Конструктор (панель)
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
 
-  // Создание (старая модалка)
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -465,10 +451,8 @@ function setupEventListeners() {
   createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
-  // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Добавление
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
@@ -479,7 +463,6 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
-  // Шаринг
   $('close-share-btn')?.addEventListener('click', closeShareModal);
   $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
   $('copy-app-code-btn')?.addEventListener('click', copyAppCode);
@@ -489,12 +472,10 @@ function setupEventListeners() {
     shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });
   }
 
-  // Вкладки
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
 
-  // Сайдбар: копирование промпт-инструкции
   $('sidebar-prompt-btn')?.addEventListener('click', () => {
     const promptText = EDIT_PROMPT_INSTRUCTION;
     
@@ -504,9 +485,7 @@ function setupEventListeners() {
         if (btn) {
           const originalText = btn.innerHTML;
           btn.innerHTML = '✅';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-          }, 2000);
+          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         }
         showToast('✅ Промпт-инструкция скопирована', 'success');
       }).catch(() => {
@@ -525,9 +504,7 @@ function setupEventListeners() {
         if (btn) {
           const originalText = btn.innerHTML;
           btn.innerHTML = '✅';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-          }, 2000);
+          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         }
         showToast('✅ Промпт-инструкция скопирована', 'success');
       } catch (e) {
@@ -537,10 +514,8 @@ function setupEventListeners() {
     }
   });
 
-  // Сайдбар: создание из буфера обмена (теперь с поддержкой ссылок)
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
-  // Управление темами
   $('manage-themes-btn')?.addEventListener('click', () => {
     const modal = $('themes-modal');
     if (modal) {
@@ -565,15 +540,10 @@ function setupEventListeners() {
     }
   });
 
-  // Добавление темы
   $('add-theme-btn')?.addEventListener('click', openAddThemeModal);
-
   $('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-
   $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-
   $('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
-
   $('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
 
   $('add-theme-modal')?.addEventListener('click', (e) => {
@@ -582,7 +552,6 @@ function setupEventListeners() {
     }
   });
 
-  // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
       closeCreateModal(); 
@@ -597,5 +566,4 @@ function setupEventListeners() {
   });
 }
 
-// Запуск платформы
 init();
