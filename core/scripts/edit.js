@@ -2,15 +2,7 @@
 // РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ (КОПИРОВАНИЕ)
 // ==========================================
 
-const EDIT_PROMPT_INSTRUCTION = `КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:
-1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (\`\`\`html ... \`\`\`). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.
-2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1  в конце.
-3. Уникальный ID: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности.
-4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.
-5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.
-6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.
-
-Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`;
+let currentEditModule = null;
 
 // ГЛАВНАЯ ФУНКЦИЯ: Копирование кода + инструкции прямо из карточки
 function copyCodeWithInstruction(module, buttonElement) {
@@ -19,8 +11,8 @@ function copyCodeWithInstruction(module, buttonElement) {
     return;
   }
   
-  // Сначала код, потом инструкция
-  const fullPrompt = module.content + '\n\n' + EDIT_PROMPT_INSTRUCTION;
+  // Используем getPrompt() из prompts.js
+  const fullPrompt = module.content + '\n\n' + getPrompt('EDIT_PROMPT_INSTRUCTION');
   
   const onSuccess = () => {
     if (buttonElement) {
@@ -42,7 +34,6 @@ function copyCodeWithInstruction(module, buttonElement) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(onSuccess).catch(onError);
   } else {
-    // Fallback для старых браузеров
     const textarea = document.createElement('textarea');
     textarea.value = fullPrompt;
     textarea.style.position = 'fixed';
@@ -57,4 +48,134 @@ function copyCodeWithInstruction(module, buttonElement) {
     }
     document.body.removeChild(textarea);
   }
+}
+
+function openEditModal(module) {
+  currentEditModule = module;
+  
+  const previewIcon = $('edit-preview-icon');
+  const previewName = $('edit-preview-name');
+  const previewDesc = $('edit-preview-desc');
+  const sourceCodeTextarea = $('edit-source-code');
+  const editStatus = $('edit-status');
+  
+  if (previewIcon) previewIcon.textContent = module.icon;
+  if (previewName) previewName.textContent = module.name;
+  if (previewDesc) previewDesc.textContent = module.description || '';
+  
+  if (sourceCodeTextarea) {
+    sourceCodeTextarea.value = module.content || '';
+    sourceCodeTextarea.style.display = 'none';
+  }
+  
+  if (editStatus) {
+    editStatus.textContent = '';
+    editStatus.className = 'modal-status';
+  }
+  
+  const editModalEl = $('edit-modal');
+  if (editModalEl) editModalEl.classList.add('active');
+}
+
+function closeEditModal() {
+  const editModalEl = $('edit-modal');
+  if (editModalEl) editModalEl.classList.remove('active');
+  currentEditModule = null;
+}
+
+function toggleCodeVisibility() {
+  const sourceCodeTextarea = $('edit-source-code');
+  const toggleBtn = $('toggle-code-btn');
+  if (sourceCodeTextarea) {
+    if (sourceCodeTextarea.style.display === 'none') {
+      sourceCodeTextarea.style.display = 'block';
+      if (toggleBtn) toggleBtn.textContent = '🙈 Скрыть код';
+    } else {
+      sourceCodeTextarea.style.display = 'none';
+      if (toggleBtn) toggleBtn.textContent = '👁 Показать код';
+    }
+  }
+}
+
+function copyCurrentCode() {
+  if (!currentEditModule || !currentEditModule.content) return;
+  
+  const copyBtn = $('copy-code-btn');
+  const statusEl = $('edit-status');
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(currentEditModule.content).then(() => {
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать код', 2000);
+      }
+      if (statusEl) showEditStatus(statusEl, '✅ Код приложения скопирован!', 'success');
+    }).catch(() => {
+      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+    });
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = currentEditModule.content;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать код', 2000);
+      }
+      if (statusEl) showEditStatus(statusEl, '✅ Код приложения скопирован!', 'success');
+    } catch (e) {
+      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+    }
+    document.body.removeChild(textarea);
+  }
+}
+
+function copyEditPrompt() {
+  if (!currentEditModule || !currentEditModule.content) return;
+  
+  const copyBtn = $('copy-edit-prompt-btn');
+  const statusEl = $('edit-status');
+  
+  // Используем getPrompt() из prompts.js
+  const fullPrompt = currentEditModule.content + '\n\n' + getPrompt('EDIT_PROMPT_INSTRUCTION');
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullPrompt).then(() => {
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать код + инструкцию для AI', 2000);
+      }
+      if (statusEl) showEditStatus(statusEl, '✅ Код и инструкция скопированы! Вставьте в нейросеть.', 'success');
+    }).catch(() => {
+      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+    });
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.value = fullPrompt;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      if (copyBtn) {
+        copyBtn.textContent = '✅ Скопировано!';
+        setTimeout(() => copyBtn.textContent = '📋 Копировать код + инструкцию для AI', 2000);
+      }
+      if (statusEl) showEditStatus(statusEl, '✅ Код и инструкция скопированы! Вставьте в нейросеть.', 'success');
+    } catch (e) {
+      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+    }
+    document.body.removeChild(textarea);
+  }
+}
+
+function showEditStatus(element, message, type = '') {
+  if (!element) return;
+  element.textContent = message;
+  element.className = `modal-status ${type}`.trim();
 }

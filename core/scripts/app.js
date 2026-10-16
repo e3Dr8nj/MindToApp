@@ -83,27 +83,21 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
-// ЗАГРУЗКА ПО ССЫЛКЕ (ТАЯ ЖЕ ЛОГИКА, ЧТО В МОДАЛКЕ "ДОБАВИТЬ → 🔗 ССЫЛКА")
+// ЗАГРУЗКА ПО ССЫЛКЕ
 // ==========================================
 
-// Конвертирует обычные ссылки Gist в Raw
 function convertGistToRaw(url) {
-  // https://gist.github.com/user/abc123 → https://gist.githubusercontent.com/user/abc123/raw
   if (url.includes('gist.github.com') && !url.includes('gist.githubusercontent.com')) {
     return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
   }
-  // Для gist.githubusercontent.com без /raw дописываем
   if (url.includes('gist.githubusercontent.com') && !url.includes('/raw')) {
     return url.replace(/\/?$/, '/raw');
   }
   return url;
 }
 
-// Загружает HTML по прямой ссылке (как в add.js)
 async function loadHTMLFromURL(url) {
-  // Для Gist конвертируем в Raw
   const finalUrl = convertGistToRaw(url);
-  
   console.log('📥 Загружаю по ссылке:', finalUrl);
   
   const response = await fetch(finalUrl);
@@ -113,7 +107,6 @@ async function loadHTMLFromURL(url) {
   
   const html = await response.text();
   
-  // Проверяем, что пришёл именно HTML
   if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<script id="manifest"')) {
     throw new Error('По ссылке нет HTML-кода');
   }
@@ -122,7 +115,7 @@ async function loadHTMLFromURL(url) {
 }
 
 // ==========================================
-// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА (С ПОДДЕРЖКОЙ ССЫЛОК)
+// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА
 // ==========================================
 
 async function createFromClipboard() {
@@ -151,7 +144,6 @@ async function createFromClipboard() {
     let trimmedContent = clipboardContent.trim();
     let trimmedCode = trimmedContent;
     
-    // Проверяем, является ли это URL
     if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
       showToast('🔗 Загружаю по ссылке...', 'info', 2000);
       
@@ -165,7 +157,6 @@ async function createFromClipboard() {
       }
     }
     
-    // Проверяем, что это HTML
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
       showToast('❌ В буфере нет HTML-кода', 'error');
       return;
@@ -255,18 +246,6 @@ function closeAIPanel() {
 // КОНСТРУКТОР ПРИЛОЖЕНИЙ (ПАНЕЛЬ)
 // ==========================================
 
-const BUILDER_PLATFORM_INSTRUCTION = `
-
-КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:
-1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (\`\`\`html ... \`\`\`). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.
-2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>.
-3. Уникальный ID: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности.
-4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.
-5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.
-6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.
-
-Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`;
-
 function openBuilder() {
   const ideaInput = $('builder-idea-input');
   const codeInput = $('builder-code-input');
@@ -303,7 +282,8 @@ function copyBuilderPrompt() {
     return;
   }
   
-  const fullPrompt = BASE_PROMPT + idea + BUILDER_PLATFORM_INSTRUCTION;
+  // Используем getPrompt() из prompts.js
+  const fullPrompt = BASE_PROMPT + idea + getPrompt('BUILDER_PLATFORM_INSTRUCTION');
   
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
@@ -447,7 +427,8 @@ function setupEventListeners() {
   });
 
   $('sidebar-prompt-btn')?.addEventListener('click', () => {
-    const promptText = EDIT_PROMPT_INSTRUCTION;
+    // Используем getPrompt() из prompts.js
+    const promptText = getPrompt('EDIT_PROMPT_INSTRUCTION');
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(promptText).then(() => {
