@@ -1,6 +1,7 @@
 async function init() {
   initCustomThemes();
   initTheme();
+  initAINetworks();
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
@@ -68,12 +69,12 @@ async function refreshApp() {
 function showToast(message, type = 'info', duration = 3000) {
   const container = $('toast-container');
   if (!container) return;
-  
+
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.textContent = message;
   container.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.classList.add('fade-out');
     setTimeout(() => {
@@ -99,18 +100,16 @@ function convertGistToRaw(url) {
 async function loadHTMLFromURL(url) {
   const finalUrl = convertGistToRaw(url);
   console.log('📥 Загружаю по ссылке:', finalUrl);
-  
+
   const response = await fetch(finalUrl);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
-  
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
   const html = await response.text();
-  
+
   if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<script id="manifest"')) {
     throw new Error('По ссылке нет HTML-кода');
   }
-  
+
   return html;
 }
 
@@ -120,33 +119,33 @@ async function loadHTMLFromURL(url) {
 
 async function createFromClipboard() {
   const createBtn = $('sidebar-create-btn');
-  
+
   if (!navigator.clipboard || !navigator.clipboard.readText) {
     showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
     return;
   }
-  
+
   try {
     if (createBtn) {
       createBtn.textContent = '⏳';
       createBtn.disabled = true;
     }
-    
+
     showToast('📋 Чтение буфера обмена...', 'info', 2000);
-    
+
     const clipboardContent = await navigator.clipboard.readText();
-    
+
     if (!clipboardContent || !clipboardContent.trim()) {
       showToast('❌ Буфер обмена пуст', 'error');
       return;
     }
-    
+
     let trimmedContent = clipboardContent.trim();
     let trimmedCode = trimmedContent;
-    
+
     if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
       showToast('🔗 Загружаю по ссылке...', 'info', 2000);
-      
+
       try {
         trimmedCode = await loadHTMLFromURL(trimmedContent);
         showToast('✅ Код загружен по ссылке', 'success', 2000);
@@ -156,33 +155,33 @@ async function createFromClipboard() {
         return;
       }
     }
-    
+
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
       showToast('❌ В буфере нет HTML-кода', 'error');
       return;
     }
-    
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(trimmedCode, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    
+
     if (!manifestScript) {
       showToast('❌ Не найден manifest в коде', 'error');
       return;
     }
-    
+
     const manifest = JSON.parse(manifestScript.textContent);
-    
+
     if (!manifest.id || !manifest.name || !manifest.icon) {
       showToast('❌ В manifest не хватает полей', 'error');
       return;
     }
-    
+
     if (allModules.some(m => m.id === manifest.id)) {
       showToast('❌ Приложение с таким ID уже есть', 'error');
       return;
     }
-    
+
     const newModule = {
       id: manifest.id,
       name: manifest.name,
@@ -193,15 +192,15 @@ async function createFromClipboard() {
       isLocal: true,
       isFolder: false
     };
-    
+
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
-    
+
     if (!installedModules.includes(manifest.id)) {
       installedModules.push(manifest.id);
       localStorage.setItem('installedModules', JSON.stringify(installedModules));
     }
-    
+
     allModules.push({
       ...manifest,
       content: trimmedCode,
@@ -210,11 +209,11 @@ async function createFromClipboard() {
       isLocal: true,
       isFolder: false
     });
-    
+
     showToast(`✅ "${manifest.name}" создано!`, 'success', 3000);
     renderInstalledApps();
     renderAllApps();
-    
+
   } catch (error) {
     console.error('Ошибка создания из буфера:', error);
     showToast(`❌ Ошибка: ${error.message}`, 'error');
@@ -227,7 +226,7 @@ async function createFromClipboard() {
 }
 
 // ==========================================
-// ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: ПАНЕЛЬ НЕЙРОСЕТЕЙ
+// ПАНЕЛЬ НЕЙРОСЕТЕЙ
 // ==========================================
 
 function openAIPanel() {
@@ -243,7 +242,7 @@ function closeAIPanel() {
 }
 
 // ==========================================
-// КОНСТРУКТОР ПРИЛОЖЕНИЙ (ПАНЕЛЬ)
+// КОНСТРУКТОР ПРИЛОЖЕНИЙ
 // ==========================================
 
 function openBuilder() {
@@ -251,15 +250,15 @@ function openBuilder() {
   const codeInput = $('builder-code-input');
   const status1 = $('builder-status-1');
   const status3 = $('builder-status-3');
-  
+
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
-  
+
   const builderPanel = $('builder-panel');
   if (builderPanel) builderPanel.style.display = 'block';
-  
+
   setTimeout(() => {
     if (builderPanel) builderPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
@@ -274,17 +273,16 @@ function copyBuilderPrompt() {
   const ideaInput = $('builder-idea-input');
   const statusEl = $('builder-status-1');
   const copyBtn = $('builder-copy-prompt-btn');
-  
+
   if (!ideaInput) return;
   const idea = ideaInput.value.trim();
   if (!idea) {
     showStatus(statusEl, '❌ Сначала опишите идею приложения', 'error');
     return;
   }
-  
-  // Используем getPrompt() из prompts.js
+
   const fullPrompt = getPrompt('BASE_PROMPT') + idea + getPrompt('BUILDER_PLATFORM_INSTRUCTION');
-  
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
       if (copyBtn) {
@@ -314,46 +312,46 @@ function openSelectedAI() {
   const selectEl = $('builder-ai-select');
   if (!selectEl) return;
   const url = selectEl.value;
-  if (url) window.open(url, '_blank');
+  if (url) window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function createFromBuilder() {
   const codeInput = $('builder-code-input');
   const statusEl = $('builder-status-3');
   const createBtn = $('builder-create-btn');
-  
+
   if (!codeInput || !statusEl) return;
   const code = codeInput.value.trim();
   if (!code) { showStatus(statusEl, '❌ Вставьте HTML-код от нейросети', 'error'); return; }
   if (!code.includes('<html') && !code.includes('<!DOCTYPE')) { showStatus(statusEl, '❌ Это не похоже на HTML-код', 'error'); return; }
-  
+
   showStatus(statusEl, '⏳ Анализ кода...', 'loading');
-  
+
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(code, 'text/html');
     const manifestScript = doc.getElementById('manifest');
     if (!manifestScript) throw new Error('Не найден тег <script id="manifest"> в <head>');
-    
+
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('В manifest не хватает полей id, name или icon');
     if (allModules.some(m => m.id === manifest.id)) throw new Error('Приложение с таким ID уже существует');
-    
+
     const newModule = {
       id: manifest.id, name: manifest.name, icon: manifest.icon,
       description: manifest.description || 'Создано через конструктор',
       content: code, isCustom: true, isLocal: true, isFolder: false
     };
-    
+
     customModules.push(newModule);
     localStorage.setItem('customModules', JSON.stringify(customModules));
     if (!installedModules.includes(manifest.id)) {
       installedModules.push(manifest.id);
       localStorage.setItem('installedModules', JSON.stringify(installedModules));
     }
-    
+
     allModules.push({ ...manifest, content: code, url: URL.createObjectURL(new Blob([code], { type: 'text/html' })), isCustom: true, isLocal: true, isFolder: false });
-    
+
     showStatus(statusEl, '✅ Приложение успешно создано!', 'success');
     if (createBtn) {
       createBtn.textContent = '✅ Создано!';
@@ -389,14 +387,14 @@ function setupEventListeners() {
   // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
-  // Конструктор (панель)
+  // Конструктор
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
 
-  // Создание (старая модалка)
+  // Старая модалка создания
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -408,7 +406,7 @@ function setupEventListeners() {
   // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
-  // Добавление
+  // Добавление модуля
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
@@ -434,12 +432,12 @@ function setupEventListeners() {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
 
-  // Сайдбар: копирование промпт-инструкции
+  // Сайдбар: копирование промпта
   $('sidebar-prompt-btn')?.addEventListener('click', () => {
-    const promptText = getPrompt('EDIT_PROMPT_INSTRUCTION');
-    
+    const promptTextValue = getPrompt('EDIT_PROMPT_INSTRUCTION');
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(promptText).then(() => {
+      navigator.clipboard.writeText(promptTextValue).then(() => {
         const btn = $('sidebar-prompt-btn');
         if (btn) {
           const originalText = btn.innerHTML;
@@ -452,7 +450,7 @@ function setupEventListeners() {
       });
     } else {
       const textarea = document.createElement('textarea');
-      textarea.value = promptText;
+      textarea.value = promptTextValue;
       textarea.style.position = 'fixed';
       textarea.style.opacity = '0';
       document.body.appendChild(textarea);
@@ -473,8 +471,14 @@ function setupEventListeners() {
     }
   });
 
-  // Сайдбар: создание из буфера обмена
+  // Сайдбар: создание из буфера
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
+
+  // Сайдбар: клик по AI открывает редактор списка
+  $('sidebar-ai-btn')?.addEventListener('click', openAIManagerModal);
+
+  // Панель нейросетей
+  $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
 
   // Управление темами
   $('manage-themes-btn')?.addEventListener('click', () => {
@@ -484,21 +488,10 @@ function setupEventListeners() {
       renderCustomThemesList();
     }
   });
-
-  $('close-themes-btn')?.addEventListener('click', () => {
-    const modal = $('themes-modal');
-    if (modal) modal.classList.remove('active');
-  });
-
-  $('close-themes-footer-btn')?.addEventListener('click', () => {
-    const modal = $('themes-modal');
-    if (modal) modal.classList.remove('active');
-  });
-
+  $('close-themes-btn')?.addEventListener('click', () => $('themes-modal')?.classList.remove('active'));
+  $('close-themes-footer-btn')?.addEventListener('click', () => $('themes-modal')?.classList.remove('active'));
   $('themes-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('themes-modal')) {
-      $('themes-modal').classList.remove('active');
-    }
+    if (e.target === $('themes-modal')) $('themes-modal').classList.remove('active');
   });
 
   // Добавление темы
@@ -507,32 +500,40 @@ function setupEventListeners() {
   $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
   $('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
   $('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
-
   $('add-theme-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('add-theme-modal')) {
-      closeAddThemeModal();
-    }
+    if (e.target === $('add-theme-modal')) closeAddThemeModal();
   });
 
   // Редактор промптов
   $('edit-prompts-btn')?.addEventListener('click', openPromptsModal);
   $('close-prompts-btn')?.addEventListener('click', closePromptsModal);
   $('prompts-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('prompts-modal')) {
-      closePromptsModal();
-    }
+    if (e.target === $('prompts-modal')) closePromptsModal();
   });
+
+  // Управление списком нейросетей
+  $('manage-ai-btn')?.addEventListener('click', openAIManagerModal);
+  $('close-ai-manager-btn')?.addEventListener('click', closeAIManagerModal);
+  $('close-ai-manager-footer-btn')?.addEventListener('click', closeAIManagerModal);
+  $('ai-manager-modal')?.addEventListener('click', (e) => {
+    if (e.target === $('ai-manager-modal')) closeAIManagerModal();
+  });
+  $('add-ai-btn')?.addEventListener('click', () => showAIEditor(null));
+  $('save-ai-btn')?.addEventListener('click', saveAINetworkFromForm);
+  $('cancel-ai-edit-btn')?.addEventListener('click', hideAIEditor);
+  $('reset-ai-list-btn')?.addEventListener('click', resetAIList);
 
   // Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { 
-      closeCreateModal(); 
-      closeAddModal(); 
-      closeShareModal(); 
-      closeBuilder(); 
+    if (e.key === 'Escape') {
+      closeCreateModal();
+      closeAddModal();
+      closeShareModal();
+      closeBuilder();
       closeAIPanel();
       closeAddThemeModal();
       closePromptsModal();
+      closeAIManagerModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
     }

@@ -887,3 +887,175 @@ h1 { color: var(--heading-color); font-size: 24px; }
   transform: scale(1.1);
   opacity: 0.9;
 }
+/* ==========================================
+   УПРАВЛЕНИЕ СПИСКОМ НЕЙРОСЕТЕЙ
+   ========================================== */
+
+.ai-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.ai-manager-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--edit-preview-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.ai-manager-item:hover {
+  border-color: var(--accent-color);
+}
+
+.ai-manager-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-manager-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.ai-manager-url {
+  font-size: 12px;
+  color: var(--description-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 3px;
+}
+
+.ai-manager-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ai-manager-actions button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 6px;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-color);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ai-manager-actions button:hover:not(:disabled) {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.ai-manager-actions button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ai-manager-actions button[data-action="delete"] {
+  background: var(--delete-btn-bg);
+  color: white;
+}
+
+.ai-editor-box {
+  background: var(--edit-preview-bg);
+  padding: 18px;
+  border-radius: 12px;
+  border: 2px solid var(--input-focus-border);
+}
+
+.ai-editor-box label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--modal-heading-color);
+  margin: 12px 0 6px;
+}
+
+.ai-editor-box .url-input {
+  width: 100%;
+}
+
+.ai-checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 14px !important;
+}
+
+.ai-checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.ai-editor-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ai-dropdown-empty {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--description-color);
+  text-align: center;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .ai-manager-item {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .ai-manager-actions {
+    gap: 3px;
+  }
+
+  .ai-manager-actions button {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .ai-manager-name {
+    font-size: 13px;
+  }
+
+  .ai-manager-url {
+    font-size: 11px;
+  }
+
+  .ai-editor-box {
+    padding: 14px;
+  }
+
+  #ai-manager-modal .modal-footer {
+    flex-wrap: wrap;
+  }
+
+  #ai-manager-modal .modal-footer .btn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}

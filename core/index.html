@@ -21,27 +21,18 @@
     <button id="sidebar-prompt-btn" class="sidebar-btn" title="Скопировать промпт-инструкцию">
       📋 prompt
     </button>
-    
+
     <div class="sidebar-arrow">↓</div>
-    
+
     <div class="sidebar-ai-wrapper">
-      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Нейросети">
+      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Наведите — список. Нажмите — редактировать.">
         🤖 AI
       </button>
-      <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown">
-        <a href="https://chat.qwenlm.ai" target="_blank" class="sidebar-ai-link ai-available">⭐ Qwen Chat</a>
-        <a href="https://chat.deepseek.com" target="_blank" class="sidebar-ai-link ai-available">⭐ DeepSeek</a>
-        <a href="https://groq.com" target="_blank" class="sidebar-ai-link ai-available">⭐ Groq</a>
-        <a href="https://chat.openai.com" target="_blank" class="sidebar-ai-link">ChatGPT</a>
-        <a href="https://gemini.google.com" target="_blank" class="sidebar-ai-link">Google Gemini</a>
-        <a href="https://claude.ai" target="_blank" class="sidebar-ai-link">Claude</a>
-        <a href="https://www.perplexity.ai" target="_blank" class="sidebar-ai-link">Perplexity</a>
-        <a href="https://lmarena.ai" target="_blank" class="sidebar-ai-link">LM Arena</a>
-      </div>
+      <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown"></div>
     </div>
-    
+
     <div class="sidebar-arrow">↓</div>
-    
+
     <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Создать приложение из буфера обмена">
       🚀 Создать
     </button>
@@ -60,32 +51,24 @@
           <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
           <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
           <button id="manage-themes-btn" class="btn" title="Управление темами оформления">🎨 Темы</button>
+          <button id="manage-ai-btn" class="btn" title="Редактировать список нейросетей">🤖 ИИ</button>
           <button id="edit-prompts-btn" class="btn" title="Редактировать промпты для ИИ">⚙️ Промпты</button>
           <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
           <button id="add-custom-btn" class="btn">➕ Добавить</button>
           <button id="open-store-btn" class="btn">🛒 Магазин</button>
         </div>
       </header>
-      
+
       <!-- ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: Панель нейросетей -->
       <div id="ai-panel" class="ai-panel" style="display: none;">
         <div class="ai-panel-header">
-          <h2>🤖 Бесплатные нейросети для создания приложений</h2>
+          <h2>🤖 Нейросети для создания приложений</h2>
           <button id="ai-panel-close-btn" class="modal-close" title="Закрыть">&times;</button>
         </div>
-        <p class="ai-panel-hint">⭐ — работают в РФ без VPN. Откройте любую, вставьте промпт из конструктора и получите HTML-код.</p>
-        <div class="ai-panel-grid">
-          <a href="https://chat.qwenlm.ai" target="_blank" class="ai-panel-link ai-available">⭐ Qwen Chat</a>
-          <a href="https://chat.deepseek.com" target="_blank" class="ai-panel-link ai-available">⭐ DeepSeek</a>
-          <a href="https://groq.com" target="_blank" class="ai-panel-link ai-available">⭐ Groq</a>
-          <a href="https://chat.openai.com" target="_blank" class="ai-panel-link">ChatGPT</a>
-          <a href="https://gemini.google.com" target="_blank" class="ai-panel-link">Google Gemini</a>
-          <a href="https://claude.ai" target="_blank" class="ai-panel-link">Claude</a>
-          <a href="https://www.perplexity.ai" target="_blank" class="ai-panel-link">Perplexity</a>
-          <a href="https://lmarena.ai" target="_blank" class="ai-panel-link">LM Arena</a>
-        </div>
+        <p class="ai-panel-hint">⭐ — работают в РФ без VPN. Список можно изменить кнопкой «🤖 ИИ».</p>
+        <div id="ai-panel-grid" class="ai-panel-grid"></div>
       </div>
-      
+
       <!-- Панель конструктора -->
       <div id="builder-panel" class="builder-panel" style="display: none;">
         <div class="builder-panel-header">
@@ -101,25 +84,20 @@
             <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
             <div id="builder-status-1" class="modal-status"></div>
           </div>
+
           <div class="builder-arrow">→</div>
+
           <div class="builder-block">
             <div class="builder-block-number">2</div>
             <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
             <p class="builder-block-desc">Вставьте скопированный промпт в любую нейросеть и дождитесь ответа.</p>
-            <select id="builder-ai-select" class="builder-select">
-              <option value="https://chat.qwenlm.ai">🌟 Qwen Chat (Отлично кодит)</option>
-              <option value="https://chat.deepseek.com">DeepSeek (Топ для кода)</option>
-              <option value="https://chat.openai.com">ChatGPT</option>
-              <option value="https://claude.ai">Claude</option>
-              <option value="https://gemini.google.com">Google Gemini</option>
-              <option value="https://groq.com">Groq (Очень быстро)</option>
-              <option value="https://www.perplexity.ai">Perplexity</option>
-              <option value="https://lmarena.ai">LM Arena</option>
-            </select>
+            <select id="builder-ai-select" class="builder-select"></select>
             <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
             <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
           </div>
+
           <div class="builder-arrow">→</div>
+
           <div class="builder-block">
             <div class="builder-block-number">3</div>
             <h3 class="builder-block-title">🚀 Создайте приложение</h3>
@@ -130,7 +108,7 @@
           </div>
         </div>
       </div>
-      
+
       <div id="installed-apps" class="app-grid"></div>
       <div id="empty-state" class="empty-state" style="display: none;">
         <p>У вас пока нет установленных приложений</p>
@@ -179,24 +157,13 @@
           <button id="copy-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт</button>
         </div>
         <div class="step-box">
-          <h3>3. Вставьте промпт в любую из этих бесплатных нейросетей:</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте скопированный промпт, дождитесь ответа и скопируйте полученный HTML-код.</p>
-          <div class="ai-links">
-            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
-            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek (Топ для кода)</a>
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat (Отлично кодит)</a>
-            <a href="https://copilot.microsoft.com" target="_blank" class="ai-link">Microsoft Copilot</a>
-            <a href="https://gemini.google.com" target="_blank" class="ai-link">Google Gemini</a>
-            <a href="https://chat.mistral.ai" target="_blank" class="ai-link">Mistral Le Chat</a>
-            <a href="https://groq.com" target="_blank" class="ai-link">Groq (Очень быстро)</a>
-            <a href="https://www.blackbox.ai" target="_blank" class="ai-link">Blackbox AI</a>
-            <a href="https://www.phind.com" target="_blank" class="ai-link">Phind</a>
-          </div>
+          <h3>3. Вставьте промпт в нейросеть:</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте промпт, дождитесь ответа и скопируйте HTML-код.</p>
+          <div id="create-ai-links" class="ai-links"></div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте полученный от нейросети HTML-код сюда:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html, который сгенерировала нейросеть..."></textarea>
+          <h3>4. Вставьте полученный HTML-код:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
@@ -218,13 +185,7 @@
         <div class="tab" data-tab="url">
           <p class="modal-description">
             Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>
-            Поддерживаются любые форматы: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages и другие хостинги.
-          </p>
-          <p class="modal-description" style="margin-top: 5px;">
-            Примеры:<br>
-            • <code>https://username.github.io/my-app/</code><br>
-            • <code>https://gist.githubusercontent.com/.../raw/file.html</code><br>
-            • <code>https://gist.githubusercontent.com/.../raw/file.txt</code>
+            Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.
           </p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
@@ -275,7 +236,6 @@
             <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
           </div>
         </div>
-
         <div class="step-box">
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <button id="toggle-code-btn" class="btn btn-secondary" style="flex: 1;">👁 Показать код</button>
@@ -283,7 +243,6 @@
           </div>
           <textarea id="edit-source-code" class="code-input" style="display: none;" readonly></textarea>
         </div>
-
         <div class="step-box">
           <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Копировать код + инструкцию для AI</button>
           <div id="edit-status" class="modal-status"></div>
@@ -310,25 +269,19 @@
             <div class="share-preview-desc" id="share-preview-desc">Описание</div>
           </div>
         </div>
-        
         <div class="step-box">
           <h3>📋 Шаг 1: Скопировать код</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Скопируйте весь HTML-код приложения в буфер обмена.
-          </p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Скопируйте весь HTML-код приложения в буфер обмена.</p>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
-
         <div class="step-box">
           <h3>🌐 Шаг 2: Разместить и получить ссылку</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Откройте любой из этих бесплатных сервисов, вставьте код (Ctrl+V), сохраните и скопируйте полученную ссылку.
-          </p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте сервис, вставьте код, сохраните и скопируйте ссылку.</p>
           <div class="ai-links">
-            <a href="https://gist.github.com" target="_blank" class="ai-link">GitHub Gist</a>
-            <a href="https://privatebin.net/" target="_blank" class="ai-link">PrivateBin (Шифрование)</a>
-            <a href="https://www.toptal.com/developers/hastebin" target="_blank" class="ai-link">Toptal Hastebin</a>
+            <a href="https://gist.github.com" target="_blank" rel="noopener noreferrer" class="ai-link">GitHub Gist</a>
+            <a href="https://privatebin.net/" target="_blank" rel="noopener noreferrer" class="ai-link">PrivateBin</a>
+            <a href="https://www.toptal.com/developers/hastebin" target="_blank" rel="noopener noreferrer" class="ai-link">Toptal Hastebin</a>
           </div>
         </div>
       </div>
@@ -385,22 +338,12 @@
       <div class="modal-body">
         <div class="step-box">
           <h3>1. Скопируйте шаблон темы</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Это CSS-шаблон с переменными. Отправьте его ИИ и попросите изменить цвета.
-          </p>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Отправьте его ИИ и попросите изменить цвета.</p>
           <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Скопировать шаблон</button>
         </div>
         <div class="step-box">
           <h3>2. Отправьте шаблон в нейросеть</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Попросите ИИ изменить цвета, например: "Сделай тему в зелёных тонах" или "Добавь неоновые эффекты".
-          </p>
-          <div class="ai-links">
-            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
-            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
-            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
-            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
-          </div>
+          <div id="theme-ai-links" class="ai-links"></div>
         </div>
         <div class="step-box">
           <h3>3. Вставьте результат</h3>
@@ -425,18 +368,65 @@
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <label for="prompt-select" style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--modal-heading-color);">Выберите промпт для редактирования:</label>
+          <label for="prompt-select" style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--modal-heading-color);">Выберите промпт:</label>
           <select id="prompt-select" class="builder-select"></select>
           <p id="prompt-desc" style="font-size: 13px; color: var(--description-color); margin-top: 8px;"></p>
         </div>
         <div class="step-box">
-          <textarea id="prompt-editor-textarea" class="code-input" style="height: 350px; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+          <textarea id="prompt-editor-textarea" class="code-input" style="height: 350px;"></textarea>
         </div>
         <div id="prompt-editor-status" class="modal-status"></div>
       </div>
       <div class="modal-footer">
         <button id="reset-prompt-btn" class="btn btn-secondary">🔄 Сбросить к стандартному</button>
         <button id="save-prompt-btn" class="btn btn-primary">💾 Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Управление списком нейросетей -->
+  <div id="ai-manager-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>🤖 Список нейросетей</h2>
+        <button class="modal-close" id="close-ai-manager-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>Ваши нейросети</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Порядок в списке = порядок в меню. ⭐ — работает в РФ без VPN.
+          </p>
+          <div id="ai-manager-list" class="ai-manager-list"></div>
+        </div>
+
+        <div class="step-box ai-editor-box" id="ai-editor-box" style="display: none;">
+          <h3 id="ai-editor-title">➕ Новая нейросеть</h3>
+          <input type="hidden" id="ai-edit-id">
+
+          <label for="ai-edit-name">Название</label>
+          <input type="text" id="ai-edit-name" class="url-input" placeholder="Например: Qwen Chat">
+
+          <label for="ai-edit-url">Ссылка (URL)</label>
+          <input type="url" id="ai-edit-url" class="url-input" placeholder="https://chat.qwenlm.ai">
+
+          <label class="ai-checkbox-label" for="ai-edit-available">
+            <input type="checkbox" id="ai-edit-available">
+            Работает в РФ без VPN (показывать ⭐)
+          </label>
+
+          <div id="ai-editor-status" class="modal-status"></div>
+
+          <div class="ai-editor-buttons">
+            <button id="save-ai-btn" class="btn btn-primary">💾 Сохранить</button>
+            <button id="cancel-ai-edit-btn" class="btn btn-secondary">Отмена</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="add-ai-btn" class="btn btn-primary">➕ Добавить нейросеть</button>
+        <button id="reset-ai-list-btn" class="btn btn-secondary">🔄 Сбросить список</button>
+        <button id="close-ai-manager-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>
@@ -448,6 +438,7 @@
   <script src="scripts/state.js"></script>
   <script src="scripts/theme.js"></script>
   <script src="scripts/custom-themes.js"></script>
+  <script src="scripts/ai-list.js"></script>
   <script src="scripts/registry.js"></script>
   <script src="scripts/render.js"></script>
   <script src="scripts/create.js"></script>
