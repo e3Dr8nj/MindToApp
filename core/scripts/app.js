@@ -1,9 +1,6 @@
 async function init() {
-  // СНАЧАЛА загружаем пользовательские темы (добавляем их в THEMES)
   initCustomThemes();
-  // ПОТОМ применяем текущую тему (теперь она точно есть в THEMES)
   initTheme();
-  
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
@@ -86,54 +83,42 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ПО ССЫЛКЕ
+// ЗАГРУЗКА ПО ССЫЛКЕ (ТАЯ ЖЕ ЛОГИКА, ЧТО В МОДАЛКЕ "ДОБАВИТЬ → 🔗 ССЫЛКА")
 // ==========================================
 
-function detectService(url) {
-  if (!url) return null;
-  const lower = url.toLowerCase();
-  
-  if (lower.includes('gist.github.com') || lower.includes('gist.githubusercontent.com')) return 'gist';
-  if (lower.includes('toptal.com/developers/hastebin')) return 'hastebin';
-  if (lower.includes('pastebin.com')) return 'pastebin';
-  
-  return null;
-}
-
-function convertToRaw(url, service) {
-  try {
-    if (url.includes('/raw/') || url.includes('/raw?') || url.endsWith('/raw')) {
-      return url;
-    }
-    
-    if (service === 'gist') {
-      return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
-    }
-    
-    if (service === 'hastebin') {
-      const match = url.match(/hastebin\/([^\/\?\#]+)/);
-      if (match) return `https://www.toptal.com/developers/hastebin/raw/${match[1]}`;
-    }
-    
-    if (service === 'pastebin') {
-      const match = url.match(/pastebin\.com\/([^\/\?\#]+)/);
-      if (match) return `https://pastebin.com/raw/${match[1]}`;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Ошибка преобразования URL:', error);
-    return null;
+// Конвертирует обычные ссылки Gist в Raw
+function convertGistToRaw(url) {
+  // https://gist.github.com/user/abc123 → https://gist.githubusercontent.com/user/abc123/raw
+  if (url.includes('gist.github.com') && !url.includes('gist.githubusercontent.com')) {
+    return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
   }
+  // Для gist.githubusercontent.com без /raw дописываем
+  if (url.includes('gist.githubusercontent.com') && !url.includes('/raw')) {
+    return url.replace(/\/?$/, '/raw');
+  }
+  return url;
 }
 
-function getServiceName(service) {
-  const names = {
-    gist: 'GitHub Gist',
-    hastebin: 'Hastebin',
-    pastebin: 'Pastebin'
-  };
-  return names[service] || 'сервис';
+// Загружает HTML по прямой ссылке (как в add.js)
+async function loadHTMLFromURL(url) {
+  // Для Gist конвертируем в Raw
+  const finalUrl = convertGistToRaw(url);
+  
+  console.log('📥 Загружаю по ссылке:', finalUrl);
+  
+  const response = await fetch(finalUrl);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  
+  const html = await response.text();
+  
+  // Проверяем, что пришёл именно HTML
+  if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<script id="manifest"')) {
+    throw new Error('По ссылке нет HTML-кода');
+  }
+  
+  return html;
 }
 
 // ==========================================
@@ -163,42 +148,24 @@ async function createFromClipboard() {
       return;
     }
     
-    let trimmedCode = clipboardContent.trim();
+    let trimmedContent = clipboardContent.trim();
+    let trimmedCode = trimmedContent;
     
     // Проверяем, является ли это URL
-    if (trimmedCode.startsWith('http://') || trimmedCode.startsWith('https://')) {
-      showToast('🔗 Обнаружена ссылка, загружаю...', 'info', 2000);
+    if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
+      showToast('🔗 Загружаю по ссылке...', 'info', 2000);
       
-      const service = detectService(trimmedCode);
-      if (!service) {
-        showToast('❌ Неизвестный сервис. Поддерживаются: GitHub Gist, Hastebin, Pastebin', 'error');
+      try {
+        trimmedCode = await loadHTMLFromURL(trimmedContent);
+        showToast('✅ Код загружен по ссылке', 'success', 2000);
+      } catch (loadError) {
+        console.error('Ошибка загрузки по ссылке:', loadError);
+        showToast(`❌ Не удалось загрузить: ${loadError.message}`, 'error');
         return;
       }
-      
-      const rawUrl = convertToRaw(trimmedCode, service);
-      if (!rawUrl) {
-        showToast('❌ Не удалось преобразовать ссылку', 'error');
-        return;
-      }
-      
-      const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-      const proxyUrl = CORS_PROXY + encodeURIComponent(rawUrl);
-      
-      const response = await fetch(proxyUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      trimmedCode = await response.text();
-      
-      if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
-        showToast('❌ По ссылке нет HTML-кода', 'error');
-        return;
-      }
-      
-      showToast(`✅ Загружено с ${getServiceName(service)}`, 'success', 2000);
     }
     
+    // Проверяем, что это HTML
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
       showToast('❌ В буфере нет HTML-кода', 'error');
       return;
