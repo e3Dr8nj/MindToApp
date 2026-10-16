@@ -380,19 +380,23 @@ function showStatus(element, message, type = '') {
 // ==========================================
 
 function setupEventListeners() {
+  // Навигация
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
+  // Тема
   $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
 
+  // Конструктор (панель)
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
   $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
   $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
   $('builder-create-btn')?.addEventListener('click', createFromBuilder);
 
+  // Создание (старая модалка)
   $('create-app-btn')?.addEventListener('click', openCreateModal);
   $('close-create-btn')?.addEventListener('click', closeCreateModal);
   $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
@@ -401,8 +405,10 @@ function setupEventListeners() {
   createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
   userIdeaInput?.addEventListener('input', updatePromptPreview);
 
+  // Кэш
   $('refresh-btn')?.addEventListener('click', refreshApp);
 
+  // Добавление
   $('add-custom-btn')?.addEventListener('click', openAddModal);
   $('add-custom-btn-store')?.addEventListener('click', openAddModal);
   $('close-modal-btn')?.addEventListener('click', closeAddModal);
@@ -413,6 +419,7 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
+  // Шаринг
   $('close-share-btn')?.addEventListener('click', closeShareModal);
   $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
   $('copy-app-code-btn')?.addEventListener('click', copyAppCode);
@@ -422,10 +429,12 @@ function setupEventListeners() {
     shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });
   }
 
+  // Вкладки
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.target));
   });
 
+  // Сайдбар: копирование промпт-инструкции
   $('sidebar-prompt-btn')?.addEventListener('click', () => {
     const promptText = getPrompt('EDIT_PROMPT_INSTRUCTION');
     
@@ -464,8 +473,10 @@ function setupEventListeners() {
     }
   });
 
+  // Сайдбар: создание из буфера обмена
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
+  // Управление темами
   $('manage-themes-btn')?.addEventListener('click', () => {
     const modal = $('themes-modal');
     if (modal) {
@@ -490,6 +501,7 @@ function setupEventListeners() {
     }
   });
 
+  // Добавление темы
   $('add-theme-btn')?.addEventListener('click', openAddThemeModal);
   $('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
   $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
@@ -502,6 +514,16 @@ function setupEventListeners() {
     }
   });
 
+  // Редактор промптов
+  $('edit-prompts-btn')?.addEventListener('click', openPromptsModal);
+  $('close-prompts-btn')?.addEventListener('click', closePromptsModal);
+  $('prompts-modal')?.addEventListener('click', (e) => {
+    if (e.target === $('prompts-modal')) {
+      closePromptsModal();
+    }
+  });
+
+  // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { 
       closeCreateModal(); 
@@ -510,10 +532,12 @@ function setupEventListeners() {
       closeBuilder(); 
       closeAIPanel();
       closeAddThemeModal();
+      closePromptsModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
     }
   });
 }
 
+// Запуск платформы
 init();

@@ -7,15 +7,10 @@
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MindToApp Platform</title>
-  
-  <!-- Базовые стили -->
-  <link rel="stylesheet" href="styles.css?v=1">
-  
-  <!-- Темы (порядок важен: light загружается первым как базовая) -->
-  <link rel="stylesheet" href="styles/themes/light.css?v=1">
-  <link rel="stylesheet" href="styles/themes/cyberpunk.css?v=1">
-  <link rel="stylesheet" href="styles/themes/discord.css?v=1">
-  
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/themes/light.css">
+  <link rel="stylesheet" href="styles/themes/cyberpunk.css">
+  <link rel="stylesheet" href="styles/themes/discord.css">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#667eea">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
@@ -64,6 +59,7 @@
         <div class="header-buttons">
           <button id="theme-toggle-btn" class="btn" title="Переключить тему">☀️ Светлая</button>
           <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
+          <button id="edit-prompts-btn" class="btn" title="Редактировать промпты для ИИ">⚙️ Промпты</button>
           <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
           <button id="add-custom-btn" class="btn">➕ Добавить</button>
           <button id="open-store-btn" class="btn">🛒 Магазин</button>
@@ -341,104 +337,122 @@
     </div>
   </div>
 
-  <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
- 
-  <!-- В хедере добавляем кнопку -->
-<button id="manage-themes-btn" class="btn">🎨 Темы</button>
-
-<!-- Модалка управления темами -->
-<div id="themes-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>🎨 Управление темами</h2>
-      <button class="modal-close" id="close-themes-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="step-box">
-        <h3>Системные темы</h3>
-        <div class="themes-list">
-          <div class="theme-item">
-            <span>☀️ Светлая</span>
-            <button class="btn btn-small" onclick="applyTheme('light')">Применить</button>
-          </div>
-          <div class="theme-item">
-            <span>🌆 Киберпанк</span>
-            <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Применить</button>
-          </div>
-          <div class="theme-item">
-            <span>💬 Дискорд</span>
-            <button class="btn btn-small" onclick="applyTheme('discord')">Применить</button>
+  <!-- Модальное окно: Управление темами -->
+  <div id="themes-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🎨 Управление темами</h2>
+        <button class="modal-close" id="close-themes-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>Системные темы</h3>
+          <div class="themes-list">
+            <div class="theme-item">
+              <span>☀️ Светлая</span>
+              <button class="btn btn-small" onclick="applyTheme('light')">Применить</button>
+            </div>
+            <div class="theme-item">
+              <span>🌆 Киберпанк</span>
+              <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Применить</button>
+            </div>
+            <div class="theme-item">
+              <span>💬 Дискорд</span>
+              <button class="btn btn-small" onclick="applyTheme('discord')">Применить</button>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div class="step-box">
-        <h3>Пользовательские темы</h3>
-        <div id="custom-themes-list" class="custom-themes-list"></div>
-        <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Добавить свою тему</button>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button id="close-themes-footer-btn" class="btn btn-secondary">Закрыть</button>
-    </div>
-  </div>
-</div>
-
-<!-- Модалка добавления темы -->
-<div id="add-theme-modal" class="modal">
-  <div class="modal-content modal-create">
-    <div class="modal-header">
-      <h2>➕ Добавить свою тему</h2>
-      <button class="modal-close" id="close-add-theme-btn">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="step-box">
-        <h3>1. Скопируйте шаблон темы</h3>
-        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-          Это CSS-шаблон с переменными. Отправьте его ИИ и попросите изменить цвета.
-        </p>
-        <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Скопировать шаблон</button>
-      </div>
-      
-      <div class="step-box">
-        <h3>2. Отправьте шаблон в нейросеть</h3>
-        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-          Попросите ИИ изменить цвета, например: "Сделай тему в зелёных тонах" или "Добавь неоновые эффекты".
-        </p>
-        <div class="ai-links">
-          <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
-          <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
-          <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
-          <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+        <div class="step-box">
+          <h3>Пользовательские темы</h3>
+          <div id="custom-themes-list" class="custom-themes-list"></div>
+          <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Добавить свою тему</button>
         </div>
       </div>
-      
-      <div class="step-box">
-        <h3>3. Вставьте результат</h3>
-        <input type="text" id="theme-name-input" class="url-input" placeholder="Название темы (например: Зелёная неон)" style="margin-bottom: 10px;">
-        <textarea id="theme-css-input" class="code-input" placeholder="Вставьте сюда CSS-код темы от ИИ..." style="height: 250px;"></textarea>
-        <div id="add-theme-status" class="modal-status"></div>
+      <div class="modal-footer">
+        <button id="close-themes-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
-    <div class="modal-footer">
-      <button id="cancel-add-theme-btn" class="btn btn-secondary">Отмена</button>
-      <button id="submit-theme-btn" class="btn btn-primary">Добавить тему</button>
+  </div>
+
+  <!-- Модальное окно: Добавление темы -->
+  <div id="add-theme-modal" class="modal">
+    <div class="modal-content modal-create">
+      <div class="modal-header">
+        <h2>➕ Добавить свою тему</h2>
+        <button class="modal-close" id="close-add-theme-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>1. Скопируйте шаблон темы</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+            Это CSS-шаблон с переменными. Отправьте его ИИ и попросите изменить цвета.
+          </p>
+          <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Скопировать шаблон</button>
+        </div>
+        <div class="step-box">
+          <h3>2. Отправьте шаблон в нейросеть</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+            Попросите ИИ изменить цвета, например: "Сделай тему в зелёных тонах" или "Добавь неоновые эффекты".
+          </p>
+          <div class="ai-links">
+            <a href="https://chat.qwenlm.ai" target="_blank" class="ai-link">Qwen Chat</a>
+            <a href="https://chat.deepseek.com" target="_blank" class="ai-link">DeepSeek</a>
+            <a href="https://chat.openai.com" target="_blank" class="ai-link">ChatGPT</a>
+            <a href="https://claude.ai" target="_blank" class="ai-link">Claude</a>
+          </div>
+        </div>
+        <div class="step-box">
+          <h3>3. Вставьте результат</h3>
+          <input type="text" id="theme-name-input" class="url-input" placeholder="Название темы (например: Зелёная неон)" style="margin-bottom: 10px;">
+          <textarea id="theme-css-input" class="code-input" placeholder="Вставьте сюда CSS-код темы от ИИ..." style="height: 250px;"></textarea>
+          <div id="add-theme-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-add-theme-btn" class="btn btn-secondary">Отмена</button>
+        <button id="submit-theme-btn" class="btn btn-primary">Добавить тему</button>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Модальное окно: Редактор промптов -->
+  <div id="prompts-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2>⚙️ Редактор промптов</h2>
+        <button class="modal-close" id="close-prompts-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <label for="prompt-select" style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--modal-heading-color);">Выберите промпт для редактирования:</label>
+          <select id="prompt-select" class="builder-select"></select>
+          <p id="prompt-desc" style="font-size: 13px; color: var(--description-color); margin-top: 8px;"></p>
+        </div>
+        <div class="step-box">
+          <textarea id="prompt-editor-textarea" class="code-input" style="height: 350px; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
+        </div>
+        <div id="prompt-editor-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="reset-prompt-btn" class="btn btn-secondary">🔄 Сбросить к стандартному</button>
+        <button id="save-prompt-btn" class="btn btn-primary">💾 Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
-<script src="scripts/prompts.js"></script>
-<script src="scripts/db.js"></script>
-<script src="scripts/state.js"></script>
-<script src="scripts/theme.js"></script>
-<script src="scripts/custom-themes.js"></script>
-<script src="scripts/registry.js"></script>
-<script src="scripts/render.js"></script>
-<script src="scripts/create.js"></script>
-<script src="scripts/edit.js"></script>
-<script src="scripts/add.js"></script>
-<script src="scripts/share.js"></script>
-<script src="scripts/app.js"></script>
+  <script src="scripts/prompts.js"></script>
+  <script src="scripts/prompt-editor.js"></script>
+  <script src="scripts/db.js"></script>
+  <script src="scripts/state.js"></script>
+  <script src="scripts/theme.js"></script>
+  <script src="scripts/custom-themes.js"></script>
+  <script src="scripts/registry.js"></script>
+  <script src="scripts/render.js"></script>
+  <script src="scripts/create.js"></script>
+  <script src="scripts/edit.js"></script>
+  <script src="scripts/add.js"></script>
+  <script src="scripts/share.js"></script>
+  <script src="scripts/app.js"></script>
 </body>
-
 </html>
