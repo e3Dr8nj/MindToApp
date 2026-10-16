@@ -45,16 +45,4 @@ const editChangesInput = $('edit-changes-input');
 const editNewCodeInput = $('edit-new-code-input');
 const editStatus = $('edit-status');
 
-// Константы
-const BASE_PROMPT = `Создай одностраничное веб-приложение в одном файле index.html для платформы MindToApp.
-
-Требования:
-- Manifest в <head>: <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>
-- ВАЖНО: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915"). Это нужно для уникальности.
-- CSS в <style>, JS в <script>, без внешних библиотек
-- Адаптивный дизайн: работает на десктопе и мобильных
-- body { min-height: calc(100vh - 60px); margin: 0; }
-- Без alert/confirm/prompt (заблокированы в iframe)
-- Картинки/звуки только в Base64
-
-Задача: `;
+// BASE_PROMPT удален отсюда, так как теперь он находится в prompts.js

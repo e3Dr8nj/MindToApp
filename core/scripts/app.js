@@ -283,7 +283,7 @@ function copyBuilderPrompt() {
   }
   
   // Используем getPrompt() из prompts.js
-  const fullPrompt = BASE_PROMPT + idea + getPrompt('BUILDER_PLATFORM_INSTRUCTION');
+  const fullPrompt = getPrompt('BASE_PROMPT') + idea + getPrompt('BUILDER_PLATFORM_INSTRUCTION');
   
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
@@ -427,7 +427,6 @@ function setupEventListeners() {
   });
 
   $('sidebar-prompt-btn')?.addEventListener('click', () => {
-    // Используем getPrompt() из prompts.js
     const promptText = getPrompt('EDIT_PROMPT_INSTRUCTION');
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
