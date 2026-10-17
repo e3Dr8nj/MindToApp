@@ -342,7 +342,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
-   ВЕРХНЯЯ ДОПОЛНИТЕЛЬНАЯ ОБЛАСТЬ: ПАНЕЛЬ НЕЙРОСЕТЕЙ
+   ПАНЕЛЬ НЕЙРОСЕТЕЙ
    ========================================== */
 
 .ai-panel {
@@ -709,25 +709,13 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 @keyframes toastSlideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes toastFadeOut {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
 }
 
 /* ==========================================
@@ -918,7 +906,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
-   БУРГЕР-МЕНЮ ДЛЯ МОБИЛЬНЫХ
+   БУРГЕР-МЕНЮ
    ========================================== */
 
 .burger-menu-btn {
@@ -931,6 +919,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
   font-size: 24px;
   cursor: pointer;
   transition: background 0.3s;
+  line-height: 1;
 }
 
 .burger-menu-btn:hover {
@@ -970,32 +959,32 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .sidebar {
     width: 60px;
   }
-  
+
   .sidebar-btn {
     width: 50px;
     height: 50px;
     font-size: 9px;
   }
-  
+
   .sidebar-arrow {
     font-size: 18px;
   }
-  
+
   .sidebar-ai-wrapper {
     padding-right: 180px;
     margin-right: -180px;
   }
-  
+
   .sidebar-ai-dropdown {
     left: 52px;
     min-width: 160px;
   }
-  
+
   .main-content {
     margin-left: 60px;
   }
 
-  /* Бургер-меню */
+  /* БУРГЕР-МЕНЮ */
   .burger-menu-btn {
     display: block;
   }
@@ -1011,7 +1000,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
     padding: 10px;
     flex-direction: column;
     gap: 8px;
-    min-width: 200px;
+    min-width: 220px;
     z-index: 1000;
     margin-top: 10px;
   }
@@ -1050,7 +1039,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
   .edit-preview, .share-preview { padding: 12px; gap: 10px; }
   .edit-preview-icon, .share-preview-icon { font-size: 36px; }
   .edit-preview-name, .share-preview-name { font-size: 16px; }
-  
+
   .builder-panel, .ai-panel { padding: 15px; }
   .builder-panel-header, .ai-panel-header { margin-bottom: 20px; }
   .builder-panel-header h2, .ai-panel-header h2 { font-size: 17px; }
@@ -1063,13 +1052,13 @@ h1 { color: var(--heading-color); font-size: 24px; }
     padding: 10px 12px;
     font-size: 13px;
   }
-  
+
   .toast-container {
     top: 10px;
     right: 10px;
     left: 70px;
   }
-  
+
   .toast {
     font-size: 13px;
     padding: 10px 14px;
