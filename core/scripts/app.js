@@ -474,9 +474,6 @@ function setupEventListeners() {
   // Сайдбар: создание из буфера
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
-  // Сайдбар: клик по AI открывает редактор списка
-  $('sidebar-ai-btn')?.addEventListener('click', openAIManagerModal);
-
   // Панель нейросетей
   $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
 
