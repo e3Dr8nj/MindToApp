@@ -384,9 +384,6 @@ function setupEventListeners() {
   $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('close-app-btn')?.addEventListener('click', closeApp);
 
-  // Тема
-  $('theme-toggle-btn')?.addEventListener('click', cycleTheme);
-
   // Конструктор
   $('builder-btn')?.addEventListener('click', openBuilder);
   $('builder-close-btn')?.addEventListener('click', closeBuilder);
