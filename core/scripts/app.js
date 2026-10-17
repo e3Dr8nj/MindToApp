@@ -378,6 +378,29 @@ function showStatus(element, message, type = '') {
 // ==========================================
 
 function setupEventListeners() {
+  // Бургер-меню (мобильные)
+  const burgerBtn = $('burger-menu-btn');
+  const headerMenu = $('header-menu');
+
+  if (burgerBtn && headerMenu) {
+    burgerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      headerMenu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!headerMenu.contains(e.target) && !burgerBtn.contains(e.target)) {
+        headerMenu.classList.remove('active');
+      }
+    });
+
+    headerMenu.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        headerMenu.classList.remove('active');
+      });
+    });
+  }
+
   // Навигация
   $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
@@ -530,6 +553,7 @@ function setupEventListeners() {
       closeAIManagerModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
+      if (headerMenu) headerMenu.classList.remove('active');
     }
   });
 }

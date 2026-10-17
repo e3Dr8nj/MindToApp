@@ -731,111 +731,6 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
-   АДАПТИВНОСТЬ
-   ========================================== */
-
-@media (max-width: 900px) {
-  .builder-container {
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .builder-arrow {
-    transform: rotate(90deg);
-    margin: -10px 0;
-  }
-
-  .builder-block {
-    padding: 25px 18px 18px;
-  }
-
-  .builder-block-title {
-    font-size: 16px;
-  }
-
-  #builder-idea-input,
-  #builder-code-input {
-    min-height: 120px;
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
-  
-  .sidebar-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 9px;
-  }
-  
-  .sidebar-arrow {
-    font-size: 18px;
-  }
-  
-  .sidebar-ai-wrapper {
-    padding-right: 180px;
-    margin-right: -180px;
-  }
-  
-  .sidebar-ai-dropdown {
-    left: 52px;
-    min-width: 160px;
-  }
-  
-  .main-content {
-    margin-left: 60px;
-  }
-}
-
-@media (max-width: 600px) {
-  .app-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
-  .app-icon { font-size: 36px; }
-  h1 { font-size: 20px; }
-  .header-buttons { flex-direction: column; gap: 5px; }
-  .header-buttons .btn { padding: 8px 15px; font-size: 14px; }
-  .modal-content { padding: 20px; }
-  .modal-header h2 { font-size: 20px; }
-  .app-header { padding: 8px 15px; }
-  .app-header h1 { font-size: 16px; }
-  .btn-back { padding: 8px 14px; font-size: 14px; }
-  .header-spacer { width: 90px; }
-  #app-frame { height: calc(100vh - 55px); }
-  #prompt-text { height: 140px; font-size: 12px; }
-  .code-input { height: 150px; font-size: 11px; }
-  .tab-btn { font-size: 12px; padding: 8px 4px; }
-  .ai-links, .ai-panel-grid { grid-template-columns: 1fr 1fr; }
-  .idea-input { height: 80px; font-size: 13px; }
-  .edit-preview, .share-preview { padding: 12px; gap: 10px; }
-  .edit-preview-icon, .share-preview-icon { font-size: 36px; }
-  .edit-preview-name, .share-preview-name { font-size: 16px; }
-  
-  .builder-panel, .ai-panel { padding: 15px; }
-  .builder-panel-header, .ai-panel-header { margin-bottom: 20px; }
-  .builder-panel-header h2, .ai-panel-header h2 { font-size: 17px; }
-  .builder-block { padding: 22px 15px 15px; }
-  .builder-block-number {
-    width: 28px; height: 28px;
-    font-size: 14px; top: -12px; left: 15px;
-  }
-  .ai-panel-link {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  
-  .toast-container {
-    top: 10px;
-    right: 10px;
-    left: 70px;
-  }
-  
-  .toast {
-    font-size: 13px;
-    padding: 10px 14px;
-  }
-}
-/* ==========================================
    УПРАВЛЕНИЕ ТЕМАМИ
    ========================================== */
 
@@ -887,6 +782,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
   transform: scale(1.1);
   opacity: 0.9;
 }
+
 /* ==========================================
    УПРАВЛЕНИЕ СПИСКОМ НЕЙРОСЕТЕЙ
    ========================================== */
@@ -1021,7 +917,164 @@ h1 { color: var(--heading-color); font-size: 24px; }
   line-height: 1.5;
 }
 
+/* ==========================================
+   БУРГЕР-МЕНЮ ДЛЯ МОБИЛЬНЫХ
+   ========================================== */
+
+.burger-menu-btn {
+  display: none;
+  background: var(--btn-bg);
+  color: var(--heading-color);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.burger-menu-btn:hover {
+  background: var(--btn-hover-bg);
+}
+
+/* ==========================================
+   АДАПТИВНОСТЬ
+   ========================================== */
+
+@media (max-width: 900px) {
+  .builder-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .builder-arrow {
+    transform: rotate(90deg);
+    margin: -10px 0;
+  }
+
+  .builder-block {
+    padding: 25px 18px 18px;
+  }
+
+  .builder-block-title {
+    font-size: 16px;
+  }
+
+  #builder-idea-input,
+  #builder-code-input {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  
+  .sidebar-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 9px;
+  }
+  
+  .sidebar-arrow {
+    font-size: 18px;
+  }
+  
+  .sidebar-ai-wrapper {
+    padding-right: 180px;
+    margin-right: -180px;
+  }
+  
+  .sidebar-ai-dropdown {
+    left: 52px;
+    min-width: 160px;
+  }
+  
+  .main-content {
+    margin-left: 60px;
+  }
+
+  /* Бургер-меню */
+  .burger-menu-btn {
+    display: block;
+  }
+
+  .header-buttons {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--card-bg);
+    box-shadow: 0 4px 12px var(--card-shadow);
+    border-radius: 12px;
+    padding: 10px;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 200px;
+    z-index: 1000;
+    margin-top: 10px;
+  }
+
+  .header-buttons.active {
+    display: flex;
+  }
+
+  .header-buttons .btn {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+  }
+
+  header {
+    position: relative;
+  }
+}
+
 @media (max-width: 600px) {
+  .app-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; }
+  .app-icon { font-size: 36px; }
+  h1 { font-size: 20px; }
+  .modal-content { padding: 20px; }
+  .modal-header h2 { font-size: 20px; }
+  .app-header { padding: 8px 15px; }
+  .app-header h1 { font-size: 16px; }
+  .btn-back { padding: 8px 14px; font-size: 14px; }
+  .header-spacer { width: 90px; }
+  #app-frame { height: calc(100vh - 55px); }
+  #prompt-text { height: 140px; font-size: 12px; }
+  .code-input { height: 150px; font-size: 11px; }
+  .tab-btn { font-size: 12px; padding: 8px 4px; }
+  .ai-links, .ai-panel-grid { grid-template-columns: 1fr 1fr; }
+  .idea-input { height: 80px; font-size: 13px; }
+  .edit-preview, .share-preview { padding: 12px; gap: 10px; }
+  .edit-preview-icon, .share-preview-icon { font-size: 36px; }
+  .edit-preview-name, .share-preview-name { font-size: 16px; }
+  
+  .builder-panel, .ai-panel { padding: 15px; }
+  .builder-panel-header, .ai-panel-header { margin-bottom: 20px; }
+  .builder-panel-header h2, .ai-panel-header h2 { font-size: 17px; }
+  .builder-block { padding: 22px 15px 15px; }
+  .builder-block-number {
+    width: 28px; height: 28px;
+    font-size: 14px; top: -12px; left: 15px;
+  }
+  .ai-panel-link {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 70px;
+  }
+  
+  .toast {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
   .ai-manager-item {
     padding: 8px;
     gap: 6px;
