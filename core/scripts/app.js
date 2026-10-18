@@ -35,15 +35,39 @@ async function removeCustomModule(moduleId) {
   renderAllApps();
 }
 
+// ==========================================
+// ОТКРЫТИЕ/ЗАКРЫТИЕ ПРИЛОЖЕНИЯ + СКРЫТИЕ САЙДБАРА
+// ==========================================
+
 function openApp(module) {
   currentAppName.textContent = module.name;
   appFrame.src = module.url;
   showScreen(appScreen);
+  
+  // Скрываем сайдбар
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('main-content');
+  if (sidebar) {
+    sidebar.classList.add('sidebar-hidden');
+  }
+  if (mainContent) {
+    mainContent.style.marginLeft = '0';
+  }
 }
 
 function closeApp() {
   appFrame.src = 'about:blank';
   showScreen(homeScreen);
+  
+  // Показываем сайдбар обратно
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('main-content');
+  if (sidebar) {
+    sidebar.classList.remove('sidebar-hidden');
+  }
+  if (mainContent) {
+    mainContent.style.marginLeft = '';
+  }
 }
 
 async function refreshApp() {
@@ -100,14 +124,12 @@ function openAppInfoModal(module, isInstalled) {
   actions.innerHTML = '';
 
   if (isInstalled) {
-    // Кнопка "Открыть"
     const openBtn = document.createElement('button');
     openBtn.className = 'btn btn-primary';
     openBtn.textContent = '🚀 Открыть';
     openBtn.onclick = () => { closeAppInfoModal(); openApp(module); };
     actions.appendChild(openBtn);
 
-    // Кнопка удаления
     if (module.isCustom) {
       const removeBtn = document.createElement('button');
       removeBtn.className = 'btn';
@@ -126,7 +148,6 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(uninstallBtn);
     }
 
-    // Кнопки для приложений с кодом
     if (module.content) {
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-secondary';
@@ -141,7 +162,6 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(shareBtn);
     }
   } else {
-    // Кнопка "Установить"
     const installBtn = document.createElement('button');
     installBtn.className = 'btn btn-primary';
     installBtn.textContent = '✅ Установить';
