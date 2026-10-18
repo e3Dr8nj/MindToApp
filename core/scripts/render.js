@@ -1,23 +1,12 @@
 function renderInstalledApps() {
-  const installedAppsContainer = document.getElementById('installed-apps');
-  const emptyState = document.getElementById('empty-state');
-  
-  if (!installedAppsContainer) {
-    console.error('❌ Контейнер installed-apps не найден');
-    return;
-  }
-  
   installedAppsContainer.innerHTML = '';
-  
   if (installedModules.length === 0) {
-    if (emptyState) emptyState.style.display = 'block';
+    emptyState.style.display = 'block';
     installedAppsContainer.style.display = 'none';
     return;
   }
-  
-  if (emptyState) emptyState.style.display = 'none';
+  emptyState.style.display = 'none';
   installedAppsContainer.style.display = 'grid';
-  
   installedModules.forEach(moduleId => {
     const module = allModules.find(m => m.id === moduleId);
     if (module) installedAppsContainer.appendChild(createAppCard(module, true));
@@ -25,20 +14,11 @@ function renderInstalledApps() {
 }
 
 function renderAllApps() {
-  const allAppsContainer = document.getElementById('all-apps');
-  
-  if (!allAppsContainer) {
-    console.error('❌ Контейнер all-apps не найден');
-    return;
-  }
-  
   allAppsContainer.innerHTML = '';
-  
   if (allModules.length === 0) {
     allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Нет доступных модулей</p>';
     return;
   }
-  
   allModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
 }
 
@@ -140,13 +120,8 @@ function createAppCard(module, isInstalled) {
 }
 
 function showScreen(screen) {
-  const homeScreen = document.getElementById('home-screen');
-  const storeScreen = document.getElementById('store-screen');
-  const appScreen = document.getElementById('app-screen');
-  
   [homeScreen, storeScreen, appScreen].forEach(s => {
     if (s) s.classList.remove('active');
   });
-  
   if (screen) screen.classList.add('active');
 }
