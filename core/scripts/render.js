@@ -15,11 +15,16 @@ function renderInstalledApps() {
 
 function renderAllApps() {
   allAppsContainer.innerHTML = '';
-  if (allModules.length === 0) {
-    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Нет доступных модулей</p>';
+  
+  // Фильтруем: показываем только стандартные модули (без isCustom)
+  const standardModules = allModules.filter(m => !m.isCustom);
+  
+  if (standardModules.length === 0) {
+    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Склад пуст</p>';
     return;
   }
-  allModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
+  
+  standardModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
 }
 
 function createAppCard(module, isInstalled) {
@@ -57,17 +62,30 @@ function createAppCard(module, isInstalled) {
     });
     actions.appendChild(openBtn);
 
-    // Кнопка "Редактировать" (только если есть код)
+    // Кнопка "Редактировать" (копирует промпт + инструкцию)
     if (module.content) {
       const editBtn = document.createElement('button');
       editBtn.className = 'app-card-action-btn';
       editBtn.textContent = '✏️';
-      editBtn.title = 'Редактировать';
+      editBtn.title = 'Редактировать (копировать промпт)';
       editBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        openEditModal(module);
+        copyCodeWithInstruction(module, editBtn);
       });
       actions.appendChild(editBtn);
+    }
+
+    // Кнопка "Поделиться"
+    if (module.content) {
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'app-card-action-btn';
+      shareBtn.textContent = '📤';
+      shareBtn.title = 'Поделиться';
+      shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openShareModal(module);
+      });
+      actions.appendChild(shareBtn);
     }
 
     // Кнопка "Удалить"
@@ -89,6 +107,8 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
 
   } else {
+    // Для неустановленных (в Складе)
+    
     // Кнопка "Установить"
     const installBtn = document.createElement('button');
     installBtn.className = 'app-card-action-btn app-card-action-install';
@@ -100,16 +120,31 @@ function createAppCard(module, isInstalled) {
     });
     actions.appendChild(installBtn);
 
-    // Кнопка "Информация"
-    const infoBtn = document.createElement('button');
-    infoBtn.className = 'app-card-action-btn';
-    infoBtn.textContent = 'ℹ️';
-    infoBtn.title = 'Подробнее';
-    infoBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openAppInfoModal(module, isInstalled);
-    });
-    actions.appendChild(infoBtn);
+    // Кнопка "Редактировать" (копирует промпт + инструкцию)
+    if (module.content) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'app-card-action-btn';
+      editBtn.textContent = '✏️';
+      editBtn.title = 'Редактировать (копировать промпт)';
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyCodeWithInstruction(module, editBtn);
+      });
+      actions.appendChild(editBtn);
+    }
+
+    // Кнопка "Поделиться"
+    if (module.content) {
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'app-card-action-btn';
+      shareBtn.textContent = '📤';
+      shareBtn.title = 'Поделиться';
+      shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openShareModal(module);
+      });
+      actions.appendChild(shareBtn);
+    }
 
     // Клик по карточке — показать информацию
     card.addEventListener('click', () => openAppInfoModal(module, isInstalled));

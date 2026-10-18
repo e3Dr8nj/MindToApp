@@ -55,7 +55,7 @@
           <button id="edit-prompts-btn" class="btn" title="Редактировать промпты для ИИ">⚙️ Промпты</button>
           <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
           <button id="add-custom-btn" class="btn">➕ Добавить</button>
-          <button id="open-store-btn" class="btn">📦 Все приложения</button>
+          <button id="open-store-btn" class="btn">📦 Склад</button>
         </div>
       </header>
 
@@ -112,15 +112,15 @@
       <div id="installed-apps" class="app-grid"></div>
       <div id="empty-state" class="empty-state" style="display: none;">
         <p>У вас пока нет установленных приложений</p>
-        <button id="go-to-store-btn" class="btn btn-primary">Перейти ко всем приложениям</button>
+        <button id="go-to-store-btn" class="btn btn-primary">Перейти на склад</button>
       </div>
     </div>
 
-    <!-- Экран 2: Все приложения -->
+    <!-- Экран 2: Склад -->
     <div id="store-screen" class="screen">
       <header>
         <button id="back-to-home-btn" class="btn">← Назад</button>
-        <h1>📦 Все приложения</h1>
+        <h1>📦 Склад</h1>
         <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
       </header>
       <div id="all-apps" class="app-grid"></div>
@@ -427,6 +427,29 @@
         <button id="add-ai-btn" class="btn btn-primary">➕ Добавить нейросеть</button>
         <button id="reset-ai-list-btn" class="btn btn-secondary">🔄 Сбросить список</button>
         <button id="close-ai-manager-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Информация о приложении -->
+  <div id="app-info-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="app-info-title">Приложение</h2>
+        <button class="modal-close" id="close-app-info-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="app-info-preview">
+          <div class="app-info-icon" id="app-info-icon">📱</div>
+          <div class="app-info-details">
+            <div class="app-info-name" id="app-info-name">Название</div>
+            <div class="app-info-desc" id="app-info-desc">Описание</div>
+          </div>
+        </div>
+        <div id="app-info-actions" class="app-info-actions"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-app-info-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>
