@@ -24,12 +24,21 @@ function renderAllApps() {
     return;
   }
   
-  standardModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
+  standardModules.forEach(module => {
+    // Проверяем, установлен ли этот модуль
+    const isInstalled = installedModules.includes(module.id);
+    allAppsContainer.appendChild(createAppCard(module, isInstalled));
+  });
 }
 
 function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
+  
+  // Добавляем класс для установленных приложений
+  if (isInstalled) {
+    card.classList.add('app-card-installed');
+  }
 
   // Иконка приложения
   const icon = document.createElement('div');
@@ -45,6 +54,15 @@ function createAppCard(module, isInstalled) {
 
   card.appendChild(icon);
   card.appendChild(name);
+
+  // Badge "Установлено" для склада
+  if (isInstalled && !installedAppsContainer.contains(card)) {
+    const badge = document.createElement('div');
+    badge.className = 'app-card-badge';
+    badge.textContent = '✓';
+    badge.title = 'Установлено';
+    card.appendChild(badge);
+  }
 
   // Кнопки действий под карточкой
   const actions = document.createElement('div');
