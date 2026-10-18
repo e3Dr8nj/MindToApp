@@ -1,3 +1,47 @@
+function renderInstalledApps() {
+  const installedAppsContainer = document.getElementById('installed-apps');
+  const emptyState = document.getElementById('empty-state');
+  
+  if (!installedAppsContainer) {
+    console.error('❌ Контейнер installed-apps не найден');
+    return;
+  }
+  
+  installedAppsContainer.innerHTML = '';
+  
+  if (installedModules.length === 0) {
+    if (emptyState) emptyState.style.display = 'block';
+    installedAppsContainer.style.display = 'none';
+    return;
+  }
+  
+  if (emptyState) emptyState.style.display = 'none';
+  installedAppsContainer.style.display = 'grid';
+  
+  installedModules.forEach(moduleId => {
+    const module = allModules.find(m => m.id === moduleId);
+    if (module) installedAppsContainer.appendChild(createAppCard(module, true));
+  });
+}
+
+function renderAllApps() {
+  const allAppsContainer = document.getElementById('all-apps');
+  
+  if (!allAppsContainer) {
+    console.error('❌ Контейнер all-apps не найден');
+    return;
+  }
+  
+  allAppsContainer.innerHTML = '';
+  
+  if (allModules.length === 0) {
+    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Нет доступных модулей</p>';
+    return;
+  }
+  
+  allModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
+}
+
 function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
@@ -29,7 +73,6 @@ function createAppCard(module, isInstalled) {
     openBtn.title = 'Открыть';
     openBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      console.log('🖱 Клик по кнопке Открыть');
       openApp(module);
     });
     actions.appendChild(openBtn);
@@ -63,10 +106,7 @@ function createAppCard(module, isInstalled) {
     actions.appendChild(deleteBtn);
 
     // Клик по карточке — открыть приложение
-    card.addEventListener('click', () => {
-      console.log('🖱 Клик по карточке (установленное)');
-      openApp(module);
-    });
+    card.addEventListener('click', () => openApp(module));
 
   } else {
     // Кнопка "Установить"
@@ -92,12 +132,21 @@ function createAppCard(module, isInstalled) {
     actions.appendChild(infoBtn);
 
     // Клик по карточке — показать информацию
-    card.addEventListener('click', () => {
-      console.log('🖱 Клик по карточке (неустановленное)');
-      openAppInfoModal(module, isInstalled);
-    });
+    card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
   }
 
   card.appendChild(actions);
   return card;
+}
+
+function showScreen(screen) {
+  const homeScreen = document.getElementById('home-screen');
+  const storeScreen = document.getElementById('store-screen');
+  const appScreen = document.getElementById('app-screen');
+  
+  [homeScreen, storeScreen, appScreen].forEach(s => {
+    if (s) s.classList.remove('active');
+  });
+  
+  if (screen) screen.classList.add('active');
 }
