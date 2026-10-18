@@ -84,6 +84,80 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
+// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
+// ==========================================
+
+function openAppInfoModal(module, isInstalled) {
+  const modal = $('app-info-modal');
+  if (!modal) return;
+
+  $('app-info-icon').textContent = module.icon;
+  $('app-info-name').textContent = module.name;
+  $('app-info-desc').textContent = module.description || 'Нет описания';
+  $('app-info-title').textContent = module.name;
+
+  const actions = $('app-info-actions');
+  actions.innerHTML = '';
+
+  if (isInstalled) {
+    // Кнопка "Открыть"
+    const openBtn = document.createElement('button');
+    openBtn.className = 'btn btn-primary';
+    openBtn.textContent = '🚀 Открыть';
+    openBtn.onclick = () => { closeAppInfoModal(); openApp(module); };
+    actions.appendChild(openBtn);
+
+    // Кнопка удаления
+    if (module.isCustom) {
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'btn';
+      removeBtn.style.background = 'var(--delete-btn-bg)';
+      removeBtn.style.color = 'white';
+      removeBtn.textContent = '🗑 Удалить модуль';
+      removeBtn.onclick = () => { closeAppInfoModal(); removeCustomModule(module.id); };
+      actions.appendChild(removeBtn);
+    } else {
+      const uninstallBtn = document.createElement('button');
+      uninstallBtn.className = 'btn';
+      uninstallBtn.style.background = 'var(--delete-btn-bg)';
+      uninstallBtn.style.color = 'white';
+      uninstallBtn.textContent = '❌ Удалить';
+      uninstallBtn.onclick = () => { closeAppInfoModal(); toggleInstall(module.id); };
+      actions.appendChild(uninstallBtn);
+    }
+
+    // Кнопки для приложений с кодом
+    if (module.content) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-secondary';
+      editBtn.textContent = '✏️ Редактировать';
+      editBtn.onclick = () => { closeAppInfoModal(); openEditModal(module); };
+      actions.appendChild(editBtn);
+
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'btn btn-secondary';
+      shareBtn.textContent = '📤 Поделиться';
+      shareBtn.onclick = () => { closeAppInfoModal(); openShareModal(module); };
+      actions.appendChild(shareBtn);
+    }
+  } else {
+    // Кнопка "Установить"
+    const installBtn = document.createElement('button');
+    installBtn.className = 'btn btn-primary';
+    installBtn.textContent = '✅ Установить';
+    installBtn.onclick = () => { closeAppInfoModal(); toggleInstall(module.id); };
+    actions.appendChild(installBtn);
+  }
+
+  modal.classList.add('active');
+}
+
+function closeAppInfoModal() {
+  const modal = $('app-info-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+// ==========================================
 // ЗАГРУЗКА ПО ССЫЛКЕ
 // ==========================================
 
@@ -540,6 +614,13 @@ function setupEventListeners() {
   $('cancel-ai-edit-btn')?.addEventListener('click', hideAIEditor);
   $('reset-ai-list-btn')?.addEventListener('click', resetAIList);
 
+  // Модалка информации о приложении
+  $('close-app-info-btn')?.addEventListener('click', closeAppInfoModal);
+  $('close-app-info-footer-btn')?.addEventListener('click', closeAppInfoModal);
+  $('app-info-modal')?.addEventListener('click', (e) => {
+    if (e.target === $('app-info-modal')) closeAppInfoModal();
+  });
+
   // Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -551,6 +632,7 @@ function setupEventListeners() {
       closeAddThemeModal();
       closePromptsModal();
       closeAIManagerModal();
+      closeAppInfoModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');
