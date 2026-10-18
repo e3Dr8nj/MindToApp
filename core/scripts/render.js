@@ -51,17 +51,6 @@ function createAppCard(module, isInstalled) {
   actions.className = 'app-card-actions';
 
   if (isInstalled) {
-    // Кнопка "Открыть"
-    const openBtn = document.createElement('button');
-    openBtn.className = 'app-card-action-btn';
-    openBtn.textContent = '🚀';
-    openBtn.title = 'Открыть';
-    openBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openApp(module);
-    });
-    actions.appendChild(openBtn);
-
     // Кнопка "Редактировать" (копирует промпт + инструкцию)
     if (module.content) {
       const editBtn = document.createElement('button');
