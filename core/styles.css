@@ -623,6 +623,14 @@ h1 { color: var(--heading-color); font-size: 24px; }
   padding: 20px 0;
   z-index: 500;
   gap: 12px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Скрытый сайдбар (при открытом приложении) */
+.sidebar.sidebar-hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar-btn {
@@ -727,6 +735,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
 .main-content {
   margin-left: 80px;
   min-height: 100vh;
+  transition: margin-left 0.3s ease;
 }
 
 /* ==========================================
