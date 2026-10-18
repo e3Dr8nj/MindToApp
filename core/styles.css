@@ -66,16 +66,16 @@ h1 { color: var(--heading-color); font-size: 24px; }
 
 .app-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 10px;
-  max-width: 800px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .app-card {
   background: var(--card-bg);
-  border-radius: 10px;
-  padding: 10px 8px;
+  border-radius: 12px;
+  padding: 12px 8px 8px;
   text-align: center;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -92,18 +92,18 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 .app-card-icon {
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1;
   cursor: pointer;
   transition: transform 0.2s;
 }
 
 .app-card-icon:hover {
-  transform: scale(1.25);
+  transform: scale(1.15);
 }
 
 .app-card-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-color);
   overflow: hidden;
@@ -111,6 +111,49 @@ h1 { color: var(--heading-color); font-size: 24px; }
   white-space: nowrap;
   max-width: 100%;
   line-height: 1.3;
+}
+
+/* ==========================================
+   КНОПКИ ДЕЙСТВИЙ ПОД КАРТОЧКОЙ
+   ========================================== */
+
+.app-card-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.app-card-action-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-color);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.app-card-action-btn:hover {
+  transform: scale(1.15);
+  background: var(--accent-color);
+  color: white;
+}
+
+.app-card-action-delete:hover {
+  background: var(--delete-btn-bg);
+}
+
+.app-card-action-install:hover {
+  background: var(--share-btn-bg);
 }
 
 /* ==========================================
@@ -165,7 +208,7 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
-   ОСТАЛЬНЫЕ СТИЛИ
+   ОСТАЛЬНЫЕ БАЗОВЫЕ СТИЛИ
    ========================================== */
 
 .empty-state { text-align: center; color: var(--heading-color); padding: 60px 20px; }
@@ -1037,13 +1080,14 @@ h1 { color: var(--heading-color); font-size: 24px; }
     position: relative;
   }
 
-  .app-grid { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
-  .app-card-icon { font-size: 24px; }
-  .app-card-name { font-size: 10px; }
+  /* Карточки на мобильных */
+  .app-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 10px; }
+  .app-card-icon { font-size: 28px; }
+  .app-card-name { font-size: 11px; }
+  .app-card-action-btn { width: 24px; height: 24px; font-size: 12px; }
 }
 
 @media (max-width: 600px) {
-  .app-icon { font-size: 36px; }
   h1 { font-size: 20px; }
   .modal-content { padding: 20px; }
   .modal-header h2 { font-size: 20px; }
