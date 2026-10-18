@@ -1,27 +1,3 @@
-function renderInstalledApps() {
-  installedAppsContainer.innerHTML = '';
-  if (installedModules.length === 0) {
-    emptyState.style.display = 'block';
-    installedAppsContainer.style.display = 'none';
-    return;
-  }
-  emptyState.style.display = 'none';
-  installedAppsContainer.style.display = 'grid';
-  installedModules.forEach(moduleId => {
-    const module = allModules.find(m => m.id === moduleId);
-    if (module) installedAppsContainer.appendChild(createAppCard(module, true));
-  });
-}
-
-function renderAllApps() {
-  allAppsContainer.innerHTML = '';
-  if (allModules.length === 0) {
-    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Нет доступных модулей</p>';
-    return;
-  }
-  allModules.forEach(module => allAppsContainer.appendChild(createAppCard(module, false)));
-}
-
 function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
@@ -53,6 +29,7 @@ function createAppCard(module, isInstalled) {
     openBtn.title = 'Открыть';
     openBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      console.log('🖱 Клик по кнопке Открыть');
       openApp(module);
     });
     actions.appendChild(openBtn);
@@ -86,7 +63,10 @@ function createAppCard(module, isInstalled) {
     actions.appendChild(deleteBtn);
 
     // Клик по карточке — открыть приложение
-    card.addEventListener('click', () => openApp(module));
+    card.addEventListener('click', () => {
+      console.log('🖱 Клик по карточке (установленное)');
+      openApp(module);
+    });
 
   } else {
     // Кнопка "Установить"
@@ -112,16 +92,12 @@ function createAppCard(module, isInstalled) {
     actions.appendChild(infoBtn);
 
     // Клик по карточке — показать информацию
-    card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
+    card.addEventListener('click', () => {
+      console.log('🖱 Клик по карточке (неустановленное)');
+      openAppInfoModal(module, isInstalled);
+    });
   }
 
   card.appendChild(actions);
   return card;
-}
-
-function showScreen(screen) {
-  [homeScreen, storeScreen, appScreen].forEach(s => {
-    if (s) s.classList.remove('active');
-  });
-  if (screen) screen.classList.add('active');
 }
