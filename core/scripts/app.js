@@ -396,14 +396,50 @@ function showClipboardScreen(content) {
   showScreen(screen);
 }
 
-// Превращает URL в тексте в кликабельные ссылки (после экранирования HTML)
+// Превращает URL в тексте в кликабельные ссылки
+// Работает с исходным текстом (до экранирования), чтобы не ломать URL на буквах
 function makeUrlsClickable(text) {
-  const escaped = escapeHtml(text);
-  const urlPattern = /(https?:\/\/[^\s&lt;&gt;&quot;&#39;]+)/gi;
-  return escaped.replace(
-    urlPattern,
-    '<a href="$1" target="_blank" rel="noopener noreferrer" class="clipboard-inline-link">$1</a>'
-  );
+  // Ищем URL в исходном тексте (до экранирования HTML)
+  // Разрешаем любые символы кроме пробелов, <, >, ", '
+  const urlPattern = /(https?:\/\/[^\s<>"']+)/gi;
+  
+  let result = '';
+  let lastIndex = 0;
+  let match;
+  
+  // Сбрасываем lastIndex на случай повторных вызовов
+  urlPattern.lastIndex = 0;
+  
+  while ((match = urlPattern.exec(text)) !== null) {
+    // Добавляем текст до URL (экранированный)
+    const beforeText = text.slice(lastIndex, match.index);
+    result += escapeHtml(beforeText);
+    
+    // Убираем завершающие знаки препинания, которые часто пишут после URL
+    let url = match[0];
+    let trailing = '';
+    const trailingMatch = url.match(/([.,;:!?)\]}]+)$/);
+    if (trailingMatch) {
+      trailing = trailingMatch[1];
+      url = url.slice(0, -trailing.length);
+    }
+    
+    // Добавляем URL как ссылку (экранированный)
+    const escapedUrl = escapeHtml(url);
+    result += `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="clipboard-inline-link">${escapedUrl}</a>`;
+    
+    // Добавляем оторванные знаки препинания как обычный текст
+    if (trailing) {
+      result += escapeHtml(trailing);
+    }
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Добавляем оставшийся текст после последнего URL
+  result += escapeHtml(text.slice(lastIndex));
+  
+  return result;
 }
 
 function escapeHtml(text) {
