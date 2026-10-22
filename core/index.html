@@ -62,6 +62,7 @@
           <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
           <button id="add-custom-btn" class="btn">➕ Добавить</button>
           <button id="open-store-btn" class="btn">📦 Склад</button>
+          <button id="export-urls-btn" class="btn">📤 Экспорт ссылок</button>
         </div>
       </header>
 
@@ -300,6 +301,19 @@
             <a href="https://www.toptal.com/developers/hastebin" target="_blank" rel="noopener noreferrer" class="ai-link">Toptal Hastebin</a>
           </div>
         </div>
+        <div class="step-box">
+          <h3>🔗 Шаг 3: Привяжите ссылку к приложению</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
+            Вставьте ссылку на размещённое приложение. Она сохранится и будет доступна для экспорта.
+            <br>Если в буфере обмена есть URL — он подставится автоматически.
+          </p>
+          <input type="url" id="share-url-input" class="url-input" placeholder="https://...">
+          <div id="share-url-status" class="modal-status"></div>
+          <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+            <button id="bind-url-btn" class="btn btn-primary">🔗 Привязать ссылку</button>
+            <button id="unbind-url-btn" class="btn btn-secondary" style="display: none;">✂️ Отвязать</button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
@@ -462,10 +476,38 @@
             <div class="app-info-desc" id="app-info-desc">Описание</div>
           </div>
         </div>
+        <div id="app-info-link-block" class="app-info-link-block" style="display: none;"></div>
         <div id="app-info-actions" class="app-info-actions"></div>
       </div>
       <div class="modal-footer">
         <button id="close-app-info-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Экспорт ссылок -->
+  <div id="export-urls-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📤 Экспорт ссылок</h2>
+        <button class="modal-close" id="close-export-urls-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 15px;">
+          Список приложений из «Мои приложения» с привязанными ссылками.
+        </p>
+        <div id="export-urls-empty" class="export-urls-empty" style="display: none;">
+          <p>📭 Нет приложений с привязанными ссылками</p>
+          <p style="font-size: 14px; color: var(--description-color); margin-top: 10px;">
+            Привяжите ссылки через кнопку «📤» на карточках приложений.
+          </p>
+        </div>
+        <textarea id="export-urls-text" class="export-urls-text" readonly></textarea>
+        <div id="export-urls-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="copy-export-urls-btn" class="btn btn-primary">📋 Скопировать список</button>
+        <button id="close-export-urls-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>

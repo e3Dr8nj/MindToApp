@@ -2,6 +2,7 @@ async function init() {
   initCustomThemes();
   initTheme();
   initAINetworks();
+  loadAppUrls();
   await loadRegistry();
   renderInstalledApps();
   setupEventListeners();
@@ -44,7 +45,6 @@ function openApp(module) {
   appFrame.src = module.url;
   showScreen(appScreen);
   
-  // Скрываем сайдбар при открытом приложении
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
   if (sidebar) sidebar.classList.add('sidebar-hidden');
@@ -55,7 +55,6 @@ function closeApp() {
   appFrame.src = 'about:blank';
   showScreen(homeScreen);
   
-  // Показываем сайдбар обратно
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
   if (sidebar) sidebar.classList.remove('sidebar-hidden');
@@ -112,18 +111,32 @@ function openAppInfoModal(module, isInstalled) {
   $('app-info-desc').textContent = module.description || 'Нет описания';
   $('app-info-title').textContent = module.name;
 
+  // Блок привязанной ссылки
+  const linkBlock = $('app-info-link-block');
+  if (linkBlock) {
+    const linkedUrl = getAppUrl(module.id);
+    if (linkedUrl) {
+      linkBlock.style.display = 'block';
+      linkBlock.innerHTML = `
+        <div class="app-info-link-label">🔗 Привязанная ссылка:</div>
+        <a href="${escapeHtml(linkedUrl)}" target="_blank" rel="noopener noreferrer" class="app-info-link-url">${escapeHtml(linkedUrl)}</a>
+      `;
+    } else {
+      linkBlock.style.display = 'none';
+      linkBlock.innerHTML = '';
+    }
+  }
+
   const actions = $('app-info-actions');
   actions.innerHTML = '';
 
   if (isInstalled) {
-    // Кнопка "Открыть"
     const openBtn = document.createElement('button');
     openBtn.className = 'btn btn-primary';
     openBtn.textContent = '🚀 Открыть';
     openBtn.onclick = () => { closeAppInfoModal(); openApp(module); };
     actions.appendChild(openBtn);
 
-    // Кнопка удаления
     if (module.isCustom) {
       const removeBtn = document.createElement('button');
       removeBtn.className = 'btn';
@@ -142,7 +155,6 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(uninstallBtn);
     }
 
-    // Кнопки для приложений с кодом
     if (module.content) {
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-secondary';
@@ -157,7 +169,6 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(shareBtn);
     }
   } else {
-    // Кнопка "Установить"
     const installBtn = document.createElement('button');
     installBtn.className = 'btn btn-primary';
     installBtn.textContent = '✅ Установить';
@@ -345,7 +356,6 @@ async function handleUrlFromClipboard() {
     
     const trimmedContent = clipboardContent.trim();
     
-    // Если весь текст — это один URL, просто переходим по нему
     const singleUrlPattern = /^https?:\/\/[^\s]+$/i;
     if (singleUrlPattern.test(trimmedContent)) {
       showToast('🔗 Открываю URL...', 'success', 1500);
@@ -353,7 +363,6 @@ async function handleUrlFromClipboard() {
       return;
     }
     
-    // Иначе показываем всё содержимое как страницу (с кликабельными ссылками внутри)
     showClipboardScreen(trimmedContent);
     
   } catch (error) {
@@ -383,7 +392,6 @@ function showClipboardScreen(content) {
       </div>
     `;
   } else {
-    // Показываем весь текст, превращая URL в кликабельные ссылки
     contentArea.innerHTML = `
       <div class="clipboard-wrapper">
         <div class="clipboard-text">
@@ -396,26 +404,19 @@ function showClipboardScreen(content) {
   showScreen(screen);
 }
 
-// Превращает URL в тексте в кликабельные ссылки
-// Работает с исходным текстом (до экранирования), чтобы не ломать URL на буквах
 function makeUrlsClickable(text) {
-  // Ищем URL в исходном тексте (до экранирования HTML)
-  // Разрешаем любые символы кроме пробелов, <, >, ", '
   const urlPattern = /(https?:\/\/[^\s<>"']+)/gi;
   
   let result = '';
   let lastIndex = 0;
   let match;
   
-  // Сбрасываем lastIndex на случай повторных вызовов
   urlPattern.lastIndex = 0;
   
   while ((match = urlPattern.exec(text)) !== null) {
-    // Добавляем текст до URL (экранированный)
     const beforeText = text.slice(lastIndex, match.index);
     result += escapeHtml(beforeText);
     
-    // Убираем завершающие знаки препинания, которые часто пишут после URL
     let url = match[0];
     let trailing = '';
     const trailingMatch = url.match(/([.,;:!?)\]}]+)$/);
@@ -424,11 +425,9 @@ function makeUrlsClickable(text) {
       url = url.slice(0, -trailing.length);
     }
     
-    // Добавляем URL как ссылку (экранированный)
     const escapedUrl = escapeHtml(url);
     result += `<a href="${escapedUrl}" target="_blank" rel="noopener noreferrer" class="clipboard-inline-link">${escapedUrl}</a>`;
     
-    // Добавляем оторванные знаки препинания как обычный текст
     if (trailing) {
       result += escapeHtml(trailing);
     }
@@ -436,16 +435,9 @@ function makeUrlsClickable(text) {
     lastIndex = match.index + match[0].length;
   }
   
-  // Добавляем оставшийся текст после последнего URL
   result += escapeHtml(text.slice(lastIndex));
   
   return result;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 function closeClipboardScreen() {
@@ -664,14 +656,25 @@ function setupEventListeners() {
   $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
   $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
 
-  // Шаринг
+  // Шаринг и привязка ссылок
   $('close-share-btn')?.addEventListener('click', closeShareModal);
   $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
   $('copy-app-code-btn')?.addEventListener('click', copyAppCode);
-  $('open-gist-btn')?.addEventListener('click', openGistWithCode);
   const shareModalEl = $('share-modal');
   if (shareModalEl) {
     shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });
+  }
+  $('bind-url-btn')?.addEventListener('click', bindUrlToApp);
+  $('unbind-url-btn')?.addEventListener('click', unbindUrlFromApp);
+
+  // Экспорт ссылок
+  $('export-urls-btn')?.addEventListener('click', openExportUrlsModal);
+  $('close-export-urls-btn')?.addEventListener('click', closeExportUrlsModal);
+  $('close-export-urls-footer-btn')?.addEventListener('click', closeExportUrlsModal);
+  $('copy-export-urls-btn')?.addEventListener('click', copyExportText);
+  const exportModalEl = $('export-urls-modal');
+  if (exportModalEl) {
+    exportModalEl.addEventListener('click', (e) => { if (e.target === exportModalEl) closeExportUrlsModal(); });
   }
 
   // Вкладки
@@ -793,6 +796,7 @@ function setupEventListeners() {
       closeAIManagerModal();
       closeAppInfoModal();
       closeClipboardScreen();
+      closeExportUrlsModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');

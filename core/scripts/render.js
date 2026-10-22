@@ -55,13 +55,24 @@ function createAppCard(module, isInstalled) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Badge "Установлено" для склада
-  if (isInstalled && !installedAppsContainer.contains(card)) {
+  // Badge "Установлено" для склада (только для неустановленных в списке "Мои")
+  // Показываем только на рабочем столе для установленных
+  if (isInstalled) {
     const badge = document.createElement('div');
     badge.className = 'app-card-badge';
     badge.textContent = '✓';
     badge.title = 'Установлено';
     card.appendChild(badge);
+  }
+
+  // Значок привязанной ссылки
+  const linkedUrl = getAppUrl(module.id);
+  if (linkedUrl) {
+    const linkBadge = document.createElement('div');
+    linkBadge.className = 'app-card-link-badge';
+    linkBadge.textContent = '🔗';
+    linkBadge.title = `Привязана ссылка: ${linkedUrl}`;
+    card.appendChild(linkBadge);
   }
 
   // Кнопки действий под карточкой
