@@ -99,7 +99,7 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
-// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
+// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ (только информация)
 // ==========================================
 
 function openAppInfoModal(module, isInstalled) {
@@ -127,54 +127,9 @@ function openAppInfoModal(module, isInstalled) {
     }
   }
 
+  // Кнопки действий убраны — всё в меню ⚙️ на карточке
   const actions = document.getElementById('app-info-actions');
-  actions.innerHTML = '';
-
-  if (isInstalled) {
-    const openBtn = document.createElement('button');
-    openBtn.className = 'btn btn-primary';
-    openBtn.textContent = '🚀 Открыть';
-    openBtn.onclick = () => { closeAppInfoModal(); openApp(module); };
-    actions.appendChild(openBtn);
-
-    if (module.isCustom) {
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'btn';
-      removeBtn.style.background = 'var(--delete-btn-bg)';
-      removeBtn.style.color = 'white';
-      removeBtn.textContent = '🗑 Удалить модуль';
-      removeBtn.onclick = () => { closeAppInfoModal(); removeCustomModule(module.id); };
-      actions.appendChild(removeBtn);
-    } else {
-      const uninstallBtn = document.createElement('button');
-      uninstallBtn.className = 'btn';
-      uninstallBtn.style.background = 'var(--delete-btn-bg)';
-      uninstallBtn.style.color = 'white';
-      uninstallBtn.textContent = '❌ Удалить';
-      uninstallBtn.onclick = () => { closeAppInfoModal(); toggleInstall(module.id); };
-      actions.appendChild(uninstallBtn);
-    }
-
-    if (module.content) {
-      const editBtn = document.createElement('button');
-      editBtn.className = 'btn btn-secondary';
-      editBtn.textContent = '✏️ Редактировать';
-      editBtn.onclick = () => { closeAppInfoModal(); openEditModal(module); };
-      actions.appendChild(editBtn);
-
-      const shareBtn = document.createElement('button');
-      shareBtn.className = 'btn btn-secondary';
-      shareBtn.textContent = '📤 Поделиться';
-      shareBtn.onclick = () => { closeAppInfoModal(); openShareModal(module); };
-      actions.appendChild(shareBtn);
-    }
-  } else {
-    const installBtn = document.createElement('button');
-    installBtn.className = 'btn btn-primary';
-    installBtn.textContent = '✅ Установить';
-    installBtn.onclick = () => { closeAppInfoModal(); toggleInstall(module.id); };
-    actions.appendChild(installBtn);
-  }
+  if (actions) actions.innerHTML = '';
 
   modal.classList.add('active');
 }
@@ -797,6 +752,7 @@ function setupEventListeners() {
       closeAppInfoModal();
       closeClipboardScreen();
       closeExportUrlsModal();
+      hideCardContextMenu();
       const themesModal = document.getElementById('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');

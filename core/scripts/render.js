@@ -25,7 +25,6 @@ function renderAllApps() {
   }
   
   standardModules.forEach(module => {
-    // Проверяем, установлен ли этот модуль
     const isInstalled = installedModules.includes(module.id);
     allAppsContainer.appendChild(createAppCard(module, isInstalled));
   });
@@ -35,7 +34,6 @@ function createAppCard(module, isInstalled) {
   const card = document.createElement('div');
   card.className = 'app-card';
   
-  // Добавляем класс для установленных приложений
   if (isInstalled) {
     card.classList.add('app-card-installed');
   }
@@ -81,24 +79,9 @@ function createAppCard(module, isInstalled) {
   actions.className = 'app-card-actions';
 
   if (isInstalled) {
-    // Для установленных: только кнопка "Удалить" (остальное в меню ⚙️)
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'app-card-action-btn app-card-action-delete';
-    deleteBtn.textContent = '🗑';
-    deleteBtn.title = 'Удалить';
-    deleteBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (module.isCustom) {
-        removeCustomModule(module.id);
-      } else {
-        toggleInstall(module.id);
-      }
-    });
-    actions.appendChild(deleteBtn);
-
+    // Для установленных: под карточкой кнопок нет — всё в меню ⚙️
     // Клик по карточке — открыть приложение
     card.addEventListener('click', () => openApp(module));
-
   } else {
     // Для неустановленных (в Складе): кнопка "Установить"
     const installBtn = document.createElement('button');
@@ -126,7 +109,6 @@ function createAppCard(module, isInstalled) {
 let currentContextMenu = null;
 
 function showCardContextMenu(event, module, isInstalled, anchorElement) {
-  // Закрываем предыдущее меню, если есть
   hideCardContextMenu();
 
   const menu = document.createElement('div');
@@ -139,6 +121,15 @@ function showCardContextMenu(event, module, isInstalled, anchorElement) {
     openAppInfoModal(module, isInstalled);
   });
   menu.appendChild(infoItem);
+
+  // Пункт "Открыть" (только для установленных)
+  if (isInstalled) {
+    const openItem = createMenuItem('🚀', 'Открыть', () => {
+      hideCardContextMenu();
+      openApp(module);
+    });
+    menu.appendChild(openItem);
+  }
 
   // Пункт "Редактировать" (только если есть код)
   if (module.content) {
@@ -159,10 +150,14 @@ function showCardContextMenu(event, module, isInstalled, anchorElement) {
   }
 
   // Пункт "Удалить"
-  const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+  const deleteItem = createMenuItem('🗑', isInstalled ? 'Удалить' : 'Установить', () => {
     hideCardContextMenu();
-    if (module.isCustom) {
-      removeCustomModule(module.id);
+    if (isInstalled) {
+      if (module.isCustom) {
+        removeCustomModule(module.id);
+      } else {
+        toggleInstall(module.id);
+      }
     } else {
       toggleInstall(module.id);
     }
@@ -178,7 +173,6 @@ function showCardContextMenu(event, module, isInstalled, anchorElement) {
   let top = rect.bottom + 5;
   let left = rect.right - menuRect.width;
   
-  // Проверяем, не выходит ли меню за пределы экрана
   if (top + menuRect.height > window.innerHeight) {
     top = rect.top - menuRect.height - 5;
   }
@@ -191,7 +185,6 @@ function showCardContextMenu(event, module, isInstalled, anchorElement) {
   
   currentContextMenu = menu;
 
-  // Закрываем меню при клике вне его
   setTimeout(() => {
     document.addEventListener('click', hideCardContextMenuOnClickOutside);
   }, 0);
