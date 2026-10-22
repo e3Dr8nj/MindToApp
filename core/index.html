@@ -36,6 +36,12 @@
     <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Создать приложение из буфера обмена">
       🚀 Создать
     </button>
+
+    <div class="sidebar-arrow">↓</div>
+
+    <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Открыть URL из буфера">
+      🔗 URL
+    </button>
   </div>
 
   <!-- TOAST УВЕДОМЛЕНИЯ -->
@@ -450,6 +456,33 @@
       </div>
       <div class="modal-footer">
         <button id="close-app-info-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Содержимое буфера обмена -->
+  <div id="clipboard-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 Буфер обмена</h2>
+        <button class="modal-close" id="close-clipboard-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="clipboard-info">
+          <p style="color: var(--description-color); font-size: 13px; margin-bottom: 15px;">
+            В буфере обмена нет URL-адреса. Вот содержимое буфера:
+          </p>
+        </div>
+        <div class="clipboard-content-box">
+          <textarea id="clipboard-content" class="code-input" readonly style="height: 300px;"></textarea>
+        </div>
+        <div class="clipboard-actions">
+          <button id="copy-clipboard-btn" class="btn btn-secondary">📋 Копировать</button>
+          <button id="clear-clipboard-btn" class="btn btn-secondary">🗑 Очистить</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-clipboard-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>

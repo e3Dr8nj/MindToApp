@@ -35,10 +35,6 @@ async function removeCustomModule(moduleId) {
   renderAllApps();
 }
 
-// ==========================================
-// ОТКРЫТИЕ/ЗАКРЫТИЕ ПРИЛОЖЕНИЯ + СКРЫТИЕ САЙДБАРА
-// ==========================================
-
 function openApp(module) {
   currentAppName.textContent = module.name;
   appFrame.src = module.url;
@@ -320,6 +316,83 @@ async function createFromClipboard() {
 }
 
 // ==========================================
+// ОБРАБОТКА URL ИЗ БУФЕРА ОБМЕНА
+// ==========================================
+
+async function handleUrlFromClipboard() {
+  const urlBtn = $('sidebar-url-btn');
+  
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
+    return;
+  }
+  
+  try {
+    if (urlBtn) {
+      urlBtn.textContent = '⏳';
+      urlBtn.disabled = true;
+    }
+    
+    showToast('📋 Чтение буфера обмена...', 'info', 1500);
+    
+    const clipboardContent = await navigator.clipboard.readText();
+    
+    if (!clipboardContent || !clipboardContent.trim()) {
+      showToast('❌ Буфер обмена пуст', 'error');
+      openClipboardModal('');
+      return;
+    }
+    
+    const trimmedContent = clipboardContent.trim();
+    
+    // Проверяем, является ли это URL
+    const urlPattern = /^(https?:\/\/[^\s]+)$/i;
+    if (urlPattern.test(trimmedContent)) {
+      showToast('🔗 Открываю URL...', 'success', 1500);
+      window.open(trimmedContent, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    
+    // Проверяем, содержит ли текст URL
+    const urlMatch = trimmedContent.match(/(https?:\/\/[^\s]+)/i);
+    if (urlMatch) {
+      const confirmOpen = confirm(`В буфере найден URL:\n\n${urlMatch[1]}\n\nОткрыть его?`);
+      if (confirmOpen) {
+        window.open(urlMatch[1], '_blank', 'noopener,noreferrer');
+        return;
+      }
+    }
+    
+    // Если URL не найден — показываем содержимое буфера
+    openClipboardModal(trimmedContent);
+    
+  } catch (error) {
+    console.error('Ошибка чтения буфера:', error);
+    showToast(`❌ Ошибка: ${error.message}`, 'error');
+  } finally {
+    if (urlBtn) {
+      urlBtn.innerHTML = '🔗 URL';
+      urlBtn.disabled = false;
+    }
+  }
+}
+
+function openClipboardModal(content) {
+  const modal = $('clipboard-modal');
+  const textarea = $('clipboard-content');
+  
+  if (!modal || !textarea) return;
+  
+  textarea.value = content || '(буфер обмена пуст)';
+  modal.classList.add('active');
+}
+
+function closeClipboardModal() {
+  const modal = $('clipboard-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+// ==========================================
 // ПАНЕЛЬ НЕЙРОСЕТЕЙ
 // ==========================================
 
@@ -588,6 +661,40 @@ function setupEventListeners() {
   // Сайдбар: создание из буфера
   $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
+  // Сайдбар: обработка URL из буфера
+  $('sidebar-url-btn')?.addEventListener('click', handleUrlFromClipboard);
+
+  // Модалка буфера обмена
+  $('close-clipboard-btn')?.addEventListener('click', closeClipboardModal);
+  $('close-clipboard-footer-btn')?.addEventListener('click', closeClipboardModal);
+  $('clipboard-modal')?.addEventListener('click', (e) => {
+    if (e.target === $('clipboard-modal')) closeClipboardModal();
+  });
+
+  $('copy-clipboard-btn')?.addEventListener('click', () => {
+    const textarea = $('clipboard-content');
+    if (!textarea) return;
+    
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      showToast('✅ Скопировано', 'success');
+    } catch (e) {
+      showToast('❌ Не удалось скопировать', 'error');
+    }
+  });
+
+  $('clear-clipboard-btn')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText('');
+      const textarea = $('clipboard-content');
+      if (textarea) textarea.value = '(буфер обмена очищен)';
+      showToast('✅ Буфер очищен', 'success');
+    } catch (e) {
+      showToast('❌ Не удалось очистить буфер', 'error');
+    }
+  });
+
   // Панель нейросетей
   $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
 
@@ -653,6 +760,7 @@ function setupEventListeners() {
       closePromptsModal();
       closeAIManagerModal();
       closeAppInfoModal();
+      closeClipboardModal();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');

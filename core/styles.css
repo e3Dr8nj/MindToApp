@@ -235,6 +235,29 @@ h1 { color: var(--heading-color); font-size: 24px; }
 }
 
 /* ==========================================
+   МОДАЛКА БУФЕРА ОБМЕНА
+   ========================================== */
+
+.clipboard-info {
+  margin-bottom: 15px;
+}
+
+.clipboard-content-box {
+  margin-bottom: 15px;
+}
+
+.clipboard-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.clipboard-actions .btn {
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ==========================================
    ОСТАЛЬНЫЕ БАЗОВЫЕ СТИЛИ
    ========================================== */
 
@@ -695,6 +718,14 @@ h1 { color: var(--heading-color); font-size: 24px; }
 
 .sidebar-create-btn:hover {
   background: var(--share-btn-hover-bg);
+}
+
+.sidebar-url-btn {
+  background: var(--accent-color);
+}
+
+.sidebar-url-btn:hover {
+  background: var(--accent-hover);
 }
 
 .sidebar-arrow {
