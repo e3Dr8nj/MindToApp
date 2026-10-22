@@ -73,35 +73,21 @@ function openShareModal(module) {
     const existingUrl = getAppUrl(module.id);
 
     if (existingUrl) {
-      // Ссылка уже привязана
+      // Ссылка уже привязана — показываем её
       urlInput.value = existingUrl;
       bindBtn.textContent = '✏️ Изменить ссылку';
       unbindBtn.style.display = 'inline-block';
     } else {
-      // Ссылка не привязана — автозаполнение из буфера
+      // Ссылка не привязана — поле пустое (без автозаполнения из буфера)
       urlInput.value = '';
       bindBtn.textContent = '🔗 Привязать ссылку';
       unbindBtn.style.display = 'none';
-      autoFillUrlFromClipboard(urlInput);
     }
 
     if (urlStatus) { urlStatus.textContent = ''; urlStatus.className = 'modal-status'; }
   }
 
   modal.classList.add('active');
-}
-
-async function autoFillUrlFromClipboard(input) {
-  if (!navigator.clipboard || !navigator.clipboard.readText) return;
-
-  try {
-    const content = await navigator.clipboard.readText();
-    if (content && /^https?:\/\/[^\s]+$/i.test(content.trim())) {
-      input.value = content.trim();
-    }
-  } catch (e) {
-    // Игнорируем ошибки доступа к буферу
-  }
 }
 
 function closeShareModal() {
