@@ -312,8 +312,9 @@ h1 {
 }
 
 .clipboard-wrapper {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .clipboard-empty {
@@ -323,71 +324,47 @@ h1 {
   font-size: 18px;
 }
 
-.clipboard-url-single,
-.clipboard-url-list,
 .clipboard-text {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: var(--edit-preview-bg);
-  border-radius: 12px;
-  border: 2px solid var(--input-border);
-}
-
-.clipboard-url-single h3,
-.clipboard-url-list h3,
-.clipboard-text h3 {
-  color: var(--modal-heading-color);
-  font-size: 16px;
-  margin-bottom: 12px;
-}
-
-.clipboard-url-link {
-  display: block;
-  padding: 12px 16px;
-  background: var(--ai-link-bg);
-  color: var(--ai-link-color);
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  word-break: break-all;
-  transition: all 0.2s;
-  border: 2px solid transparent;
-}
-
-.clipboard-url-link:hover {
-  background: var(--ai-link-hover-bg);
-  color: var(--ai-link-hover-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px var(--ai-link-hover-shadow);
-}
-
-.clipboard-url-items {
-  list-style: none;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.clipboard-url-items li {
-  margin: 0;
+  background: transparent;
+  border: none;
 }
 
 .clipboard-pre {
   background: var(--code-input-bg);
   color: var(--code-input-text);
-  padding: 15px;
-  border-radius: 8px;
+  padding: 20px;
+  border-radius: 12px;
   font-family: 'Courier New', monospace;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
   white-space: pre-wrap;
   word-wrap: break-word;
-  overflow-x: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
   border: 2px solid var(--input-border);
-  max-height: 500px;
-  overflow-y: auto;
+  width: 100%;
+  min-height: 100px;
+}
+
+/* Кликабельные ссылки внутри текста буфера */
+.clipboard-inline-link {
+  color: var(--ai-link-color);
+  background: var(--ai-link-bg);
+  text-decoration: none;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  word-break: break-all;
+}
+
+.clipboard-inline-link:hover {
+  background: var(--ai-link-hover-bg);
+  color: var(--ai-link-hover-color);
+  border-color: var(--ai-link-hover-bg);
+  text-decoration: underline;
 }
 
 /* ==========================================
@@ -1575,15 +1552,9 @@ h1 {
     padding: 20px 15px;
   }
 
-  .clipboard-url-single,
-  .clipboard-url-list,
-  .clipboard-text {
-    padding: 15px;
-  }
-
   .clipboard-pre {
-    font-size: 12px;
-    padding: 12px;
+    font-size: 13px;
+    padding: 15px;
   }
 }
 

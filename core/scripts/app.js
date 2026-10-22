@@ -35,11 +35,16 @@ async function removeCustomModule(moduleId) {
   renderAllApps();
 }
 
+// ==========================================
+// ОТКРЫТИЕ/ЗАКРЫТИЕ ПРИЛОЖЕНИЯ + СКРЫТИЕ САЙДБАРА
+// ==========================================
+
 function openApp(module) {
   currentAppName.textContent = module.name;
   appFrame.src = module.url;
   showScreen(appScreen);
   
+  // Скрываем сайдбар при открытом приложении
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
   if (sidebar) sidebar.classList.add('sidebar-hidden');
@@ -50,6 +55,7 @@ function closeApp() {
   appFrame.src = 'about:blank';
   showScreen(homeScreen);
   
+  // Показываем сайдбар обратно
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
   if (sidebar) sidebar.classList.remove('sidebar-hidden');
@@ -110,12 +116,14 @@ function openAppInfoModal(module, isInstalled) {
   actions.innerHTML = '';
 
   if (isInstalled) {
+    // Кнопка "Открыть"
     const openBtn = document.createElement('button');
     openBtn.className = 'btn btn-primary';
     openBtn.textContent = '🚀 Открыть';
     openBtn.onclick = () => { closeAppInfoModal(); openApp(module); };
     actions.appendChild(openBtn);
 
+    // Кнопка удаления
     if (module.isCustom) {
       const removeBtn = document.createElement('button');
       removeBtn.className = 'btn';
@@ -134,6 +142,7 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(uninstallBtn);
     }
 
+    // Кнопки для приложений с кодом
     if (module.content) {
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-secondary';
@@ -148,6 +157,7 @@ function openAppInfoModal(module, isInstalled) {
       actions.appendChild(shareBtn);
     }
   } else {
+    // Кнопка "Установить"
     const installBtn = document.createElement('button');
     installBtn.className = 'btn btn-primary';
     installBtn.textContent = '✅ Установить';
@@ -335,22 +345,16 @@ async function handleUrlFromClipboard() {
     
     const trimmedContent = clipboardContent.trim();
     
-    // Извлекаем все URL из содержимого
-    const urlPattern = /https?:\/\/[^\s<>"']+/gi;
-    const urls = trimmedContent.match(urlPattern) || [];
-    
-    // Убираем дубликаты
-    const uniqueUrls = [...new Set(urls)];
-    
-    // Если ровно один URL и весь текст — это URL, переходим
-    if (uniqueUrls.length === 1 && trimmedContent === uniqueUrls[0]) {
+    // Если весь текст — это один URL, просто переходим по нему
+    const singleUrlPattern = /^https?:\/\/[^\s]+$/i;
+    if (singleUrlPattern.test(trimmedContent)) {
       showToast('🔗 Открываю URL...', 'success', 1500);
-      window.open(uniqueUrls[0], '_blank', 'noopener,noreferrer');
+      window.open(trimmedContent, '_blank', 'noopener,noreferrer');
       return;
     }
     
-    // Иначе показываем содержимое как страницу
-    showClipboardScreen(trimmedContent, uniqueUrls);
+    // Иначе показываем всё содержимое как страницу (с кликабельными ссылками внутри)
+    showClipboardScreen(trimmedContent);
     
   } catch (error) {
     console.error('Ошибка чтения буфера:', error);
@@ -363,13 +367,11 @@ async function handleUrlFromClipboard() {
   }
 }
 
-function showClipboardScreen(content, urls = []) {
+function showClipboardScreen(content) {
   const screen = $('clipboard-screen');
   const contentArea = $('clipboard-content-area');
   
   if (!screen || !contentArea) return;
-  
-  contentArea.innerHTML = '';
   
   if (!content || !content.trim()) {
     contentArea.innerHTML = `
@@ -380,46 +382,12 @@ function showClipboardScreen(content, urls = []) {
         </p>
       </div>
     `;
-  } else if (urls.length > 0) {
-    let html = '<div class="clipboard-wrapper">';
-    
-    if (urls.length === 1) {
-      html += `<div class="clipboard-url-single">`;
-      html += `<h3>🔗 Найденная ссылка:</h3>`;
-      html += `<a href="${escapeHtml(urls[0])}" target="_blank" rel="noopener noreferrer" class="clipboard-url-link">${escapeHtml(urls[0])}</a>`;
-      html += `</div>`;
-    } else {
-      html += `<div class="clipboard-url-list">`;
-      html += `<h3>🔗 Найдено ссылок: ${urls.length}</h3>`;
-      html += `<ul class="clipboard-url-items">`;
-      urls.forEach(url => {
-        html += `<li><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="clipboard-url-link">${escapeHtml(url)}</a></li>`;
-      });
-      html += `</ul></div>`;
-    }
-    
-    // Показываем остальной текст (если есть)
-    let plainText = content;
-    urls.forEach(url => {
-      plainText = plainText.replace(url, '');
-    });
-    plainText = plainText.trim();
-    
-    if (plainText) {
-      html += `<div class="clipboard-text">`;
-      html += `<h3>📝 Содержимое:</h3>`;
-      html += `<pre class="clipboard-pre">${escapeHtml(plainText)}</pre>`;
-      html += `</div>`;
-    }
-    
-    html += '</div>';
-    contentArea.innerHTML = html;
   } else {
+    // Показываем весь текст, превращая URL в кликабельные ссылки
     contentArea.innerHTML = `
       <div class="clipboard-wrapper">
         <div class="clipboard-text">
-          <h3>📝 Содержимое буфера:</h3>
-          <pre class="clipboard-pre">${escapeHtml(content)}</pre>
+          <div class="clipboard-pre">${makeUrlsClickable(content)}</div>
         </div>
       </div>
     `;
@@ -428,14 +396,24 @@ function showClipboardScreen(content, urls = []) {
   showScreen(screen);
 }
 
-function closeClipboardScreen() {
-  showScreen(homeScreen);
+// Превращает URL в тексте в кликабельные ссылки (после экранирования HTML)
+function makeUrlsClickable(text) {
+  const escaped = escapeHtml(text);
+  const urlPattern = /(https?:\/\/[^\s&lt;&gt;&quot;&#39;]+)/gi;
+  return escaped.replace(
+    urlPattern,
+    '<a href="$1" target="_blank" rel="noopener noreferrer" class="clipboard-inline-link">$1</a>'
+  );
 }
 
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function closeClipboardScreen() {
+  showScreen(homeScreen);
 }
 
 // ==========================================
