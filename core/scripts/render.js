@@ -162,8 +162,14 @@ function createAppCard(module, isInstalled) {
 }
 
 function showScreen(screen) {
-  [homeScreen, storeScreen, appScreen].forEach(s => {
+  const homeScreenEl = document.getElementById('home-screen');
+  const storeScreenEl = document.getElementById('store-screen');
+  const appScreenEl = document.getElementById('app-screen');
+  const clipboardScreenEl = document.getElementById('clipboard-screen');
+  
+  [homeScreenEl, storeScreenEl, appScreenEl, clipboardScreenEl].forEach(s => {
     if (s) s.classList.remove('active');
   });
+  
   if (screen) screen.classList.add('active');
 }

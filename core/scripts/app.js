@@ -40,30 +40,20 @@ function openApp(module) {
   appFrame.src = module.url;
   showScreen(appScreen);
   
-  // Скрываем сайдбар
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
-  if (sidebar) {
-    sidebar.classList.add('sidebar-hidden');
-  }
-  if (mainContent) {
-    mainContent.style.marginLeft = '0';
-  }
+  if (sidebar) sidebar.classList.add('sidebar-hidden');
+  if (mainContent) mainContent.style.marginLeft = '0';
 }
 
 function closeApp() {
   appFrame.src = 'about:blank';
   showScreen(homeScreen);
   
-  // Показываем сайдбар обратно
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
-  if (sidebar) {
-    sidebar.classList.remove('sidebar-hidden');
-  }
-  if (mainContent) {
-    mainContent.style.marginLeft = '';
-  }
+  if (sidebar) sidebar.classList.remove('sidebar-hidden');
+  if (mainContent) mainContent.style.marginLeft = '';
 }
 
 async function refreshApp() {
@@ -339,32 +329,28 @@ async function handleUrlFromClipboard() {
     
     if (!clipboardContent || !clipboardContent.trim()) {
       showToast('❌ Буфер обмена пуст', 'error');
-      openClipboardModal('');
+      showClipboardScreen('');
       return;
     }
     
     const trimmedContent = clipboardContent.trim();
     
-    // Проверяем, является ли это URL
-    const urlPattern = /^(https?:\/\/[^\s]+)$/i;
-    if (urlPattern.test(trimmedContent)) {
+    // Извлекаем все URL из содержимого
+    const urlPattern = /https?:\/\/[^\s<>"']+/gi;
+    const urls = trimmedContent.match(urlPattern) || [];
+    
+    // Убираем дубликаты
+    const uniqueUrls = [...new Set(urls)];
+    
+    // Если ровно один URL и весь текст — это URL, переходим
+    if (uniqueUrls.length === 1 && trimmedContent === uniqueUrls[0]) {
       showToast('🔗 Открываю URL...', 'success', 1500);
-      window.open(trimmedContent, '_blank', 'noopener,noreferrer');
+      window.open(uniqueUrls[0], '_blank', 'noopener,noreferrer');
       return;
     }
     
-    // Проверяем, содержит ли текст URL
-    const urlMatch = trimmedContent.match(/(https?:\/\/[^\s]+)/i);
-    if (urlMatch) {
-      const confirmOpen = confirm(`В буфере найден URL:\n\n${urlMatch[1]}\n\nОткрыть его?`);
-      if (confirmOpen) {
-        window.open(urlMatch[1], '_blank', 'noopener,noreferrer');
-        return;
-      }
-    }
-    
-    // Если URL не найден — показываем содержимое буфера
-    openClipboardModal(trimmedContent);
+    // Иначе показываем содержимое как страницу
+    showClipboardScreen(trimmedContent, uniqueUrls);
     
   } catch (error) {
     console.error('Ошибка чтения буфера:', error);
@@ -377,19 +363,79 @@ async function handleUrlFromClipboard() {
   }
 }
 
-function openClipboardModal(content) {
-  const modal = $('clipboard-modal');
-  const textarea = $('clipboard-content');
+function showClipboardScreen(content, urls = []) {
+  const screen = $('clipboard-screen');
+  const contentArea = $('clipboard-content-area');
   
-  if (!modal || !textarea) return;
+  if (!screen || !contentArea) return;
   
-  textarea.value = content || '(буфер обмена пуст)';
-  modal.classList.add('active');
+  contentArea.innerHTML = '';
+  
+  if (!content || !content.trim()) {
+    contentArea.innerHTML = `
+      <div class="clipboard-empty">
+        <p>📋 Буфер обмена пуст</p>
+        <p style="font-size: 14px; color: var(--description-color); margin-top: 10px;">
+          Скопируйте текст или ссылку и нажмите кнопку снова
+        </p>
+      </div>
+    `;
+  } else if (urls.length > 0) {
+    let html = '<div class="clipboard-wrapper">';
+    
+    if (urls.length === 1) {
+      html += `<div class="clipboard-url-single">`;
+      html += `<h3>🔗 Найденная ссылка:</h3>`;
+      html += `<a href="${escapeHtml(urls[0])}" target="_blank" rel="noopener noreferrer" class="clipboard-url-link">${escapeHtml(urls[0])}</a>`;
+      html += `</div>`;
+    } else {
+      html += `<div class="clipboard-url-list">`;
+      html += `<h3>🔗 Найдено ссылок: ${urls.length}</h3>`;
+      html += `<ul class="clipboard-url-items">`;
+      urls.forEach(url => {
+        html += `<li><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="clipboard-url-link">${escapeHtml(url)}</a></li>`;
+      });
+      html += `</ul></div>`;
+    }
+    
+    // Показываем остальной текст (если есть)
+    let plainText = content;
+    urls.forEach(url => {
+      plainText = plainText.replace(url, '');
+    });
+    plainText = plainText.trim();
+    
+    if (plainText) {
+      html += `<div class="clipboard-text">`;
+      html += `<h3>📝 Содержимое:</h3>`;
+      html += `<pre class="clipboard-pre">${escapeHtml(plainText)}</pre>`;
+      html += `</div>`;
+    }
+    
+    html += '</div>';
+    contentArea.innerHTML = html;
+  } else {
+    contentArea.innerHTML = `
+      <div class="clipboard-wrapper">
+        <div class="clipboard-text">
+          <h3>📝 Содержимое буфера:</h3>
+          <pre class="clipboard-pre">${escapeHtml(content)}</pre>
+        </div>
+      </div>
+    `;
+  }
+  
+  showScreen(screen);
 }
 
-function closeClipboardModal() {
-  const modal = $('clipboard-modal');
-  if (modal) modal.classList.remove('active');
+function closeClipboardScreen() {
+  showScreen(homeScreen);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // ==========================================
@@ -664,36 +710,8 @@ function setupEventListeners() {
   // Сайдбар: обработка URL из буфера
   $('sidebar-url-btn')?.addEventListener('click', handleUrlFromClipboard);
 
-  // Модалка буфера обмена
-  $('close-clipboard-btn')?.addEventListener('click', closeClipboardModal);
-  $('close-clipboard-footer-btn')?.addEventListener('click', closeClipboardModal);
-  $('clipboard-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('clipboard-modal')) closeClipboardModal();
-  });
-
-  $('copy-clipboard-btn')?.addEventListener('click', () => {
-    const textarea = $('clipboard-content');
-    if (!textarea) return;
-    
-    textarea.select();
-    try {
-      document.execCommand('copy');
-      showToast('✅ Скопировано', 'success');
-    } catch (e) {
-      showToast('❌ Не удалось скопировать', 'error');
-    }
-  });
-
-  $('clear-clipboard-btn')?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText('');
-      const textarea = $('clipboard-content');
-      if (textarea) textarea.value = '(буфер обмена очищен)';
-      showToast('✅ Буфер очищен', 'success');
-    } catch (e) {
-      showToast('❌ Не удалось очистить буфер', 'error');
-    }
-  });
+  // Экран буфера обмена
+  $('close-clipboard-screen-btn')?.addEventListener('click', closeClipboardScreen);
 
   // Панель нейросетей
   $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
@@ -760,7 +778,7 @@ function setupEventListeners() {
       closePromptsModal();
       closeAIManagerModal();
       closeAppInfoModal();
-      closeClipboardModal();
+      closeClipboardScreen();
       const themesModal = $('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');
