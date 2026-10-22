@@ -181,14 +181,15 @@ h1 {
   background: linear-gradient(135deg, var(--card-bg) 0%, rgba(46, 204, 113, 0.05) 100%);
 }
 
-.app-card-badge {
+/* Значок информации (ℹ️) в правом верхнем углу */
+.app-card-info-badge {
   position: absolute;
   top: 6px;
   right: 6px;
   width: 22px;
   height: 22px;
-  background: var(--share-btn-bg);
-  color: white;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-color);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -196,10 +197,18 @@ h1 {
   font-size: 12px;
   font-weight: bold;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
 }
 
-/* Значок привязанной ссылки */
+.app-card-info-badge:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: scale(1.15);
+}
+
+/* Значок привязанной ссылки (🔗) в левом верхнем углу */
 .app-card-link-badge {
   position: absolute;
   top: 6px;
@@ -1643,6 +1652,12 @@ h1 {
     width: 24px;
     height: 24px;
     font-size: 12px;
+  }
+
+  .app-card-info-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
   }
 
   /* Экран буфера на мобильных */

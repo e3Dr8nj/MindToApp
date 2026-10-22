@@ -55,16 +55,18 @@ function createAppCard(module, isInstalled) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Badge "Установлено" для установленных
-  if (isInstalled) {
-    const badge = document.createElement('div');
-    badge.className = 'app-card-badge';
-    badge.textContent = '✓';
-    badge.title = 'Установлено';
-    card.appendChild(badge);
-  }
+  // Значок информации (ℹ️) в правом верхнем углу — для всех карточек
+  const infoBadge = document.createElement('div');
+  infoBadge.className = 'app-card-info-badge';
+  infoBadge.textContent = 'ℹ️';
+  infoBadge.title = 'Подробнее о приложении';
+  infoBadge.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openAppInfoModal(module, isInstalled);
+  });
+  card.appendChild(infoBadge);
 
-  // Значок привязанной ссылки
+  // Значок привязанной ссылки (если есть)
   const linkedUrl = getAppUrl(module.id);
   if (linkedUrl) {
     const linkBadge = document.createElement('div');
