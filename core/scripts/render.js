@@ -55,8 +55,7 @@ function createAppCard(module, isInstalled) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Badge "Установлено" для склада (только для неустановленных в списке "Мои")
-  // Показываем только на рабочем столе для установленных
+  // Badge "Установлено" для установленных
   if (isInstalled) {
     const badge = document.createElement('div');
     badge.className = 'app-card-badge';

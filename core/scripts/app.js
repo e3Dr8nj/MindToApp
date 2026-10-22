@@ -62,7 +62,7 @@ function closeApp() {
 }
 
 async function refreshApp() {
-  const btn = $('refresh-btn');
+  const btn = document.getElementById('refresh-btn');
   if (btn) btn.textContent = '⏳';
   try {
     if ('caches' in window) {
@@ -82,7 +82,7 @@ async function refreshApp() {
 // ==========================================
 
 function showToast(message, type = 'info', duration = 3000) {
-  const container = $('toast-container');
+  const container = document.getElementById('toast-container');
   if (!container) return;
 
   const toast = document.createElement('div');
@@ -103,16 +103,16 @@ function showToast(message, type = 'info', duration = 3000) {
 // ==========================================
 
 function openAppInfoModal(module, isInstalled) {
-  const modal = $('app-info-modal');
+  const modal = document.getElementById('app-info-modal');
   if (!modal) return;
 
-  $('app-info-icon').textContent = module.icon;
-  $('app-info-name').textContent = module.name;
-  $('app-info-desc').textContent = module.description || 'Нет описания';
-  $('app-info-title').textContent = module.name;
+  document.getElementById('app-info-icon').textContent = module.icon;
+  document.getElementById('app-info-name').textContent = module.name;
+  document.getElementById('app-info-desc').textContent = module.description || 'Нет описания';
+  document.getElementById('app-info-title').textContent = module.name;
 
   // Блок привязанной ссылки
-  const linkBlock = $('app-info-link-block');
+  const linkBlock = document.getElementById('app-info-link-block');
   if (linkBlock) {
     const linkedUrl = getAppUrl(module.id);
     if (linkedUrl) {
@@ -127,7 +127,7 @@ function openAppInfoModal(module, isInstalled) {
     }
   }
 
-  const actions = $('app-info-actions');
+  const actions = document.getElementById('app-info-actions');
   actions.innerHTML = '';
 
   if (isInstalled) {
@@ -180,7 +180,7 @@ function openAppInfoModal(module, isInstalled) {
 }
 
 function closeAppInfoModal() {
-  const modal = $('app-info-modal');
+  const modal = document.getElementById('app-info-modal');
   if (modal) modal.classList.remove('active');
 }
 
@@ -219,7 +219,7 @@ async function loadHTMLFromURL(url) {
 // ==========================================
 
 async function createFromClipboard() {
-  const createBtn = $('sidebar-create-btn');
+  const createBtn = document.getElementById('sidebar-create-btn');
 
   if (!navigator.clipboard || !navigator.clipboard.readText) {
     showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
@@ -331,7 +331,7 @@ async function createFromClipboard() {
 // ==========================================
 
 async function handleUrlFromClipboard() {
-  const urlBtn = $('sidebar-url-btn');
+  const urlBtn = document.getElementById('sidebar-url-btn');
   
   if (!navigator.clipboard || !navigator.clipboard.readText) {
     showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
@@ -377,8 +377,8 @@ async function handleUrlFromClipboard() {
 }
 
 function showClipboardScreen(content) {
-  const screen = $('clipboard-screen');
-  const contentArea = $('clipboard-content-area');
+  const screen = document.getElementById('clipboard-screen');
+  const contentArea = document.getElementById('clipboard-content-area');
   
   if (!screen || !contentArea) return;
   
@@ -440,6 +440,12 @@ function makeUrlsClickable(text) {
   return result;
 }
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function closeClipboardScreen() {
   showScreen(homeScreen);
 }
@@ -449,14 +455,14 @@ function closeClipboardScreen() {
 // ==========================================
 
 function openAIPanel() {
-  const aiPanel = $('ai-panel');
+  const aiPanel = document.getElementById('ai-panel');
   if (!aiPanel) return;
   aiPanel.style.display = 'block';
   setTimeout(() => { aiPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
 }
 
 function closeAIPanel() {
-  const aiPanel = $('ai-panel');
+  const aiPanel = document.getElementById('ai-panel');
   if (aiPanel) aiPanel.style.display = 'none';
 }
 
@@ -465,17 +471,17 @@ function closeAIPanel() {
 // ==========================================
 
 function openBuilder() {
-  const ideaInput = $('builder-idea-input');
-  const codeInput = $('builder-code-input');
-  const status1 = $('builder-status-1');
-  const status3 = $('builder-status-3');
+  const ideaInput = document.getElementById('builder-idea-input');
+  const codeInput = document.getElementById('builder-code-input');
+  const status1 = document.getElementById('builder-status-1');
+  const status3 = document.getElementById('builder-status-3');
 
   if (ideaInput) ideaInput.value = '';
   if (codeInput) codeInput.value = '';
   if (status1) { status1.textContent = ''; status1.className = 'modal-status'; }
   if (status3) { status3.textContent = ''; status3.className = 'modal-status'; }
 
-  const builderPanel = $('builder-panel');
+  const builderPanel = document.getElementById('builder-panel');
   if (builderPanel) builderPanel.style.display = 'block';
 
   setTimeout(() => {
@@ -484,14 +490,14 @@ function openBuilder() {
 }
 
 function closeBuilder() {
-  const builderPanel = $('builder-panel');
+  const builderPanel = document.getElementById('builder-panel');
   if (builderPanel) builderPanel.style.display = 'none';
 }
 
 function copyBuilderPrompt() {
-  const ideaInput = $('builder-idea-input');
-  const statusEl = $('builder-status-1');
-  const copyBtn = $('builder-copy-prompt-btn');
+  const ideaInput = document.getElementById('builder-idea-input');
+  const statusEl = document.getElementById('builder-status-1');
+  const copyBtn = document.getElementById('builder-copy-prompt-btn');
 
   if (!ideaInput) return;
   const idea = ideaInput.value.trim();
@@ -528,16 +534,16 @@ function copyBuilderPrompt() {
 }
 
 function openSelectedAI() {
-  const selectEl = $('builder-ai-select');
+  const selectEl = document.getElementById('builder-ai-select');
   if (!selectEl) return;
   const url = selectEl.value;
   if (url) window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function createFromBuilder() {
-  const codeInput = $('builder-code-input');
-  const statusEl = $('builder-status-3');
-  const createBtn = $('builder-create-btn');
+  const codeInput = document.getElementById('builder-code-input');
+  const statusEl = document.getElementById('builder-status-3');
+  const createBtn = document.getElementById('builder-create-btn');
 
   if (!codeInput || !statusEl) return;
   const code = codeInput.value.trim();
@@ -598,8 +604,8 @@ function showStatus(element, message, type = '') {
 
 function setupEventListeners() {
   // Бургер-меню (мобильные)
-  const burgerBtn = $('burger-menu-btn');
-  const headerMenu = $('header-menu');
+  const burgerBtn = document.getElementById('burger-menu-btn');
+  const headerMenu = document.getElementById('header-menu');
 
   if (burgerBtn && headerMenu) {
     burgerBtn.addEventListener('click', (e) => {
@@ -621,61 +627,55 @@ function setupEventListeners() {
   }
 
   // Навигация
-  $('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
-  $('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
-  $('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
-  $('close-app-btn')?.addEventListener('click', closeApp);
+  document.getElementById('open-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
+  document.getElementById('back-to-home-btn')?.addEventListener('click', () => showScreen(homeScreen));
+  document.getElementById('go-to-store-btn')?.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
+  document.getElementById('close-app-btn')?.addEventListener('click', closeApp);
 
   // Конструктор
-  $('builder-btn')?.addEventListener('click', openBuilder);
-  $('builder-close-btn')?.addEventListener('click', closeBuilder);
-  $('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
-  $('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
-  $('builder-create-btn')?.addEventListener('click', createFromBuilder);
+  document.getElementById('builder-btn')?.addEventListener('click', openBuilder);
+  document.getElementById('builder-close-btn')?.addEventListener('click', closeBuilder);
+  document.getElementById('builder-copy-prompt-btn')?.addEventListener('click', copyBuilderPrompt);
+  document.getElementById('builder-open-ai-btn')?.addEventListener('click', openSelectedAI);
+  document.getElementById('builder-create-btn')?.addEventListener('click', createFromBuilder);
 
   // Старая модалка создания
-  $('create-app-btn')?.addEventListener('click', openCreateModal);
-  $('close-create-btn')?.addEventListener('click', closeCreateModal);
-  $('cancel-create-btn')?.addEventListener('click', closeCreateModal);
-  $('copy-prompt-btn')?.addEventListener('click', copyPrompt);
-  $('confirm-create-btn')?.addEventListener('click', createAppFromText);
-  createModal?.addEventListener('click', (e) => { if (e.target === createModal) closeCreateModal(); });
-  userIdeaInput?.addEventListener('input', updatePromptPreview);
+  document.getElementById('create-app-btn')?.addEventListener('click', openCreateModal);
+  document.getElementById('close-create-btn')?.addEventListener('click', closeCreateModal);
+  document.getElementById('cancel-create-btn')?.addEventListener('click', closeCreateModal);
+  document.getElementById('copy-prompt-btn')?.addEventListener('click', copyPrompt);
+  document.getElementById('confirm-create-btn')?.addEventListener('click', createAppFromText);
+  document.getElementById('create-modal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('create-modal')) closeCreateModal(); });
+  document.getElementById('user-idea-input')?.addEventListener('input', updatePromptPreview);
 
   // Кэш
-  $('refresh-btn')?.addEventListener('click', refreshApp);
+  document.getElementById('refresh-btn')?.addEventListener('click', refreshApp);
 
   // Добавление модуля
-  $('add-custom-btn')?.addEventListener('click', openAddModal);
-  $('add-custom-btn-store')?.addEventListener('click', openAddModal);
-  $('close-modal-btn')?.addEventListener('click', closeAddModal);
-  $('cancel-modal-btn')?.addEventListener('click', closeAddModal);
-  $('confirm-add-btn')?.addEventListener('click', addModule);
-  addModal?.addEventListener('click', (e) => { if (e.target === addModal) closeAddModal(); });
-  moduleUrlInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') addModule(); });
-  $('select-file-btn')?.addEventListener('click', () => localFileInput?.click());
-  $('select-folder-btn')?.addEventListener('click', () => folderInput?.click());
+  document.getElementById('add-custom-btn')?.addEventListener('click', openAddModal);
+  document.getElementById('add-custom-btn-store')?.addEventListener('click', openAddModal);
+  document.getElementById('close-modal-btn')?.addEventListener('click', closeAddModal);
+  document.getElementById('cancel-modal-btn')?.addEventListener('click', closeAddModal);
+  document.getElementById('confirm-add-btn')?.addEventListener('click', addModule);
+  document.getElementById('add-modal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('add-modal')) closeAddModal(); });
+  document.getElementById('module-url-input')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') addModule(); });
+  document.getElementById('select-file-btn')?.addEventListener('click', () => document.getElementById('local-file-input')?.click());
+  document.getElementById('select-folder-btn')?.addEventListener('click', () => document.getElementById('folder-input')?.click());
 
   // Шаринг и привязка ссылок
-  $('close-share-btn')?.addEventListener('click', closeShareModal);
-  $('close-share-footer-btn')?.addEventListener('click', closeShareModal);
-  $('copy-app-code-btn')?.addEventListener('click', copyAppCode);
-  const shareModalEl = $('share-modal');
-  if (shareModalEl) {
-    shareModalEl.addEventListener('click', (e) => { if (e.target === shareModalEl) closeShareModal(); });
-  }
-  $('bind-url-btn')?.addEventListener('click', bindUrlToApp);
-  $('unbind-url-btn')?.addEventListener('click', unbindUrlFromApp);
+  document.getElementById('close-share-btn')?.addEventListener('click', closeShareModal);
+  document.getElementById('close-share-footer-btn')?.addEventListener('click', closeShareModal);
+  document.getElementById('copy-app-code-btn')?.addEventListener('click', copyAppCode);
+  document.getElementById('share-modal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('share-modal')) closeShareModal(); });
+  document.getElementById('bind-url-btn')?.addEventListener('click', bindUrlToApp);
+  document.getElementById('unbind-url-btn')?.addEventListener('click', unbindUrlFromApp);
 
   // Экспорт ссылок
-  $('export-urls-btn')?.addEventListener('click', openExportUrlsModal);
-  $('close-export-urls-btn')?.addEventListener('click', closeExportUrlsModal);
-  $('close-export-urls-footer-btn')?.addEventListener('click', closeExportUrlsModal);
-  $('copy-export-urls-btn')?.addEventListener('click', copyExportText);
-  const exportModalEl = $('export-urls-modal');
-  if (exportModalEl) {
-    exportModalEl.addEventListener('click', (e) => { if (e.target === exportModalEl) closeExportUrlsModal(); });
-  }
+  document.getElementById('export-urls-btn')?.addEventListener('click', openExportUrlsModal);
+  document.getElementById('close-export-urls-btn')?.addEventListener('click', closeExportUrlsModal);
+  document.getElementById('close-export-urls-footer-btn')?.addEventListener('click', closeExportUrlsModal);
+  document.getElementById('copy-export-urls-btn')?.addEventListener('click', copyExportText);
+  document.getElementById('export-urls-modal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('export-urls-modal')) closeExportUrlsModal(); });
 
   // Вкладки
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -683,12 +683,12 @@ function setupEventListeners() {
   });
 
   // Сайдбар: копирование промпта
-  $('sidebar-prompt-btn')?.addEventListener('click', () => {
+  document.getElementById('sidebar-prompt-btn')?.addEventListener('click', () => {
     const promptTextValue = getPrompt('EDIT_PROMPT_INSTRUCTION');
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(promptTextValue).then(() => {
-        const btn = $('sidebar-prompt-btn');
+        const btn = document.getElementById('sidebar-prompt-btn');
         if (btn) {
           const originalText = btn.innerHTML;
           btn.innerHTML = '✅';
@@ -707,7 +707,7 @@ function setupEventListeners() {
       textarea.select();
       try {
         document.execCommand('copy');
-        const btn = $('sidebar-prompt-btn');
+        const btn = document.getElementById('sidebar-prompt-btn');
         if (btn) {
           const originalText = btn.innerHTML;
           btn.innerHTML = '✅';
@@ -722,65 +722,65 @@ function setupEventListeners() {
   });
 
   // Сайдбар: создание из буфера
-  $('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
+  document.getElementById('sidebar-create-btn')?.addEventListener('click', createFromClipboard);
 
   // Сайдбар: обработка URL из буфера
-  $('sidebar-url-btn')?.addEventListener('click', handleUrlFromClipboard);
+  document.getElementById('sidebar-url-btn')?.addEventListener('click', handleUrlFromClipboard);
 
   // Экран буфера обмена
-  $('close-clipboard-screen-btn')?.addEventListener('click', closeClipboardScreen);
+  document.getElementById('close-clipboard-screen-btn')?.addEventListener('click', closeClipboardScreen);
 
   // Панель нейросетей
-  $('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
+  document.getElementById('ai-panel-close-btn')?.addEventListener('click', closeAIPanel);
 
   // Управление темами
-  $('manage-themes-btn')?.addEventListener('click', () => {
-    const modal = $('themes-modal');
+  document.getElementById('manage-themes-btn')?.addEventListener('click', () => {
+    const modal = document.getElementById('themes-modal');
     if (modal) {
       modal.classList.add('active');
       renderCustomThemesList();
     }
   });
-  $('close-themes-btn')?.addEventListener('click', () => $('themes-modal')?.classList.remove('active'));
-  $('close-themes-footer-btn')?.addEventListener('click', () => $('themes-modal')?.classList.remove('active'));
-  $('themes-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('themes-modal')) $('themes-modal').classList.remove('active');
+  document.getElementById('close-themes-btn')?.addEventListener('click', () => document.getElementById('themes-modal')?.classList.remove('active'));
+  document.getElementById('close-themes-footer-btn')?.addEventListener('click', () => document.getElementById('themes-modal')?.classList.remove('active'));
+  document.getElementById('themes-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('themes-modal')) document.getElementById('themes-modal').classList.remove('active');
   });
 
   // Добавление темы
-  $('add-theme-btn')?.addEventListener('click', openAddThemeModal);
-  $('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-  $('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
-  $('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
-  $('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
-  $('add-theme-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('add-theme-modal')) closeAddThemeModal();
+  document.getElementById('add-theme-btn')?.addEventListener('click', openAddThemeModal);
+  document.getElementById('close-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
+  document.getElementById('cancel-add-theme-btn')?.addEventListener('click', closeAddThemeModal);
+  document.getElementById('copy-theme-template-btn')?.addEventListener('click', copyThemeTemplate);
+  document.getElementById('submit-theme-btn')?.addEventListener('click', submitCustomTheme);
+  document.getElementById('add-theme-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('add-theme-modal')) closeAddThemeModal();
   });
 
   // Редактор промптов
-  $('edit-prompts-btn')?.addEventListener('click', openPromptsModal);
-  $('close-prompts-btn')?.addEventListener('click', closePromptsModal);
-  $('prompts-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('prompts-modal')) closePromptsModal();
+  document.getElementById('edit-prompts-btn')?.addEventListener('click', openPromptsModal);
+  document.getElementById('close-prompts-btn')?.addEventListener('click', closePromptsModal);
+  document.getElementById('prompts-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('prompts-modal')) closePromptsModal();
   });
 
   // Управление списком нейросетей
-  $('manage-ai-btn')?.addEventListener('click', openAIManagerModal);
-  $('close-ai-manager-btn')?.addEventListener('click', closeAIManagerModal);
-  $('close-ai-manager-footer-btn')?.addEventListener('click', closeAIManagerModal);
-  $('ai-manager-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('ai-manager-modal')) closeAIManagerModal();
+  document.getElementById('manage-ai-btn')?.addEventListener('click', openAIManagerModal);
+  document.getElementById('close-ai-manager-btn')?.addEventListener('click', closeAIManagerModal);
+  document.getElementById('close-ai-manager-footer-btn')?.addEventListener('click', closeAIManagerModal);
+  document.getElementById('ai-manager-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('ai-manager-modal')) closeAIManagerModal();
   });
-  $('add-ai-btn')?.addEventListener('click', () => showAIEditor(null));
-  $('save-ai-btn')?.addEventListener('click', saveAINetworkFromForm);
-  $('cancel-ai-edit-btn')?.addEventListener('click', hideAIEditor);
-  $('reset-ai-list-btn')?.addEventListener('click', resetAIList);
+  document.getElementById('add-ai-btn')?.addEventListener('click', () => showAIEditor(null));
+  document.getElementById('save-ai-btn')?.addEventListener('click', saveAINetworkFromForm);
+  document.getElementById('cancel-ai-edit-btn')?.addEventListener('click', hideAIEditor);
+  document.getElementById('reset-ai-list-btn')?.addEventListener('click', resetAIList);
 
   // Модалка информации о приложении
-  $('close-app-info-btn')?.addEventListener('click', closeAppInfoModal);
-  $('close-app-info-footer-btn')?.addEventListener('click', closeAppInfoModal);
-  $('app-info-modal')?.addEventListener('click', (e) => {
-    if (e.target === $('app-info-modal')) closeAppInfoModal();
+  document.getElementById('close-app-info-btn')?.addEventListener('click', closeAppInfoModal);
+  document.getElementById('close-app-info-footer-btn')?.addEventListener('click', closeAppInfoModal);
+  document.getElementById('app-info-modal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('app-info-modal')) closeAppInfoModal();
   });
 
   // Escape
@@ -797,7 +797,7 @@ function setupEventListeners() {
       closeAppInfoModal();
       closeClipboardScreen();
       closeExportUrlsModal();
-      const themesModal = $('themes-modal');
+      const themesModal = document.getElementById('themes-modal');
       if (themesModal) themesModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');
     }

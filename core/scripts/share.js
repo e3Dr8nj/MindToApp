@@ -3,7 +3,7 @@
 // ==========================================
 
 let currentShareModule = null;
-let appUrls = {};
+let appUrlBindings = {};
 
 // ==========================================
 // ХРАНЕНИЕ ПРИВЯЗАННЫХ ССЫЛОК
@@ -15,30 +15,30 @@ function loadAppUrls() {
     if (stored) {
       const parsed = JSON.parse(stored);
       if (parsed && typeof parsed === 'object') {
-        appUrls = parsed;
+        appUrlBindings = parsed;
       }
     }
   } catch (e) {
     console.error('Ошибка загрузки appUrls:', e);
-    appUrls = {};
+    appUrlBindings = {};
   }
 }
 
 function saveAppUrls() {
-  localStorage.setItem('appUrls', JSON.stringify(appUrls));
+  localStorage.setItem('appUrls', JSON.stringify(appUrlBindings));
 }
 
 function getAppUrl(moduleId) {
-  return appUrls[moduleId] || null;
+  return appUrlBindings[moduleId] || null;
 }
 
 function setAppUrl(moduleId, url) {
-  appUrls[moduleId] = url;
+  appUrlBindings[moduleId] = url;
   saveAppUrls();
 }
 
 function removeAppUrl(moduleId) {
-  delete appUrls[moduleId];
+  delete appUrlBindings[moduleId];
   saveAppUrls();
 }
 
@@ -48,26 +48,26 @@ function removeAppUrl(moduleId) {
 
 function openShareModal(module) {
   currentShareModule = module;
-  const modal = $('share-modal');
+  const modal = document.getElementById('share-modal');
   if (!modal) return;
 
   // Заполняем превью
-  const iconEl = $('share-preview-icon');
-  const nameEl = $('share-preview-name');
-  const descEl = $('share-preview-desc');
+  const iconEl = document.getElementById('share-preview-icon');
+  const nameEl = document.getElementById('share-preview-name');
+  const descEl = document.getElementById('share-preview-desc');
   if (iconEl) iconEl.textContent = module.icon;
   if (nameEl) nameEl.textContent = module.name;
   if (descEl) descEl.textContent = module.description || 'Нет описания';
 
   // Очищаем статус копирования кода
-  const status = $('copy-code-status');
+  const status = document.getElementById('copy-code-status');
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
   // Шаг 3: привязка ссылки
-  const urlInput = $('share-url-input');
-  const bindBtn = $('bind-url-btn');
-  const unbindBtn = $('unbind-url-btn');
-  const urlStatus = $('share-url-status');
+  const urlInput = document.getElementById('share-url-input');
+  const bindBtn = document.getElementById('bind-url-btn');
+  const unbindBtn = document.getElementById('unbind-url-btn');
+  const urlStatus = document.getElementById('share-url-status');
 
   if (urlInput && bindBtn && unbindBtn) {
     const existingUrl = getAppUrl(module.id);
@@ -105,19 +105,19 @@ async function autoFillUrlFromClipboard(input) {
 }
 
 function closeShareModal() {
-  const modal = $('share-modal');
+  const modal = document.getElementById('share-modal');
   if (modal) modal.classList.remove('active');
   currentShareModule = null;
 }
 
 function copyAppCode() {
   if (!currentShareModule || !currentShareModule.content) {
-    const status = $('copy-code-status');
+    const status = document.getElementById('copy-code-status');
     if (status) { status.textContent = '❌ У приложения нет кода'; status.className = 'modal-status error'; }
     return;
   }
 
-  const status = $('copy-code-status');
+  const status = document.getElementById('copy-code-status');
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(currentShareModule.content).then(() => {
@@ -157,10 +157,10 @@ function openGistWithCode() {
 function bindUrlToApp() {
   if (!currentShareModule) return;
 
-  const urlInput = $('share-url-input');
-  const bindBtn = $('bind-url-btn');
-  const unbindBtn = $('unbind-url-btn');
-  const status = $('share-url-status');
+  const urlInput = document.getElementById('share-url-input');
+  const bindBtn = document.getElementById('bind-url-btn');
+  const unbindBtn = document.getElementById('unbind-url-btn');
+  const status = document.getElementById('share-url-status');
 
   if (!urlInput) return;
 
@@ -194,10 +194,10 @@ function unbindUrlFromApp() {
 
   removeAppUrl(currentShareModule.id);
 
-  const urlInput = $('share-url-input');
-  const bindBtn = $('bind-url-btn');
-  const unbindBtn = $('unbind-url-btn');
-  const status = $('share-url-status');
+  const urlInput = document.getElementById('share-url-input');
+  const bindBtn = document.getElementById('bind-url-btn');
+  const unbindBtn = document.getElementById('unbind-url-btn');
+  const status = document.getElementById('share-url-status');
 
   if (urlInput) urlInput.value = '';
   if (bindBtn) bindBtn.textContent = '🔗 Привязать ссылку';
@@ -236,12 +236,15 @@ function generateExportText(apps) {
 }
 
 function openExportUrlsModal() {
-  const modal = $('export-urls-modal');
-  const textarea = $('export-urls-text');
-  const emptyMsg = $('export-urls-empty');
-  const status = $('export-urls-status');
+  const modal = document.getElementById('export-urls-modal');
+  const textarea = document.getElementById('export-urls-text');
+  const emptyMsg = document.getElementById('export-urls-empty');
+  const status = document.getElementById('export-urls-status');
 
-  if (!modal) return;
+  if (!modal) {
+    console.error('❌ Модалка export-urls-modal не найдена');
+    return;
+  }
 
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
@@ -262,13 +265,13 @@ function openExportUrlsModal() {
 }
 
 function closeExportUrlsModal() {
-  const modal = $('export-urls-modal');
+  const modal = document.getElementById('export-urls-modal');
   if (modal) modal.classList.remove('active');
 }
 
 function copyExportText() {
-  const textarea = $('export-urls-text');
-  const status = $('export-urls-status');
+  const textarea = document.getElementById('export-urls-text');
+  const status = document.getElementById('export-urls-status');
 
   if (!textarea || !textarea.value) {
     if (status) { status.textContent = '❌ Нечего копировать'; status.className = 'modal-status error'; }
@@ -284,14 +287,4 @@ function copyExportText() {
   } else {
     fallbackCopy(textarea.value, status);
   }
-}
-
-// ==========================================
-// УТИЛИТА ЭКРАНИРОВАНИЯ HTML
-// ==========================================
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
