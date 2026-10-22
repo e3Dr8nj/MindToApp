@@ -55,18 +55,18 @@ function createAppCard(module, isInstalled) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Значок информации (ℹ️) в правом верхнем углу — для всех карточек
-  const infoBadge = document.createElement('div');
-  infoBadge.className = 'app-card-info-badge';
-  infoBadge.textContent = 'ℹ️';
-  infoBadge.title = 'Подробнее о приложении';
-  infoBadge.addEventListener('click', (e) => {
+  // Значок настроек (⚙️) в правом верхнем углу
+  const settingsBadge = document.createElement('div');
+  settingsBadge.className = 'app-card-settings-badge';
+  settingsBadge.textContent = '⚙️';
+  settingsBadge.title = 'Настройки';
+  settingsBadge.addEventListener('click', (e) => {
     e.stopPropagation();
-    openAppInfoModal(module, isInstalled);
+    showCardContextMenu(e, module, isInstalled, settingsBadge);
   });
-  card.appendChild(infoBadge);
+  card.appendChild(settingsBadge);
 
-  // Значок привязанной ссылки (если есть)
+  // Значок привязанной ссылки (🔗) в левом верхнем углу
   const linkedUrl = getAppUrl(module.id);
   if (linkedUrl) {
     const linkBadge = document.createElement('div');
@@ -81,33 +81,7 @@ function createAppCard(module, isInstalled) {
   actions.className = 'app-card-actions';
 
   if (isInstalled) {
-    // Кнопка "Редактировать" (копирует промпт + инструкцию)
-    if (module.content) {
-      const editBtn = document.createElement('button');
-      editBtn.className = 'app-card-action-btn';
-      editBtn.textContent = '✏️';
-      editBtn.title = 'Редактировать (копировать промпт)';
-      editBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        copyCodeWithInstruction(module, editBtn);
-      });
-      actions.appendChild(editBtn);
-    }
-
-    // Кнопка "Поделиться"
-    if (module.content) {
-      const shareBtn = document.createElement('button');
-      shareBtn.className = 'app-card-action-btn';
-      shareBtn.textContent = '📤';
-      shareBtn.title = 'Поделиться';
-      shareBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openShareModal(module);
-      });
-      actions.appendChild(shareBtn);
-    }
-
-    // Кнопка "Удалить"
+    // Для установленных: только кнопка "Удалить" (остальное в меню ⚙️)
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'app-card-action-btn app-card-action-delete';
     deleteBtn.textContent = '🗑';
@@ -126,9 +100,7 @@ function createAppCard(module, isInstalled) {
     card.addEventListener('click', () => openApp(module));
 
   } else {
-    // Для неустановленных (в Складе)
-    
-    // Кнопка "Установить"
+    // Для неустановленных (в Складе): кнопка "Установить"
     const installBtn = document.createElement('button');
     installBtn.className = 'app-card-action-btn app-card-action-install';
     installBtn.textContent = '✅';
@@ -139,38 +111,115 @@ function createAppCard(module, isInstalled) {
     });
     actions.appendChild(installBtn);
 
-    // Кнопка "Редактировать" (копирует промпт + инструкцию)
-    if (module.content) {
-      const editBtn = document.createElement('button');
-      editBtn.className = 'app-card-action-btn';
-      editBtn.textContent = '✏️';
-      editBtn.title = 'Редактировать (копировать промпт)';
-      editBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        copyCodeWithInstruction(module, editBtn);
-      });
-      actions.appendChild(editBtn);
-    }
-
-    // Кнопка "Поделиться"
-    if (module.content) {
-      const shareBtn = document.createElement('button');
-      shareBtn.className = 'app-card-action-btn';
-      shareBtn.textContent = '📤';
-      shareBtn.title = 'Поделиться';
-      shareBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openShareModal(module);
-      });
-      actions.appendChild(shareBtn);
-    }
-
     // Клик по карточке — показать информацию
     card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
   }
 
   card.appendChild(actions);
   return card;
+}
+
+// ==========================================
+// КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
+// ==========================================
+
+let currentContextMenu = null;
+
+function showCardContextMenu(event, module, isInstalled, anchorElement) {
+  // Закрываем предыдущее меню, если есть
+  hideCardContextMenu();
+
+  const menu = document.createElement('div');
+  menu.className = 'app-card-context-menu';
+  menu.addEventListener('click', (e) => e.stopPropagation());
+
+  // Пункт "Информация"
+  const infoItem = createMenuItem('ℹ️', 'Информация', () => {
+    hideCardContextMenu();
+    openAppInfoModal(module, isInstalled);
+  });
+  menu.appendChild(infoItem);
+
+  // Пункт "Редактировать" (только если есть код)
+  if (module.content) {
+    const editItem = createMenuItem('✏️', 'Редактировать', () => {
+      hideCardContextMenu();
+      copyCodeWithInstruction(module);
+    });
+    menu.appendChild(editItem);
+  }
+
+  // Пункт "Поделиться" (только если есть код)
+  if (module.content) {
+    const shareItem = createMenuItem('📤', 'Поделиться', () => {
+      hideCardContextMenu();
+      openShareModal(module);
+    });
+    menu.appendChild(shareItem);
+  }
+
+  // Пункт "Удалить"
+  const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+    hideCardContextMenu();
+    if (module.isCustom) {
+      removeCustomModule(module.id);
+    } else {
+      toggleInstall(module.id);
+    }
+  }, 'delete');
+  menu.appendChild(deleteItem);
+
+  // Позиционируем меню под иконкой ⚙️
+  document.body.appendChild(menu);
+  
+  const rect = anchorElement.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  
+  let top = rect.bottom + 5;
+  let left = rect.right - menuRect.width;
+  
+  // Проверяем, не выходит ли меню за пределы экрана
+  if (top + menuRect.height > window.innerHeight) {
+    top = rect.top - menuRect.height - 5;
+  }
+  if (left < 0) {
+    left = rect.left;
+  }
+  
+  menu.style.top = `${top}px`;
+  menu.style.left = `${left}px`;
+  
+  currentContextMenu = menu;
+
+  // Закрываем меню при клике вне его
+  setTimeout(() => {
+    document.addEventListener('click', hideCardContextMenuOnClickOutside);
+  }, 0);
+}
+
+function createMenuItem(icon, text, onClick, className = '') {
+  const item = document.createElement('div');
+  item.className = `app-card-context-menu-item ${className}`;
+  item.innerHTML = `<span class="menu-icon">${icon}</span><span class="menu-text">${text}</span>`;
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    onClick();
+  });
+  return item;
+}
+
+function hideCardContextMenu() {
+  if (currentContextMenu) {
+    currentContextMenu.remove();
+    currentContextMenu = null;
+  }
+  document.removeEventListener('click', hideCardContextMenuOnClickOutside);
+}
+
+function hideCardContextMenuOnClickOutside(e) {
+  if (currentContextMenu && !currentContextMenu.contains(e.target)) {
+    hideCardContextMenu();
+  }
 }
 
 function showScreen(screen) {
