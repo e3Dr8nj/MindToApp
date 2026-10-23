@@ -224,7 +224,7 @@ h1 {
   pointer-events: none;
 }
 
-/* Кнопки действий под карточкой */
+/* Кнопки действий под карточкой (круглые) */
 .app-card-actions {
   display: flex;
   gap: 4px;
@@ -262,6 +262,34 @@ h1 {
 
 .app-card-action-install:hover {
   background: var(--share-btn-bg);
+}
+
+/* ==========================================
+   КНОПКА "УСТАНОВИТЬ" НА СКЛАДЕ
+   ========================================== */
+
+.app-card-install-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--share-btn-bg);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.app-card-install-btn:hover {
+  background: var(--share-btn-hover-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.app-card-install-btn:active {
+  transform: translateY(0);
 }
 
 /* ==========================================
@@ -1719,6 +1747,11 @@ h1 {
     width: 20px;
     height: 20px;
     font-size: 11px;
+  }
+
+  .app-card-install-btn {
+    font-size: 12px;
+    padding: 6px 10px;
   }
 
   /* Экран буфера на мобильных */

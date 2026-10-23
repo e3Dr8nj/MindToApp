@@ -80,11 +80,11 @@ function createAppCard(module, isInstalled, isOnStore) {
   if (isOnStore) {
     // === СКЛАД ===
     if (!isInstalled) {
-      // Неустановленное на складе: только кнопка "Установить"
+      // Неустановленное на складе: кнопка "Установить" с текстом
       const installBtn = document.createElement('button');
-      installBtn.className = 'app-card-action-btn app-card-action-install';
-      installBtn.textContent = '✅';
-      installBtn.title = 'Установить';
+      installBtn.className = 'app-card-install-btn';
+      installBtn.textContent = 'Установить';
+      installBtn.title = 'Установить приложение';
       installBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleInstall(module.id);
