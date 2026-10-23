@@ -122,24 +122,41 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
   menu.className = 'app-card-context-menu';
   menu.addEventListener('click', (e) => e.stopPropagation());
 
-  if (isOnStore && !isInstalled) {
-    // === СКЛАД + НЕУСТАНОВЛЕННОЕ ===
-    // Только "Информация" и "Установить"
+  if (isOnStore) {
+    // === СКЛАД ===
+    // Только базовые действия: Информация, Установить/Открыть, Удалить
 
+    // Пункт "Информация"
     const infoItem = createMenuItem('ℹ️', 'Информация', () => {
       hideCardContextMenu();
       openAppInfoModal(module, isInstalled);
     });
     menu.appendChild(infoItem);
 
-    const installItem = createMenuItem('✅', 'Установить', () => {
-      hideCardContextMenu();
-      toggleInstall(module.id);
-    });
-    menu.appendChild(installItem);
+    if (isInstalled) {
+      // Установленное на складе: Открыть + Удалить
+      const openItem = createMenuItem('🚀', 'Открыть', () => {
+        hideCardContextMenu();
+        openApp(module);
+      });
+      menu.appendChild(openItem);
+
+      const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+        hideCardContextMenu();
+        toggleInstall(module.id);
+      }, 'delete');
+      menu.appendChild(deleteItem);
+    } else {
+      // Неустановленное на складе: Установить
+      const installItem = createMenuItem('✅', 'Установить', () => {
+        hideCardContextMenu();
+        toggleInstall(module.id);
+      });
+      menu.appendChild(installItem);
+    }
 
   } else {
-    // === РАБОЧИЙ СТОЛ или УСТАНОВЛЕННОЕ НА СКЛАДЕ ===
+    // === РАБОЧИЙ СТОЛ (Мои приложения) ===
     // Полный набор действий
 
     // Пункт "Информация"
@@ -150,13 +167,11 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
     menu.appendChild(infoItem);
 
     // Пункт "Открыть"
-    if (isInstalled) {
-      const openItem = createMenuItem('🚀', 'Открыть', () => {
-        hideCardContextMenu();
-        openApp(module);
-      });
-      menu.appendChild(openItem);
-    }
+    const openItem = createMenuItem('🚀', 'Открыть', () => {
+      hideCardContextMenu();
+      openApp(module);
+    });
+    menu.appendChild(openItem);
 
     // Пункт "Редактировать" (только если есть код)
     if (module.content) {
@@ -176,18 +191,16 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
       menu.appendChild(shareItem);
     }
 
-    // Пункт "Удалить" (только для установленных)
-    if (isInstalled) {
-      const deleteItem = createMenuItem('🗑', 'Удалить', () => {
-        hideCardContextMenu();
-        if (module.isCustom) {
-          removeCustomModule(module.id);
-        } else {
-          toggleInstall(module.id);
-        }
-      }, 'delete');
-      menu.appendChild(deleteItem);
-    }
+    // Пункт "Удалить"
+    const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+      hideCardContextMenu();
+      if (module.isCustom) {
+        removeCustomModule(module.id);
+      } else {
+        toggleInstall(module.id);
+      }
+    }, 'delete');
+    menu.appendChild(deleteItem);
   }
 
   // Позиционируем меню под иконкой ⚙️
