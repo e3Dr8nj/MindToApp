@@ -9,14 +9,13 @@ function renderInstalledApps() {
   installedAppsContainer.style.display = 'grid';
   installedModules.forEach(moduleId => {
     const module = allModules.find(m => m.id === moduleId);
-    if (module) installedAppsContainer.appendChild(createAppCard(module, true));
+    if (module) installedAppsContainer.appendChild(createAppCard(module, true, false));
   });
 }
 
 function renderAllApps() {
   allAppsContainer.innerHTML = '';
   
-  // Фильтруем: показываем только стандартные модули (без isCustom)
   const standardModules = allModules.filter(m => !m.isCustom);
   
   if (standardModules.length === 0) {
@@ -26,11 +25,11 @@ function renderAllApps() {
   
   standardModules.forEach(module => {
     const isInstalled = installedModules.includes(module.id);
-    allAppsContainer.appendChild(createAppCard(module, isInstalled));
+    allAppsContainer.appendChild(createAppCard(module, isInstalled, true));
   });
 }
 
-function createAppCard(module, isInstalled) {
+function createAppCard(module, isInstalled, isOnStore) {
   const card = document.createElement('div');
   card.className = 'app-card';
   
@@ -60,7 +59,7 @@ function createAppCard(module, isInstalled) {
   settingsBadge.title = 'Настройки';
   settingsBadge.addEventListener('click', (e) => {
     e.stopPropagation();
-    showCardContextMenu(e, module, isInstalled, settingsBadge);
+    showCardContextMenu(e, module, isInstalled, isOnStore, settingsBadge);
   });
   card.appendChild(settingsBadge);
 
@@ -78,24 +77,32 @@ function createAppCard(module, isInstalled) {
   const actions = document.createElement('div');
   actions.className = 'app-card-actions';
 
-  if (isInstalled) {
-    // Для установленных: под карточкой кнопок нет — всё в меню ⚙️
+  if (isOnStore) {
+    // === СКЛАД ===
+    if (!isInstalled) {
+      // Неустановленное на складе: только кнопка "Установить"
+      const installBtn = document.createElement('button');
+      installBtn.className = 'app-card-action-btn app-card-action-install';
+      installBtn.textContent = '✅';
+      installBtn.title = 'Установить';
+      installBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleInstall(module.id);
+      });
+      actions.appendChild(installBtn);
+
+      // Клик по карточке — показать информацию
+      card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
+    } else {
+      // Установленное на складе: нет кнопок под карточкой
+      // Клик по карточке — открыть приложение
+      card.addEventListener('click', () => openApp(module));
+    }
+  } else {
+    // === РАБОЧИЙ СТОЛ (Мои приложения) ===
+    // Все приложения здесь установлены, кнопок под карточкой нет
     // Клик по карточке — открыть приложение
     card.addEventListener('click', () => openApp(module));
-  } else {
-    // Для неустановленных (в Складе): кнопка "Установить"
-    const installBtn = document.createElement('button');
-    installBtn.className = 'app-card-action-btn app-card-action-install';
-    installBtn.textContent = '✅';
-    installBtn.title = 'Установить';
-    installBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleInstall(module.id);
-    });
-    actions.appendChild(installBtn);
-
-    // Клик по карточке — показать информацию
-    card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
   }
 
   card.appendChild(actions);
@@ -108,61 +115,80 @@ function createAppCard(module, isInstalled) {
 
 let currentContextMenu = null;
 
-function showCardContextMenu(event, module, isInstalled, anchorElement) {
+function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElement) {
   hideCardContextMenu();
 
   const menu = document.createElement('div');
   menu.className = 'app-card-context-menu';
   menu.addEventListener('click', (e) => e.stopPropagation());
 
-  // Пункт "Информация"
-  const infoItem = createMenuItem('ℹ️', 'Информация', () => {
-    hideCardContextMenu();
-    openAppInfoModal(module, isInstalled);
-  });
-  menu.appendChild(infoItem);
+  if (isOnStore && !isInstalled) {
+    // === СКЛАД + НЕУСТАНОВЛЕННОЕ ===
+    // Только "Информация" и "Установить"
 
-  // Пункт "Открыть" (только для установленных)
-  if (isInstalled) {
-    const openItem = createMenuItem('🚀', 'Открыть', () => {
+    const infoItem = createMenuItem('ℹ️', 'Информация', () => {
       hideCardContextMenu();
-      openApp(module);
+      openAppInfoModal(module, isInstalled);
     });
-    menu.appendChild(openItem);
-  }
+    menu.appendChild(infoItem);
 
-  // Пункт "Редактировать" (только если есть код)
-  if (module.content) {
-    const editItem = createMenuItem('✏️', 'Редактировать', () => {
+    const installItem = createMenuItem('✅', 'Установить', () => {
       hideCardContextMenu();
-      copyCodeWithInstruction(module);
-    });
-    menu.appendChild(editItem);
-  }
-
-  // Пункт "Поделиться" (только если есть код)
-  if (module.content) {
-    const shareItem = createMenuItem('📤', 'Поделиться', () => {
-      hideCardContextMenu();
-      openShareModal(module);
-    });
-    menu.appendChild(shareItem);
-  }
-
-  // Пункт "Удалить"
-  const deleteItem = createMenuItem('🗑', isInstalled ? 'Удалить' : 'Установить', () => {
-    hideCardContextMenu();
-    if (isInstalled) {
-      if (module.isCustom) {
-        removeCustomModule(module.id);
-      } else {
-        toggleInstall(module.id);
-      }
-    } else {
       toggleInstall(module.id);
+    });
+    menu.appendChild(installItem);
+
+  } else {
+    // === РАБОЧИЙ СТОЛ или УСТАНОВЛЕННОЕ НА СКЛАДЕ ===
+    // Полный набор действий
+
+    // Пункт "Информация"
+    const infoItem = createMenuItem('ℹ️', 'Информация', () => {
+      hideCardContextMenu();
+      openAppInfoModal(module, isInstalled);
+    });
+    menu.appendChild(infoItem);
+
+    // Пункт "Открыть"
+    if (isInstalled) {
+      const openItem = createMenuItem('🚀', 'Открыть', () => {
+        hideCardContextMenu();
+        openApp(module);
+      });
+      menu.appendChild(openItem);
     }
-  }, 'delete');
-  menu.appendChild(deleteItem);
+
+    // Пункт "Редактировать" (только если есть код)
+    if (module.content) {
+      const editItem = createMenuItem('✏️', 'Редактировать', () => {
+        hideCardContextMenu();
+        copyCodeWithInstruction(module);
+      });
+      menu.appendChild(editItem);
+    }
+
+    // Пункт "Поделиться" (только если есть код)
+    if (module.content) {
+      const shareItem = createMenuItem('📤', 'Поделиться', () => {
+        hideCardContextMenu();
+        openShareModal(module);
+      });
+      menu.appendChild(shareItem);
+    }
+
+    // Пункт "Удалить" (только для установленных)
+    if (isInstalled) {
+      const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+        hideCardContextMenu();
+        if (module.isCustom) {
+          removeCustomModule(module.id);
+        } else {
+          toggleInstall(module.id);
+        }
+      }, 'delete');
+      menu.appendChild(deleteItem);
+    }
+  }
 
   // Позиционируем меню под иконкой ⚙️
   document.body.appendChild(menu);
