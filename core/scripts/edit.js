@@ -1,181 +1,153 @@
 // ==========================================
-// РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ (КОПИРОВАНИЕ)
+// РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЙ
 // ==========================================
 
-let currentEditModule = null;
-
-// ГЛАВНАЯ ФУНКЦИЯ: Копирование кода + инструкции прямо из карточки
-function copyCodeWithInstruction(module, buttonElement) {
-  if (!module || !module.content) {
-    console.error('Нет кода для копирования');
-    return;
-  }
-  
-  // Используем getPrompt() из prompts.js
-  const fullPrompt = module.content + '\n\n' + getPrompt('EDIT_PROMPT_INSTRUCTION');
-  
-  const onSuccess = () => {
-    if (buttonElement) {
-      const originalText = buttonElement.textContent;
-      buttonElement.textContent = '✅';
-      buttonElement.title = 'Скопировано!';
-      setTimeout(() => {
-        buttonElement.textContent = originalText;
-        buttonElement.title = 'Редактировать';
-      }, 2000);
-    }
-  };
-
-  const onError = (err) => {
-    console.error('Ошибка копирования:', err);
-    alert('❌ Не удалось скопировать код');
-  };
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(fullPrompt).then(onSuccess).catch(onError);
-  } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = fullPrompt;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand('copy');
-      onSuccess();
-    } catch (e) {
-      onError(e);
-    }
-    document.body.removeChild(textarea);
-  }
-}
-
 function openEditModal(module) {
-  currentEditModule = module;
-  
-  const previewIcon = $('edit-preview-icon');
-  const previewName = $('edit-preview-name');
-  const previewDesc = $('edit-preview-desc');
-  const sourceCodeTextarea = $('edit-source-code');
-  const editStatus = $('edit-status');
-  
-  if (previewIcon) previewIcon.textContent = module.icon;
-  if (previewName) previewName.textContent = module.name;
-  if (previewDesc) previewDesc.textContent = module.description || '';
-  
-  if (sourceCodeTextarea) {
-    sourceCodeTextarea.value = module.content || '';
-    sourceCodeTextarea.style.display = 'none';
+  const modal = document.getElementById('edit-modal');
+  if (!modal) return;
+
+  document.getElementById('edit-modal-title').textContent = `✏️ ${module.name}`;
+  document.getElementById('edit-preview-icon').textContent = module.icon;
+  document.getElementById('edit-preview-name').textContent = module.name;
+  document.getElementById('edit-preview-desc').textContent = module.description || 'Нет описания';
+
+  const sourceCode = document.getElementById('edit-source-code');
+  if (sourceCode) {
+    sourceCode.value = module.content || '';
+    sourceCode.style.display = 'none';
   }
-  
-  if (editStatus) {
-    editStatus.textContent = '';
-    editStatus.className = 'modal-status';
-  }
-  
-  const editModalEl = $('edit-modal');
-  if (editModalEl) editModalEl.classList.add('active');
+
+  const status = document.getElementById('edit-status');
+  if (status) { status.textContent = ''; status.className = 'modal-status'; }
+
+  modal.classList.add('active');
 }
 
 function closeEditModal() {
-  const editModalEl = $('edit-modal');
-  if (editModalEl) editModalEl.classList.remove('active');
-  currentEditModule = null;
+  const modal = document.getElementById('edit-modal');
+  if (modal) modal.classList.remove('active');
 }
 
 function toggleCodeVisibility() {
-  const sourceCodeTextarea = $('edit-source-code');
-  const toggleBtn = $('toggle-code-btn');
-  if (sourceCodeTextarea) {
-    if (sourceCodeTextarea.style.display === 'none') {
-      sourceCodeTextarea.style.display = 'block';
-      if (toggleBtn) toggleBtn.textContent = '🙈 Скрыть код';
-    } else {
-      sourceCodeTextarea.style.display = 'none';
-      if (toggleBtn) toggleBtn.textContent = '👁 Показать код';
-    }
+  const sourceCode = document.getElementById('edit-source-code');
+  const toggleBtn = document.getElementById('toggle-code-btn');
+  
+  if (!sourceCode || !toggleBtn) return;
+
+  if (sourceCode.style.display === 'none') {
+    sourceCode.style.display = 'block';
+    toggleBtn.textContent = '🙈 Скрыть код';
+  } else {
+    sourceCode.style.display = 'none';
+    toggleBtn.textContent = '👁 Показать код';
   }
 }
 
-function copyCurrentCode() {
-  if (!currentEditModule || !currentEditModule.content) return;
-  
-  const copyBtn = $('copy-code-btn');
-  const statusEl = $('edit-status');
-  
+function copyCodeFromEditModal() {
+  const sourceCode = document.getElementById('edit-source-code');
+  if (!sourceCode || !sourceCode.value) {
+    showToast('❌ Нет кода для копирования', 'error');
+    return;
+  }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(currentEditModule.content).then(() => {
-      if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Копировать код', 2000);
-      }
-      if (statusEl) showEditStatus(statusEl, '✅ Код приложения скопирован!', 'success');
+    navigator.clipboard.writeText(sourceCode.value).then(() => {
+      showToast('✅ Код скопирован в буфер обмена!', 'success');
     }).catch(() => {
-      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+      fallbackCopyCode(sourceCode.value);
     });
   } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = currentEditModule.content;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand('copy');
-      if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Копировать код', 2000);
-      }
-      if (statusEl) showEditStatus(statusEl, '✅ Код приложения скопирован!', 'success');
-    } catch (e) {
-      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
-    }
-    document.body.removeChild(textarea);
+    fallbackCopyCode(sourceCode.value);
   }
+}
+
+function fallbackCopyCode(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showToast('✅ Код скопирован в буфер обмена!', 'success');
+  } catch (e) {
+    showToast('❌ Не удалось скопировать', 'error');
+  }
+  document.body.removeChild(textarea);
+}
+
+function copyCodeWithInstruction(module) {
+  if (!module || !module.content) {
+    showToast('❌ У приложения нет кода', 'error');
+    return;
+  }
+
+  const instruction = getPrompt('EDIT_PROMPT_INSTRUCTION');
+  const fullText = `${instruction}\n\n${module.content}`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).then(() => {
+      showToast('✅ Промпт скопирован! Вставьте его в нейросеть.', 'success', 3000);
+    }).catch(() => {
+      fallbackCopyWithInstruction(fullText);
+    });
+  } else {
+    fallbackCopyWithInstruction(fullText);
+  }
+}
+
+function fallbackCopyWithInstruction(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showToast('✅ Промпт скопирован! Вставьте его в нейросеть.', 'success', 3000);
+  } catch (e) {
+    showToast('❌ Не удалось скопировать', 'error');
+  }
+  document.body.removeChild(textarea);
 }
 
 function copyEditPrompt() {
-  if (!currentEditModule || !currentEditModule.content) return;
-  
-  const copyBtn = $('copy-edit-prompt-btn');
-  const statusEl = $('edit-status');
-  
-  // Используем getPrompt() из prompts.js
-  const fullPrompt = currentEditModule.content + '\n\n' + getPrompt('EDIT_PROMPT_INSTRUCTION');
-  
+  const sourceCode = document.getElementById('edit-source-code');
+  const status = document.getElementById('edit-status');
+
+  if (!sourceCode || !sourceCode.value) {
+    if (status) { status.textContent = '❌ Нет кода для копирования'; status.className = 'modal-status error'; }
+    return;
+  }
+
+  const instruction = getPrompt('EDIT_PROMPT_INSTRUCTION');
+  const fullText = `${instruction}\n\n${sourceCode.value}`;
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(fullPrompt).then(() => {
-      if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Копировать код + инструкцию для AI', 2000);
-      }
-      if (statusEl) showEditStatus(statusEl, '✅ Код и инструкция скопированы! Вставьте в нейросеть.', 'success');
+    navigator.clipboard.writeText(fullText).then(() => {
+      if (status) { status.textContent = '✅ Промпт скопирован! Вставьте его в нейросеть.'; status.className = 'modal-status success'; }
     }).catch(() => {
-      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
+      fallbackCopyEditPrompt(fullText, status);
     });
   } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = fullPrompt;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand('copy');
-      if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Копировать код + инструкцию для AI', 2000);
-      }
-      if (statusEl) showEditStatus(statusEl, '✅ Код и инструкция скопированы! Вставьте в нейросеть.', 'success');
-    } catch (e) {
-      if (statusEl) showEditStatus(statusEl, '❌ Не удалось скопировать', 'error');
-    }
-    document.body.removeChild(textarea);
+    fallbackCopyEditPrompt(fullText, status);
   }
 }
 
-function showEditStatus(element, message, type = '') {
-  if (!element) return;
-  element.textContent = message;
-  element.className = `modal-status ${type}`.trim();
+function fallbackCopyEditPrompt(text, statusEl) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    if (statusEl) { statusEl.textContent = '✅ Промпт скопирован! Вставьте его в нейросеть.'; statusEl.className = 'modal-status success'; }
+  } catch (e) {
+    if (statusEl) { statusEl.textContent = '❌ Не удалось скопировать'; statusEl.className = 'modal-status error'; }
+  }
+  document.body.removeChild(textarea);
 }
