@@ -18,7 +18,7 @@
 <body>
   <!-- САЙДБАР -->
   <div id="sidebar" class="sidebar">
-    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Скопировать промпт-инструкцию">
+    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Скопировать промпт">
       📋 prompt
     </button>
 
@@ -58,7 +58,7 @@
           <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
           <button id="manage-themes-btn" class="btn" title="Управление темами оформления">🎨 Темы</button>
           <button id="manage-ai-btn" class="btn" title="Редактировать список нейросетей">🤖 ИИ</button>
-          <button id="edit-prompts-btn" class="btn" title="Редактировать промпты для ИИ">⚙️ Промпты</button>
+          <button id="edit-prompts-btn" class="btn" title="Редактировать промпт">⚙️ Промпт</button>
           <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
           <button id="add-custom-btn" class="btn">➕ Добавить</button>
           <button id="open-store-btn" class="btn">📦 Склад</button>
@@ -261,7 +261,7 @@
           <textarea id="edit-source-code" class="code-input" style="display: none;" readonly></textarea>
         </div>
         <div class="step-box">
-          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Копировать код + инструкцию для AI</button>
+          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Копировать промпт + код для AI</button>
           <div id="edit-status" class="modal-status"></div>
         </div>
       </div>
@@ -305,7 +305,6 @@
           <h3>🔗 Шаг 3: Привяжите ссылку к приложению</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
             Вставьте ссылку на размещённое приложение. Она сохранится и будет доступна для экспорта.
-            <br>Если в буфере обмена есть URL — он подставится автоматически.
           </p>
           <input type="url" id="share-url-input" class="url-input" placeholder="https://...">
           <div id="share-url-status" class="modal-status"></div>
@@ -389,21 +388,20 @@
     </div>
   </div>
 
-  <!-- Модальное окно: Редактор промптов -->
+  <!-- Модальное окно: Редактор промпта -->
   <div id="prompts-modal" class="modal">
     <div class="modal-content" style="max-width: 800px;">
       <div class="modal-header">
-        <h2>⚙️ Редактор промптов</h2>
+        <h2>⚙️ Редактор промпта</h2>
         <button class="modal-close" id="close-prompts-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <label for="prompt-select" style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--modal-heading-color);">Выберите промпт:</label>
-          <select id="prompt-select" class="builder-select"></select>
-          <p id="prompt-desc" style="font-size: 13px; color: var(--description-color); margin-top: 8px;"></p>
-        </div>
-        <div class="step-box">
-          <textarea id="prompt-editor-textarea" class="code-input" style="height: 350px;"></textarea>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Этот промпт используется при создании и редактировании приложений.
+            Измените его, чтобы настроить поведение нейросети.
+          </p>
+          <textarea id="prompt-editor-textarea" class="code-input" style="height: 400px;"></textarea>
         </div>
         <div id="prompt-editor-status" class="modal-status"></div>
       </div>

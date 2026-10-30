@@ -99,7 +99,7 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ==========================================
-// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ (только информация)
+// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
 // ==========================================
 
 function openAppInfoModal(module, isInstalled) {
@@ -461,7 +461,8 @@ function copyBuilderPrompt() {
     return;
   }
 
-  const fullPrompt = getPrompt('BASE_PROMPT') + idea + getPrompt('BUILDER_PLATFORM_INSTRUCTION');
+  // Единый промпт + идея пользователя
+  const fullPrompt = `${getPrompt()}\n\n${idea}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
@@ -598,7 +599,33 @@ function setupEventListeners() {
   document.getElementById('create-app-btn')?.addEventListener('click', openCreateModal);
   document.getElementById('close-create-btn')?.addEventListener('click', closeCreateModal);
   document.getElementById('cancel-create-btn')?.addEventListener('click', closeCreateModal);
-  document.getElementById('copy-prompt-btn')?.addEventListener('click', copyPrompt);
+  document.getElementById('copy-prompt-btn')?.addEventListener('click', () => {
+    const ideaInput = document.getElementById('user-idea-input');
+    const idea = ideaInput ? ideaInput.value.trim() : '';
+    const fullPrompt = idea ? `${getPrompt()}\n\n${idea}` : getPrompt();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(fullPrompt).then(() => {
+        showToast('✅ Промпт скопирован', 'success');
+      }).catch(() => {
+        showToast('❌ Не удалось скопировать промпт', 'error');
+      });
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = fullPrompt;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('✅ Промпт скопирован', 'success');
+      } catch (e) {
+        showToast('❌ Не удалось скопировать промпт', 'error');
+      }
+      document.body.removeChild(textarea);
+    }
+  });
   document.getElementById('confirm-create-btn')?.addEventListener('click', createAppFromText);
   document.getElementById('create-modal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('create-modal')) closeCreateModal(); });
   document.getElementById('user-idea-input')?.addEventListener('input', updatePromptPreview);
@@ -639,7 +666,7 @@ function setupEventListeners() {
 
   // Сайдбар: копирование промпта
   document.getElementById('sidebar-prompt-btn')?.addEventListener('click', () => {
-    const promptTextValue = getPrompt('EDIT_PROMPT_INSTRUCTION');
+    const promptTextValue = getPrompt();
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(promptTextValue).then(() => {
@@ -649,7 +676,7 @@ function setupEventListeners() {
           btn.innerHTML = '✅';
           setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         }
-        showToast('✅ Промпт-инструкция скопирована', 'success');
+        showToast('✅ Промпт скопирован', 'success');
       }).catch(() => {
         showToast('❌ Не удалось скопировать промпт', 'error');
       });
@@ -668,7 +695,7 @@ function setupEventListeners() {
           btn.innerHTML = '✅';
           setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         }
-        showToast('✅ Промпт-инструкция скопирована', 'success');
+        showToast('✅ Промпт скопирован', 'success');
       } catch (e) {
         showToast('❌ Не удалось скопировать промпт', 'error');
       }
@@ -715,6 +742,8 @@ function setupEventListeners() {
   // Редактор промптов
   document.getElementById('edit-prompts-btn')?.addEventListener('click', openPromptsModal);
   document.getElementById('close-prompts-btn')?.addEventListener('click', closePromptsModal);
+  document.getElementById('save-prompt-btn')?.addEventListener('click', savePrompt);
+  document.getElementById('reset-prompt-btn')?.addEventListener('click', resetPromptToDefault);
   document.getElementById('prompts-modal')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('prompts-modal')) closePromptsModal();
   });

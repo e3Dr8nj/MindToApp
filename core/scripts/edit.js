@@ -77,14 +77,15 @@ function fallbackCopyCode(text) {
   document.body.removeChild(textarea);
 }
 
+// Копирует промпт + код приложения (для меню ⚙️ → Редактировать)
 function copyCodeWithInstruction(module) {
   if (!module || !module.content) {
     showToast('❌ У приложения нет кода', 'error');
     return;
   }
 
-  const instruction = getPrompt('EDIT_PROMPT_INSTRUCTION');
-  const fullText = `${instruction}\n\n${module.content}`;
+  const prompt = getPrompt();
+  const fullText = `${prompt}\n\n${module.content}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(() => {
@@ -113,6 +114,7 @@ function fallbackCopyWithInstruction(text) {
   document.body.removeChild(textarea);
 }
 
+// Копирует промпт + код из модалки редактирования
 function copyEditPrompt() {
   const sourceCode = document.getElementById('edit-source-code');
   const status = document.getElementById('edit-status');
@@ -122,8 +124,8 @@ function copyEditPrompt() {
     return;
   }
 
-  const instruction = getPrompt('EDIT_PROMPT_INSTRUCTION');
-  const fullText = `${instruction}\n\n${sourceCode.value}`;
+  const prompt = getPrompt();
+  const fullText = `${prompt}\n\n${sourceCode.value}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(() => {
