@@ -6,6 +6,7 @@ async function init() {
   initCustomThemes();
   initTheme();
   initAINetworks();
+  initAINetworksInUI();
   loadAppUrls();
   await loadRegistry();
   renderInstalledApps();

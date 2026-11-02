@@ -122,25 +122,41 @@ function renderAINetworksList() {
         networks.splice(index, 1);
         saveAINetworks(networks);
         renderAINetworksList();
-        if (typeof initAINetworksInUI === 'function') initAINetworksInUI();
+        initAINetworksInUI();
       }
     });
   });
 }
 
 function initAINetworksInUI() {
+  // 1. Заполняем select в конструкторе
   const selectEl = document.getElementById('builder-ai-select');
-  if (!selectEl) return;
+  if (selectEl) {
+    selectEl.innerHTML = '';
+    const networks = getAINetworks();
+    networks.forEach(network => {
+      const option = document.createElement('option');
+      option.value = network.url;
+      option.textContent = network.name;
+      selectEl.appendChild(option);
+    });
+  }
 
-  selectEl.innerHTML = '';
-  const networks = getAINetworks();
-
-  networks.forEach(network => {
-    const option = document.createElement('option');
-    option.value = network.url;
-    option.textContent = network.name;
-    selectEl.appendChild(option);
-  });
+  // 2. Заполняем выпадающий список в сайдбаре
+  const dropdown = document.getElementById('sidebar-ai-dropdown');
+  if (dropdown) {
+    dropdown.innerHTML = '';
+    const networks = getAINetworks();
+    networks.forEach(network => {
+      const link = document.createElement('a');
+      link.href = network.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'sidebar-ai-link';
+      link.textContent = network.name;
+      dropdown.appendChild(link);
+    });
+  }
 }
 
 function openAIManagerModal() {
