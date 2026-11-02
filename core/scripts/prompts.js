@@ -17,18 +17,24 @@ const DEFAULT_PLATFORM_PROMPT = `КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛ�
 // ПОЛУЧЕНИЕ / СОХРАНЕНИЕ ПРОМПТА
 // ==========================================
 
+// Возвращает промпт с символом новой строки в конце,
+// чтобы при вставке курсор сразу оказывался на новой строке
 function getPrompt() {
   const stored = localStorage.getItem('platformPrompt');
-  return stored || DEFAULT_PLATFORM_PROMPT;
+  const prompt = stored || DEFAULT_PLATFORM_PROMPT;
+  // Добавляем \n в конец, если его там ещё нет
+  return prompt.endsWith('\n') ? prompt : prompt + '\n';
 }
 
 function setPrompt(text) {
-  localStorage.setItem('platformPrompt', text);
+  // Сохраняем без лишнего \n в конце — добавится при getPrompt()
+  const trimmed = text.replace(/\n+$/, '');
+  localStorage.setItem('platformPrompt', trimmed);
 }
 
 function resetPrompt() {
   localStorage.removeItem('platformPrompt');
-  return DEFAULT_PLATFORM_PROMPT;
+  return DEFAULT_PLATFORM_PROMPT + '\n';
 }
 
 // ==========================================
@@ -40,6 +46,6 @@ function updatePromptPreview() {
   if (promptText) {
     const ideaInput = document.getElementById('user-idea-input');
     const idea = ideaInput ? ideaInput.value.trim() : '';
-    promptText.value = idea ? `${getPrompt()}\n\n${idea}` : getPrompt();
+    promptText.value = idea ? `${getPrompt()}\n${idea}` : getPrompt();
   }
 }
