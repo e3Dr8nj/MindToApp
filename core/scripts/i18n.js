@@ -5,36 +5,10 @@
 const translations = {
   en: {
     // Промпт
-    prompt: `CRITICAL PLATFORM RULES:
-1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (\`\`\`html ... \`\`\`). DO NOT shorten code, DO NOT write "...rest of code unchanged". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.
-2. Manifest: In <head> there must be <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"emoji", "description":"..."}</script>. If name ends with v and a number, increment it; otherwise add v1 at the end.
-3. Unique ID: Add 6 random digits to the "id" field in manifest (e.g., "calculator-482915", "notes-739201"). This is required for uniqueness.
-4. Styles and scripts: All CSS must be inside <style>, all JS inside <script>. No external libraries or CDN.
-5. Responsiveness: body { min-height: calc(100vh - 60px); margin: 0; }. App must work on desktop and mobile.
-6. Restrictions: No alert(), confirm(), prompt() (blocked in iframe). Images/audio only in Base64.
-7. Add ability to manage saved data.
-
-Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.`,
+    prompt: "CRITICAL PLATFORM RULES:\n1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (```html ... ```). DO NOT shorten code, DO NOT write \"...rest of code unchanged\". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.\n2. Manifest: In <head> there must be <script type=\"application/json\" id=\"manifest\">{\"id\":\"...\", \"name\":\"...\", \"icon\":\"emoji\", \"description\":\"...\"}</script>. If name ends with v and a number, increment it; otherwise add v1 at the end.\n3. Unique ID: Add 6 random digits to the \"id\" field in manifest (e.g., \"calculator-482915\", \"notes-739201\"). This is required for uniqueness.\n4. Styles and scripts: All CSS must be inside <style>, all JS inside <script>. No external libraries or CDN.\n5. Responsiveness: body { min-height: calc(100vh - 60px); margin: 0; }. App must work on desktop and mobile.\n6. Restrictions: No alert(), confirm(), prompt() (blocked in iframe). Images/audio only in Base64.\n7. Add ability to manage saved data.\n\nReturn ONLY complete HTML code in one markdown block. DO NOT add text explanations.",
 
     // Инструкция для редактирования
-    editInstruction: `
-
-EDITING INSTRUCTION:
-Below is the complete code of an existing application. Your task is to improve or modify it according to the user's request.
-
-CRITICAL REQUIREMENTS:
-1. Return ONLY the FULL, complete HTML code of the improved application in one markdown code block (\`\`\`html ... \`\`\`).
-2. DO NOT shorten the code, DO NOT write "...rest of code unchanged" or similar phrases.
-3. The HTML must be provided in full, from <!DOCTYPE html> to </html>, ready to copy with one click.
-4. Keep the same manifest values (id, name, icon, description) UNLESS the user explicitly asks to change them.
-5. If the user asks to change the name, update the version number (e.g., "MyApp v1" → "MyApp v2").
-6. Preserve the unique ID in manifest (the 6-digit suffix) — do not generate a new one.
-7. Maintain the same general structure, styling approach, and functionality unless explicitly asked to change.
-8. All CSS must remain inside <style>, all JS inside <script>. No external libraries or CDN.
-9. Ensure the app remains responsive (works on desktop and mobile).
-10. No alert(), confirm(), prompt() — they are blocked in iframe.
-
-Your goal: make the requested improvements while keeping the app fully functional and complete.`,
+    editInstruction: "\n\nEDITING INSTRUCTION:\nBelow is the complete code of an existing application. Your task is to improve or modify it according to the user's request.\n\nCRITICAL REQUIREMENTS:\n1. Return ONLY the FULL, complete HTML code of the improved application in one markdown code block (```html ... ```).\n2. DO NOT shorten the code, DO NOT write \"...rest of code unchanged\" or similar phrases.\n3. The HTML must be provided in full, from <!DOCTYPE html> to </html>, ready to copy with one click.\n4. Keep the same manifest values (id, name, icon, description) UNLESS the user explicitly asks to change them.\n5. If the user asks to change the name, update the version number (e.g., \"MyApp v1\" → \"MyApp v2\").\n6. Preserve the unique ID in manifest (the 6-digit suffix) — do not generate a new one.\n7. Maintain the same general structure, styling approach, and functionality unless explicitly asked to change.\n8. All CSS must remain inside <style>, all JS inside <script>. No external libraries or CDN.\n9. Ensure the app remains responsive (works on desktop and mobile).\n10. No alert(), confirm(), prompt() — they are blocked in iframe.\n\nYour goal: make the requested improvements while keeping the app fully functional and complete.",
 
     // Интерфейс
     myApps: '🏠 My Apps',
@@ -46,13 +20,9 @@ Your goal: make the requested improvements while keeping the app fully functiona
     add: '➕ Add',
     exportUrls: '📤 Export URLs',
     refresh: '🔄',
-    
-    // Сайдбар
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
-    
-    // Конструктор
     describeIdea: '💡 Describe your idea',
     describeIdeaPlaceholder: 'For example: Expense calculator with charts, dark theme, and history saved in localStorage...',
     copyPrompt: '📋 Copy prompt',
@@ -63,25 +33,17 @@ Your goal: make the requested improvements while keeping the app fully functiona
     createApp: '🚀 Create app',
     createAppDesc: 'Paste the HTML code returned by AI and click "Create".',
     codeInputPlaceholder: 'Paste the entire HTML code from AI here...',
-    
-    // Склад
     storeEmpty: 'Store is empty',
     install: 'Install',
-    
-    // Меню карточки
     info: 'ℹ️ Info',
     open: '🚀 Open',
     edit: '✏️ Edit',
     share: '📤 Share',
     delete: '🗑 Delete',
     settings: 'Settings',
-    
-    // Модалка информации
     appInfo: 'Application',
     noDescription: 'No description',
     linkedUrl: '🔗 Linked URL:',
-    
-    // Модалка шеринга
     shareApp: '📤 Share app',
     step1CopyCode: '📋 Step 1: Copy code',
     step1Desc: 'Copy the entire HTML code of the app to clipboard.',
@@ -92,40 +54,29 @@ Your goal: make the requested improvements while keeping the app fully functiona
     step3Desc: 'Paste the link to the hosted app. It will be saved and available for export.',
     bindUrl: '🔗 Bind link',
     unbindUrl: '✂️ Unbind',
-    
-    // Модалка экспорта
     exportUrlsTitle: '📤 Export URLs',
     exportDesc: 'List of apps from "My Apps" with bound links.',
     noLinkedApps: '📭 No apps with bound links',
     noLinkedAppsDesc: 'Bind links via the "📤" button on app cards.',
     copyList: '📋 Copy list',
-    
-    // Модалка промпта
     promptEditor: '⚙️ Prompt editor',
     promptEditorDesc: 'This prompt is used when creating and editing apps. Change it to customize AI behavior.',
     resetToDefault: '🔄 Reset to default',
     saveChanges: '💾 Save changes',
-    
-    // Модалка AI менеджера
     aiList: '🤖 AI list',
     aiListDesc: 'Order in list = order in menu.',
     newAI: '➕ New AI',
     editAI: '✏️ Edit AI',
     name: 'Name',
-    url: 'URL',
     namePlaceholder: 'For example: Qwen Chat',
     urlPlaceholder: 'https://chat.qwenlm.ai',
     save: '💾 Save',
     cancel: 'Cancel',
     addAI: '➕ Add AI',
     resetList: '🔄 Reset list',
-    
-    // Буфер обмена
     clipboard: '📋 Clipboard',
     clipboardEmpty: '📋 Clipboard is empty',
     clipboardEmptyDesc: 'Copy text or link and press the button again',
-    
-    // Уведомления
     promptCopied: '✅ Prompt copied',
     codeCopied: '✅ Code copied to clipboard!',
     listCopied: '✅ List copied to clipboard!',
@@ -158,12 +109,8 @@ Your goal: make the requested improvements while keeping the app fully functiona
     aiSaved: '✅ AI saved!',
     urlMustStart: '❌ URL must start with http:// or https://',
     browserNotSupported: '❌ Your browser doesn\'t support clipboard reading',
-    
-    // Кнопки
     close: 'Close',
     back: '← Back',
-    
-    // Подсказки
     copied: '✅ Copied!',
     opening: '🔗 Opening URL...',
     reading: '📋 Reading clipboard...',
@@ -175,36 +122,10 @@ Your goal: make the requested improvements while keeping the app fully functiona
   
   ru: {
     // Промпт (оригинальный русский)
-    prompt: `КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:
-1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (\`\`\`html ... \`\`\`). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.
-2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1 в конце.
-3. Уникальный ID: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности.
-4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.
-5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.
-6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.
-7. Добавь возможность управления сохраненными данными.
-
-Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.`,
+    prompt: "КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:\n1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (```html ... ```). НЕ сокращай код, НЕ пиши \"...остальной код без изменений\". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.\n2. Manifest: В <head> должен быть <script type=\"application/json\" id=\"manifest\">{\"id\":\"...\", \"name\":\"...\", \"icon\":\"эмодзи\", \"description\":\"...\"}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1 в конце.\n3. Уникальный ID: К значению поля \"id\" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: \"calculator-482915\", \"notes-739201\"). Это нужно для уникальности.\n4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.\n5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.\n6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.\n7. Добавь возможность управления сохраненными данными.\n\nВерни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.",
 
     // Инструкция для редактирования
-    editInstruction: `
-
-ИНСТРУКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ:
-Ниже представлен полный код существующего приложения. Твоя задача — улучшить или изменить его согласно запросу пользователя.
-
-КРИТИЧЕСКИ ВАЖНЫЕ ТРЕБОВАНИЯ:
-1. Верни ТОЛЬКО ПОЛНЫЙ, завершённый HTML-код улучшенного приложения в одном блоке markdown (\`\`\`html ... \`\`\`).
-2. НЕ сокращай код, НЕ пиши "...остальной код без изменений" или подобные фразы.
-3. HTML должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, готовый к копированию одной кнопкой.
-4. Сохраняй те же значения manifest (id, name, icon, description), ЕСЛИ пользователь явно не попросил их изменить.
-5. Если пользователь просит изменить название — увеличь номер версии (например, "MyApp v1" → "MyApp v2").
-6. Сохраняй уникальный ID в manifest (6-значный суффикс) — не генерируй новый.
-7. Поддерживай ту же общую структуру, подход к стилям и функциональность, если явно не попросят изменить.
-8. Весь CSS должен оставаться внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.
-9. Убедись, что приложение остаётся адаптивным (работает на десктопе и мобильных).
-10. Никаких alert(), confirm(), prompt() — они блокируются в iframe.
-
-Твоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.`,
+    editInstruction: "\n\nИНСТРУКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ:\nНиже представлен полный код существующего приложения. Твоя задача — улучшить или изменить его согласно запросу пользователя.\n\nКРИТИЧЕСКИ ВАЖНЫЕ ТРЕБОВАНИЯ:\n1. Верни ТОЛЬКО ПОЛНЫЙ, завершённый HTML-код улучшенного приложения в одном блоке markdown (```html ... ```).\n2. НЕ сокращай код, НЕ пиши \"...остальной код без изменений\" или подобные фразы.\n3. HTML должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, готовый к копированию одной кнопкой.\n4. Сохраняй те же значения manifest (id, name, icon, description), ЕСЛИ пользователь явно не попросил их изменить.\n5. Если пользователь просит изменить название — увеличь номер версии (например, \"MyApp v1\" → \"MyApp v2\").\n6. Сохраняй уникальный ID в manifest (6-значный суффикс) — не генерируй новый.\n7. Поддерживай ту же общую структуру, подход к стилям и функциональность, если явно не попросят изменить.\n8. Весь CSS должен оставаться внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.\n9. Убедись, что приложение остаётся адаптивным (работает на десктопе и мобильных).\n10. Никаких alert(), confirm(), prompt() — они блокируются в iframe.\n\nТвоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.",
 
     // Интерфейс
     myApps: '🏠 Мои приложения',
@@ -216,13 +137,9 @@ Your goal: make the requested improvements while keeping the app fully functiona
     add: '➕ Добавить',
     exportUrls: '📤 Экспорт ссылок',
     refresh: '🔄',
-    
-    // Сайдбар
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
-    
-    // Конструктор
     describeIdea: '💡 Опишите идею',
     describeIdeaPlaceholder: 'Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage...',
     copyPrompt: '📋 Скопировать промпт',
@@ -233,25 +150,17 @@ Your goal: make the requested improvements while keeping the app fully functiona
     createApp: '🚀 Создайте приложение',
     createAppDesc: 'Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".',
     codeInputPlaceholder: 'Вставьте сюда весь HTML-код от нейросети...',
-    
-    // Склад
     storeEmpty: 'Склад пуст',
     install: 'Установить',
-    
-    // Меню карточки
     info: 'ℹ️ Информация',
     open: '🚀 Открыть',
     edit: '✏️ Редактировать',
     share: '📤 Поделиться',
     delete: '🗑 Удалить',
     settings: 'Настройки',
-    
-    // Модалка информации
     appInfo: 'Приложение',
     noDescription: 'Нет описания',
     linkedUrl: '🔗 Привязанная ссылка:',
-    
-    // Модалка шеринга
     shareApp: '📤 Поделиться приложением',
     step1CopyCode: '📋 Шаг 1: Скопировать код',
     step1Desc: 'Скопируйте весь HTML-код приложения в буфер обмена.',
@@ -262,40 +171,29 @@ Your goal: make the requested improvements while keeping the app fully functiona
     step3Desc: 'Вставьте ссылку на размещённое приложение. Она сохранится и будет доступна для экспорта.',
     bindUrl: '🔗 Привязать ссылку',
     unbindUrl: '✂️ Отвязать',
-    
-    // Модалка экспорта
     exportUrlsTitle: '📤 Экспорт ссылок',
     exportDesc: 'Список приложений из «Мои приложения» с привязанными ссылками.',
     noLinkedApps: '📭 Нет приложений с привязанными ссылками',
     noLinkedAppsDesc: 'Привяжите ссылки через кнопку «📤» на карточках приложений.',
     copyList: '📋 Скопировать список',
-    
-    // Модалка промпта
     promptEditor: '⚙️ Редактор промпта',
     promptEditorDesc: 'Этот промпт используется при создании и редактировании приложений. Измените его, чтобы настроить поведение нейросети.',
     resetToDefault: '🔄 Сбросить к стандартному',
     saveChanges: '💾 Сохранить изменения',
-    
-    // Модалка AI менеджера
     aiList: '🤖 Список нейросетей',
     aiListDesc: 'Порядок в списке = порядок в меню.',
     newAI: '➕ Новая нейросеть',
     editAI: '✏️ Редактировать нейросеть',
     name: 'Название',
-    url: 'Ссылка (URL)',
     namePlaceholder: 'Например: Qwen Chat',
     urlPlaceholder: 'https://chat.qwenlm.ai',
     save: '💾 Сохранить',
     cancel: 'Отмена',
     addAI: '➕ Добавить нейросеть',
     resetList: '🔄 Сбросить список',
-    
-    // Буфер обмена
     clipboard: '📋 Буфер обмена',
     clipboardEmpty: '📋 Буфер обмена пуст',
     clipboardEmptyDesc: 'Скопируйте текст или ссылку и нажмите кнопку снова',
-    
-    // Уведомления
     promptCopied: '✅ Промпт скопирован',
     codeCopied: '✅ Код скопирован в буфер обмена!',
     listCopied: '✅ Список скопирован в буфер обмена!',
@@ -328,12 +226,8 @@ Your goal: make the requested improvements while keeping the app fully functiona
     aiSaved: '✅ Нейросеть сохранена!',
     urlMustStart: '❌ URL должен начинаться с http:// или https://',
     browserNotSupported: '❌ Ваш браузер не поддерживает чтение буфера обмена',
-    
-    // Кнопки
     close: 'Закрыть',
     back: '← Назад',
-    
-    // Подсказки
     copied: '✅ Скопировано!',
     opening: '🔗 Открываю URL...',
     reading: '📋 Чтение буфера обмена...',
@@ -354,7 +248,7 @@ function getCurrentLanguage() {
 
 function setLanguage(lang) {
   if (!translations[lang]) {
-    console.error(`Language "${lang}" not supported`);
+    console.error('Language "' + lang + '" not supported');
     return;
   }
   localStorage.setItem('language', lang);
@@ -365,10 +259,9 @@ function t(key, params) {
   const lang = getCurrentLanguage();
   let text = translations[lang][key] || translations['en'][key] || key;
   
-  // Подстановка параметров {name}, {message} и т.д.
   if (params) {
-    Object.keys(params).forEach(paramKey => {
-      text = text.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), params[paramKey]);
+    Object.keys(params).forEach(function(paramKey) {
+      text = text.replace(new RegExp('\\{' + paramKey + '\\}', 'g'), params[paramKey]);
     });
   }
   
@@ -378,7 +271,6 @@ function t(key, params) {
 function applyLanguage() {
   const lang = getCurrentLanguage();
   
-  // Обновляем тексты в интерфейсе
   const textUpdates = [
     { selector: '#home-screen > header > h1', key: 'myApps' },
     { selector: '#open-store-btn', key: 'store' },
@@ -400,11 +292,11 @@ function applyLanguage() {
     { selector: '#empty-state > button', key: 'store' }
   ];
   
-  textUpdates.forEach(({ selector, key, isHtml }) => {
-    const el = document.querySelector(selector);
+  textUpdates.forEach(function(item) {
+    const el = document.querySelector(item.selector);
     if (el) {
-      const text = t(key);
-      if (isHtml) {
+      const text = t(item.key);
+      if (item.isHtml) {
         el.innerHTML = text;
       } else {
         el.textContent = text;
@@ -412,14 +304,12 @@ function applyLanguage() {
     }
   });
   
-  // Обновляем кнопку переключения языка
   const langBtn = document.getElementById('language-toggle-btn');
   if (langBtn) {
     langBtn.textContent = lang === 'en' ? '🇷🇺' : '🇬🇧';
     langBtn.title = lang === 'en' ? 'Switch to Russian' : 'Переключить на английский';
   }
   
-  // Перерисовываем карточки приложений
   if (typeof renderInstalledApps === 'function') renderInstalledApps();
   if (typeof renderAllApps === 'function') renderAllApps();
 }
@@ -434,7 +324,6 @@ function toggleLanguage() {
 // ПОЛУЧЕНИЕ ПОЛНОГО ПРОМПТА ДЛЯ РЕДАКТИРОВАНИЯ
 // ==========================================
 
-// Возвращает полный промпт для редактирования: основной промпт + инструкция
 function getEditPrompt() {
-  return `${getPrompt()}${t('editInstruction')}`;
+  return getPrompt() + t('editInstruction');
 }
