@@ -54,10 +54,7 @@ function resetPromptToDefault() {
   var textarea = document.getElementById('prompt-editor-textarea');
   var status = document.getElementById('prompt-editor-status');
 
-  // Получаем стандартный промпт
   var defaultText = resetPrompt();
-  
-  // Устанавливаем в textarea
   if (textarea) textarea.value = defaultText;
   
   // ВАЖНО: сразу сохраняем в localStorage!

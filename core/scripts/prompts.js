@@ -3,22 +3,22 @@
 // ==========================================
 
 function getPrompt() {
-  const lang = getCurrentLanguage();
-  const stored = localStorage.getItem(`platformPrompt_${lang}`);
-  const prompt = stored || t('prompt');
+  var lang = getCurrentLanguage();
+  var stored = localStorage.getItem('platformPrompt_' + lang);
+  var prompt = stored || t('promptText');
   return prompt.endsWith('\n') ? prompt : prompt + '\n';
 }
 
 function setPrompt(text) {
-  const lang = getCurrentLanguage();
-  const trimmed = text.replace(/\n+$/, '');
-  localStorage.setItem(`platformPrompt_${lang}`, trimmed);
+  var lang = getCurrentLanguage();
+  var trimmed = text.replace(/\n+$/, '');
+  localStorage.setItem('platformPrompt_' + lang, trimmed);
 }
 
 function resetPrompt() {
-  const lang = getCurrentLanguage();
-  localStorage.removeItem(`platformPrompt_${lang}`);
-  return t('prompt') + '\n';
+  var lang = getCurrentLanguage();
+  localStorage.removeItem('platformPrompt_' + lang);
+  return t('promptText') + '\n';
 }
 
 // ==========================================
@@ -26,10 +26,10 @@ function resetPrompt() {
 // ==========================================
 
 function updatePromptPreview() {
-  const promptText = document.getElementById('prompt-text');
+  var promptText = document.getElementById('prompt-text');
   if (promptText) {
-    const ideaInput = document.getElementById('user-idea-input');
-    const idea = ideaInput ? ideaInput.value.trim() : '';
-    promptText.value = idea ? `${getPrompt()}\n${idea}` : getPrompt();
+    var ideaInput = document.getElementById('user-idea-input');
+    var idea = ideaInput ? ideaInput.value.trim() : '';
+    promptText.value = idea ? getPrompt() + '\n' + idea : getPrompt();
   }
 }

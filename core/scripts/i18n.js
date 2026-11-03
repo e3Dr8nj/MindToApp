@@ -4,8 +4,8 @@
 
 const translations = {
   en: {
-    // Промпт — массив строк, соединённых через \n
-    prompt: [
+    // Промпт для AI (длинный текст) — ключ promptText
+    promptText: [
       'CRITICAL PLATFORM RULES:',
       '1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (```html ... ```). DO NOT shorten code, DO NOT write "...rest of code unchanged". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.',
       '2. Manifest: In <head> there must be <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"emoji", "description":"..."}</script>. If name ends with v and a number, increment it; otherwise add v1 at the end.',
@@ -50,6 +50,8 @@ const translations = {
     add: '➕ Add',
     exportUrls: '📤 Export URLs',
     refresh: '🔄',
+    
+    // Кнопка сайдбара — короткий текст (ключ prompt)
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
@@ -151,8 +153,8 @@ const translations = {
   },
 
   ru: {
-    // Промпт — массив строк, соединённых через \n
-    prompt: [
+    // Промпт для AI (длинный текст) — ключ promptText
+    promptText: [
       'КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:',
       '1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (```html ... ```). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.',
       '2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1 в конце.',
@@ -197,6 +199,8 @@ const translations = {
     add: '➕ Добавить',
     exportUrls: '📤 Экспорт ссылок',
     refresh: '🔄',
+    
+    // Кнопка сайдбара — короткий текст (ключ prompt)
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
