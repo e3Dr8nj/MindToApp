@@ -77,13 +77,15 @@ function fallbackCopyCode(text) {
   document.body.removeChild(textarea);
 }
 
+// Копирует промпт для редактирования + код приложения (для меню ⚙️ → Редактировать)
 function copyCodeWithInstruction(module) {
   if (!module || !module.content) {
     showToast(t('noCode'), 'error');
     return;
   }
 
-  const prompt = getPrompt();
+  // Используем специальный промпт для редактирования
+  const prompt = getEditPrompt();
   const fullText = `${prompt}\n\n${module.content}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -113,6 +115,7 @@ function fallbackCopyWithInstruction(text) {
   document.body.removeChild(textarea);
 }
 
+// Копирует промпт для редактирования + код из модалки редактирования
 function copyEditPrompt() {
   const sourceCode = document.getElementById('edit-source-code');
   const status = document.getElementById('edit-status');
@@ -122,7 +125,8 @@ function copyEditPrompt() {
     return;
   }
 
-  const prompt = getPrompt();
+  // Используем специальный промпт для редактирования
+  const prompt = getEditPrompt();
   const fullText = `${prompt}\n\n${sourceCode.value}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
