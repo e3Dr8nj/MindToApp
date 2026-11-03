@@ -77,16 +77,17 @@ function fallbackCopyCode(text) {
   document.body.removeChild(textarea);
 }
 
-// Копирует промпт для редактирования + код приложения (для меню ⚙️ → Редактировать)
+// Копирует промпт + код приложения (для меню ⚙️ → Редактировать)
+// Добавляет \n в конце для удобства вставки
 function copyCodeWithInstruction(module) {
   if (!module || !module.content) {
     showToast(t('noCode'), 'error');
     return;
   }
 
-  // Используем специальный промпт для редактирования
-  var prompt = getEditPrompt();
-  var fullText = prompt + '\n\n' + module.content;
+  var prompt = getPrompt();
+  // Добавляем \n в конце, чтобы курсор был на новой строке после вставки
+  var fullText = prompt + '\n\n' + module.content + '\n';
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(function() {
@@ -115,7 +116,8 @@ function fallbackCopyWithInstruction(text) {
   document.body.removeChild(textarea);
 }
 
-// Копирует промпт для редактирования + код из модалки редактирования
+// Копирует промпт + код из модалки редактирования
+// Добавляет \n в конце для удобства вставки
 function copyEditPrompt() {
   var sourceCode = document.getElementById('edit-source-code');
   var status = document.getElementById('edit-status');
@@ -125,9 +127,9 @@ function copyEditPrompt() {
     return;
   }
 
-  // Используем специальный промпт для редактирования
-  var prompt = getEditPrompt();
-  var fullText = prompt + '\n\n' + sourceCode.value;
+  var prompt = getPrompt();
+  // Добавляем \n в конце, чтобы курсор был на новой строке после вставки
+  var fullText = prompt + '\n\n' + sourceCode.value + '\n';
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(function() {

@@ -17,27 +17,6 @@ const translations = {
       'Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.'
     ].join('\n'),
 
-    editInstruction: [
-      '',
-      '',
-      'EDITING INSTRUCTION:',
-      'Below is the complete code of an existing application. Your task is to improve or modify it according to the user\'s request.',
-      '',
-      'CRITICAL REQUIREMENTS:',
-      '1. Return ONLY the FULL, complete HTML code of the improved application in one markdown code block (```html ... ```).',
-      '2. DO NOT shorten the code, DO NOT write "...rest of code unchanged" or similar phrases.',
-      '3. The HTML must be provided in full, from <!DOCTYPE html> to </html>, ready to copy with one click.',
-      '4. Keep the same manifest values (id, name, icon, description) UNLESS the user explicitly asks to change them.',
-      '5. If the user asks to change the name, update the version number (e.g., "MyApp v1" → "MyApp v2").',
-      '6. Preserve the unique ID in manifest (the 6-digit suffix) — do not generate a new one.',
-      '7. Maintain the same general structure, styling approach, and functionality unless explicitly asked to change.',
-      '8. All CSS must remain inside <style>, all JS inside <script>. No external libraries or CDN.',
-      '9. Ensure the app remains responsive (works on desktop and mobile).',
-      '10. No alert(), confirm(), prompt() — they are blocked in iframe.',
-      '',
-      'Your goal: make the requested improvements while keeping the app fully functional and complete.'
-    ].join('\n'),
-
     myApps: '🏠 My Apps',
     store: '📦 Store',
     themes: '🎨 Themes',
@@ -159,27 +138,6 @@ const translations = {
       '7. Добавь возможность управления сохраненными данными.',
       '',
       'Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.'
-    ].join('\n'),
-
-    editInstruction: [
-      '',
-      '',
-      'ИНСТРУКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ:',
-      'Ниже представлен полный код существующего приложения. Твоя задача — улучшить или изменить его согласно запросу пользователя.',
-      '',
-      'КРИТИЧЕСКИ ВАЖНЫЕ ТРЕБОВАНИЯ:',
-      '1. Верни ТОЛЬКО ПОЛНЫЙ, завершённый HTML-код улучшенного приложения в одном блоке markdown (```html ... ```).',
-      '2. НЕ сокращай код, НЕ пиши "...остальной код без изменений" или подобные фразы.',
-      '3. HTML должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, готовый к копированию одной кнопкой.',
-      '4. Сохраняй те же значения manifest (id, name, icon, description), ЕСЛИ пользователь явно не попросил их изменить.',
-      '5. Если пользователь просит изменить название — увеличь номер версии (например, "MyApp v1" → "MyApp v2").',
-      '6. Сохраняй уникальный ID в manifest (6-значный суффикс) — не генерируй новый.',
-      '7. Поддерживай ту же общую структуру, подход к стилям и функциональность, если явно не попросят изменить.',
-      '8. Весь CSS должен оставаться внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.',
-      '9. Убедись, что приложение остаётся адаптивным (работает на десктопе и мобильных).',
-      '10. Никаких alert(), confirm(), prompt() — они блокируются в iframe.',
-      '',
-      'Твоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.'
     ].join('\n'),
 
     myApps: '🏠 Мои приложения',
@@ -322,12 +280,10 @@ function t(key, params) {
   return text;
 }
 
-// Универсальная функция применения перевода с защитой от задвоения эмодзи
 function applyTranslation(el, key, isHtml) {
   var text = t(key);
   var currentText = (isHtml ? el.innerHTML : el.textContent).trim();
 
-  // Проверяем, не начинается ли текущий текст с эмодзи из перевода
   if (currentText && text) {
     var firstChars = text.slice(0, 2);
     if (currentText.startsWith(firstChars)) {
@@ -387,8 +343,4 @@ function toggleLanguage() {
   var current = getCurrentLanguage();
   var newLang = current === 'en' ? 'ru' : 'en';
   setLanguage(newLang);
-}
-
-function getEditPrompt() {
-  return getPrompt() + t('editInstruction');
 }
