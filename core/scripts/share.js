@@ -71,12 +71,13 @@ function openShareModal(module) {
 
     if (existingUrl) {
       urlInput.value = existingUrl;
-      bindBtn.textContent = `✏️ ${t('edit')}`;
+      // Используем переводы напрямую — эмодзи уже встроены в t('edit')
+      bindBtn.textContent = t('edit');
       unbindBtn.style.display = 'inline-block';
-      unbindBtn.textContent = `✂️ ${t('unbindUrl')}`;
+      unbindBtn.textContent = t('unbindUrl');
     } else {
       urlInput.value = '';
-      bindBtn.textContent = `🔗 ${t('bindUrl')}`;
+      bindBtn.textContent = t('bindUrl');
       unbindBtn.style.display = 'none';
     }
 
@@ -161,10 +162,11 @@ function bindUrlToApp() {
   setAppUrl(currentShareModule.id, url);
 
   if (status) { status.textContent = t('urlBound'); status.className = 'modal-status success'; }
-  if (bindBtn) bindBtn.textContent = `✏️ ${t('edit')}`;
+  // Используем переводы напрямую — эмодзи уже встроены в t('edit') и t('unbindUrl')
+  if (bindBtn) bindBtn.textContent = t('edit');
   if (unbindBtn) {
     unbindBtn.style.display = 'inline-block';
-    unbindBtn.textContent = `✂️ ${t('unbindUrl')}`;
+    unbindBtn.textContent = t('unbindUrl');
   }
 
   renderInstalledApps();
@@ -174,7 +176,7 @@ function bindUrlToApp() {
 function unbindUrlFromApp() {
   if (!currentShareModule) return;
 
-  if (!confirm(`${t('unbindUrl')}?`)) return;
+  if (!confirm(t('unbindUrl') + '?')) return;
 
   removeAppUrl(currentShareModule.id);
 
@@ -184,7 +186,8 @@ function unbindUrlFromApp() {
   const status = document.getElementById('share-url-status');
 
   if (urlInput) urlInput.value = '';
-  if (bindBtn) bindBtn.textContent = `🔗 ${t('bindUrl')}`;
+  // Используем перевод напрямую — эмодзи уже встроен в t('bindUrl')
+  if (bindBtn) bindBtn.textContent = t('bindUrl');
   if (unbindBtn) unbindBtn.style.display = 'none';
   if (status) { status.textContent = t('urlUnbound'); status.className = 'modal-status success'; }
 

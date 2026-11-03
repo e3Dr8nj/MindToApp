@@ -4,7 +4,6 @@
 
 const translations = {
   en: {
-    // Промпт для AI (длинный текст) — ключ promptText
     promptText: [
       'CRITICAL PLATFORM RULES:',
       '1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (```html ... ```). DO NOT shorten code, DO NOT write "...rest of code unchanged". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.',
@@ -18,7 +17,6 @@ const translations = {
       'Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.'
     ].join('\n'),
 
-    // Инструкция для редактирования
     editInstruction: [
       '',
       '',
@@ -40,7 +38,6 @@ const translations = {
       'Your goal: make the requested improvements while keeping the app fully functional and complete.'
     ].join('\n'),
 
-    // Интерфейс
     myApps: '🏠 My Apps',
     store: '📦 Store',
     themes: '🎨 Themes',
@@ -50,8 +47,6 @@ const translations = {
     add: '➕ Add',
     exportUrls: '📤 Export URLs',
     refresh: '🔄',
-    
-    // Кнопка сайдбара — короткий текст (ключ prompt)
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
@@ -153,7 +148,6 @@ const translations = {
   },
 
   ru: {
-    // Промпт для AI (длинный текст) — ключ promptText
     promptText: [
       'КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:',
       '1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (```html ... ```). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.',
@@ -167,7 +161,6 @@ const translations = {
       'Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.'
     ].join('\n'),
 
-    // Инструкция для редактирования
     editInstruction: [
       '',
       '',
@@ -189,7 +182,6 @@ const translations = {
       'Твоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.'
     ].join('\n'),
 
-    // Интерфейс
     myApps: '🏠 Мои приложения',
     store: '📦 Склад',
     themes: '🎨 Темы',
@@ -199,8 +191,6 @@ const translations = {
     add: '➕ Добавить',
     exportUrls: '📤 Экспорт ссылок',
     refresh: '🔄',
-    
-    // Кнопка сайдбара — короткий текст (ключ prompt)
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
@@ -332,6 +322,26 @@ function t(key, params) {
   return text;
 }
 
+// Универсальная функция применения перевода с защитой от задвоения эмодзи
+function applyTranslation(el, key, isHtml) {
+  var text = t(key);
+  var currentText = (isHtml ? el.innerHTML : el.textContent).trim();
+
+  // Проверяем, не начинается ли текущий текст с эмодзи из перевода
+  if (currentText && text) {
+    var firstChars = text.slice(0, 2);
+    if (currentText.startsWith(firstChars)) {
+      text = text.slice(firstChars.length).trim();
+    }
+  }
+
+  if (isHtml) {
+    el.innerHTML = text;
+  } else {
+    el.textContent = text;
+  }
+}
+
 function applyLanguage() {
   var lang = getCurrentLanguage();
 
@@ -359,12 +369,7 @@ function applyLanguage() {
   textUpdates.forEach(function(item) {
     var el = document.querySelector(item.selector);
     if (el) {
-      var text = t(item.key);
-      if (item.isHtml) {
-        el.innerHTML = text;
-      } else {
-        el.textContent = text;
-      }
+      applyTranslation(el, item.key, item.isHtml);
     }
   });
 
@@ -383,10 +388,6 @@ function toggleLanguage() {
   var newLang = current === 'en' ? 'ru' : 'en';
   setLanguage(newLang);
 }
-
-// ==========================================
-// ПОЛУЧЕНИЕ ПОЛНОГО ПРОМПТА ДЛЯ РЕДАКТИРОВАНИЯ
-// ==========================================
 
 function getEditPrompt() {
   return getPrompt() + t('editInstruction');
