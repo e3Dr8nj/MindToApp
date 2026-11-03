@@ -4,11 +4,41 @@
 
 const translations = {
   en: {
-    // Промпт
-    prompt: "CRITICAL PLATFORM RULES:\n1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (```html ... ```). DO NOT shorten code, DO NOT write \"...rest of code unchanged\". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.\n2. Manifest: In <head> there must be <script type=\"application/json\" id=\"manifest\">{\"id\":\"...\", \"name\":\"...\", \"icon\":\"emoji\", \"description\":\"...\"}</script>. If name ends with v and a number, increment it; otherwise add v1 at the end.\n3. Unique ID: Add 6 random digits to the \"id\" field in manifest (e.g., \"calculator-482915\", \"notes-739201\"). This is required for uniqueness.\n4. Styles and scripts: All CSS must be inside <style>, all JS inside <script>. No external libraries or CDN.\n5. Responsiveness: body { min-height: calc(100vh - 60px); margin: 0; }. App must work on desktop and mobile.\n6. Restrictions: No alert(), confirm(), prompt() (blocked in iframe). Images/audio only in Base64.\n7. Add ability to manage saved data.\n\nReturn ONLY complete HTML code in one markdown block. DO NOT add text explanations.",
+    // Промпт — массив строк, соединённых через \n
+    prompt: [
+      'CRITICAL PLATFORM RULES:',
+      '1. Format: Return ONLY complete, ready-to-use code for a single index.html file, wrapped in one markdown code block (```html ... ```). DO NOT shorten code, DO NOT write "...rest of code unchanged". HTML must be provided in full, from <!DOCTYPE html> to </html>, so it can be copied with one click.',
+      '2. Manifest: In <head> there must be <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"emoji", "description":"..."}</script>. If name ends with v and a number, increment it; otherwise add v1 at the end.',
+      '3. Unique ID: Add 6 random digits to the "id" field in manifest (e.g., "calculator-482915", "notes-739201"). This is required for uniqueness.',
+      '4. Styles and scripts: All CSS must be inside <style>, all JS inside <script>. No external libraries or CDN.',
+      '5. Responsiveness: body { min-height: calc(100vh - 60px); margin: 0; }. App must work on desktop and mobile.',
+      '6. Restrictions: No alert(), confirm(), prompt() (blocked in iframe). Images/audio only in Base64.',
+      '7. Add ability to manage saved data.',
+      '',
+      'Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.'
+    ].join('\n'),
 
     // Инструкция для редактирования
-    editInstruction: "\n\nEDITING INSTRUCTION:\nBelow is the complete code of an existing application. Your task is to improve or modify it according to the user's request.\n\nCRITICAL REQUIREMENTS:\n1. Return ONLY the FULL, complete HTML code of the improved application in one markdown code block (```html ... ```).\n2. DO NOT shorten the code, DO NOT write \"...rest of code unchanged\" or similar phrases.\n3. The HTML must be provided in full, from <!DOCTYPE html> to </html>, ready to copy with one click.\n4. Keep the same manifest values (id, name, icon, description) UNLESS the user explicitly asks to change them.\n5. If the user asks to change the name, update the version number (e.g., \"MyApp v1\" → \"MyApp v2\").\n6. Preserve the unique ID in manifest (the 6-digit suffix) — do not generate a new one.\n7. Maintain the same general structure, styling approach, and functionality unless explicitly asked to change.\n8. All CSS must remain inside <style>, all JS inside <script>. No external libraries or CDN.\n9. Ensure the app remains responsive (works on desktop and mobile).\n10. No alert(), confirm(), prompt() — they are blocked in iframe.\n\nYour goal: make the requested improvements while keeping the app fully functional and complete.",
+    editInstruction: [
+      '',
+      '',
+      'EDITING INSTRUCTION:',
+      'Below is the complete code of an existing application. Your task is to improve or modify it according to the user\'s request.',
+      '',
+      'CRITICAL REQUIREMENTS:',
+      '1. Return ONLY the FULL, complete HTML code of the improved application in one markdown code block (```html ... ```).',
+      '2. DO NOT shorten the code, DO NOT write "...rest of code unchanged" or similar phrases.',
+      '3. The HTML must be provided in full, from <!DOCTYPE html> to </html>, ready to copy with one click.',
+      '4. Keep the same manifest values (id, name, icon, description) UNLESS the user explicitly asks to change them.',
+      '5. If the user asks to change the name, update the version number (e.g., "MyApp v1" → "MyApp v2").',
+      '6. Preserve the unique ID in manifest (the 6-digit suffix) — do not generate a new one.',
+      '7. Maintain the same general structure, styling approach, and functionality unless explicitly asked to change.',
+      '8. All CSS must remain inside <style>, all JS inside <script>. No external libraries or CDN.',
+      '9. Ensure the app remains responsive (works on desktop and mobile).',
+      '10. No alert(), confirm(), prompt() — they are blocked in iframe.',
+      '',
+      'Your goal: make the requested improvements while keeping the app fully functional and complete.'
+    ].join('\n'),
 
     // Интерфейс
     myApps: '🏠 My Apps',
@@ -119,13 +149,43 @@ const translations = {
     loadingByUrl: '🔗 Loading by link...',
     codeLoaded: '✅ Code loaded from link'
   },
-  
+
   ru: {
-    // Промпт (оригинальный русский)
-    prompt: "КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:\n1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (```html ... ```). НЕ сокращай код, НЕ пиши \"...остальной код без изменений\". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.\n2. Manifest: В <head> должен быть <script type=\"application/json\" id=\"manifest\">{\"id\":\"...\", \"name\":\"...\", \"icon\":\"эмодзи\", \"description\":\"...\"}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1 в конце.\n3. Уникальный ID: К значению поля \"id\" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: \"calculator-482915\", \"notes-739201\"). Это нужно для уникальности.\n4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.\n5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.\n6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.\n7. Добавь возможность управления сохраненными данными.\n\nВерни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.",
+    // Промпт — массив строк, соединённых через \n
+    prompt: [
+      'КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА ПЛАТФОРМЫ:',
+      '1. Формат: Верни ТОЛЬКО полный, готовый к использованию код одного файла index.html, обернутый в один единый блок кода markdown (```html ... ```). НЕ сокращай код, НЕ пиши "...остальной код без изменений". HTML текст должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, чтобы его было максимально удобно скопировать одной кнопкой.',
+      '2. Manifest: В <head> должен быть <script type="application/json" id="manifest">{"id":"...", "name":"...", "icon":"эмодзи", "description":"..."}</script>. Если в значении name в конце есть v и номер после, то увеличь номер версии, если такого нет, поставь v1 в конце.',
+      '3. Уникальный ID: К значению поля "id" в manifest ОБЯЗАТЕЛЬНО добавь 6 случайных цифр (например: "calculator-482915", "notes-739201"). Это нужно для уникальности.',
+      '4. Стили и скрипты: Весь CSS должен быть внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.',
+      '5. Адаптивность: body { min-height: calc(100vh - 60px); margin: 0; }. Приложение должно работать на десктопе и мобильных.',
+      '6. Запреты: Никаких alert(), confirm(), prompt() (они блокируются в iframe). Картинки/звуки только в Base64.',
+      '7. Добавь возможность управления сохраненными данными.',
+      '',
+      'Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.'
+    ].join('\n'),
 
     // Инструкция для редактирования
-    editInstruction: "\n\nИНСТРУКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ:\nНиже представлен полный код существующего приложения. Твоя задача — улучшить или изменить его согласно запросу пользователя.\n\nКРИТИЧЕСКИ ВАЖНЫЕ ТРЕБОВАНИЯ:\n1. Верни ТОЛЬКО ПОЛНЫЙ, завершённый HTML-код улучшенного приложения в одном блоке markdown (```html ... ```).\n2. НЕ сокращай код, НЕ пиши \"...остальной код без изменений\" или подобные фразы.\n3. HTML должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, готовый к копированию одной кнопкой.\n4. Сохраняй те же значения manifest (id, name, icon, description), ЕСЛИ пользователь явно не попросил их изменить.\n5. Если пользователь просит изменить название — увеличь номер версии (например, \"MyApp v1\" → \"MyApp v2\").\n6. Сохраняй уникальный ID в manifest (6-значный суффикс) — не генерируй новый.\n7. Поддерживай ту же общую структуру, подход к стилям и функциональность, если явно не попросят изменить.\n8. Весь CSS должен оставаться внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.\n9. Убедись, что приложение остаётся адаптивным (работает на десктопе и мобильных).\n10. Никаких alert(), confirm(), prompt() — они блокируются в iframe.\n\nТвоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.",
+    editInstruction: [
+      '',
+      '',
+      'ИНСТРУКЦИЯ ДЛЯ РЕДАКТИРОВАНИЯ:',
+      'Ниже представлен полный код существующего приложения. Твоя задача — улучшить или изменить его согласно запросу пользователя.',
+      '',
+      'КРИТИЧЕСКИ ВАЖНЫЕ ТРЕБОВАНИЯ:',
+      '1. Верни ТОЛЬКО ПОЛНЫЙ, завершённый HTML-код улучшенного приложения в одном блоке markdown (```html ... ```).',
+      '2. НЕ сокращай код, НЕ пиши "...остальной код без изменений" или подобные фразы.',
+      '3. HTML должен быть предоставлен целиком, от <!DOCTYPE html> до </html>, готовый к копированию одной кнопкой.',
+      '4. Сохраняй те же значения manifest (id, name, icon, description), ЕСЛИ пользователь явно не попросил их изменить.',
+      '5. Если пользователь просит изменить название — увеличь номер версии (например, "MyApp v1" → "MyApp v2").',
+      '6. Сохраняй уникальный ID в manifest (6-значный суффикс) — не генерируй новый.',
+      '7. Поддерживай ту же общую структуру, подход к стилям и функциональность, если явно не попросят изменить.',
+      '8. Весь CSS должен оставаться внутри <style>, весь JS внутри <script>. Никаких внешних библиотек или CDN.',
+      '9. Убедись, что приложение остаётся адаптивным (работает на десктопе и мобильных).',
+      '10. Никаких alert(), confirm(), prompt() — они блокируются в iframe.',
+      '',
+      'Твоя цель: внести запрошенные улучшения, сохранив приложение полностью функциональным и завершённым.'
+    ].join('\n'),
 
     // Интерфейс
     myApps: '🏠 Мои приложения',
@@ -256,22 +316,22 @@ function setLanguage(lang) {
 }
 
 function t(key, params) {
-  const lang = getCurrentLanguage();
-  let text = translations[lang][key] || translations['en'][key] || key;
-  
+  var lang = getCurrentLanguage();
+  var text = translations[lang][key] || translations['en'][key] || key;
+
   if (params) {
     Object.keys(params).forEach(function(paramKey) {
       text = text.replace(new RegExp('\\{' + paramKey + '\\}', 'g'), params[paramKey]);
     });
   }
-  
+
   return text;
 }
 
 function applyLanguage() {
-  const lang = getCurrentLanguage();
-  
-  const textUpdates = [
+  var lang = getCurrentLanguage();
+
+  var textUpdates = [
     { selector: '#home-screen > header > h1', key: 'myApps' },
     { selector: '#open-store-btn', key: 'store' },
     { selector: '#manage-themes-btn', key: 'themes' },
@@ -291,11 +351,11 @@ function applyLanguage() {
     { selector: '#back-to-home-btn', key: 'back', isHtml: true },
     { selector: '#empty-state > button', key: 'store' }
   ];
-  
+
   textUpdates.forEach(function(item) {
-    const el = document.querySelector(item.selector);
+    var el = document.querySelector(item.selector);
     if (el) {
-      const text = t(item.key);
+      var text = t(item.key);
       if (item.isHtml) {
         el.innerHTML = text;
       } else {
@@ -303,20 +363,20 @@ function applyLanguage() {
       }
     }
   });
-  
-  const langBtn = document.getElementById('language-toggle-btn');
+
+  var langBtn = document.getElementById('language-toggle-btn');
   if (langBtn) {
     langBtn.textContent = lang === 'en' ? '🇷🇺' : '🇬🇧';
     langBtn.title = lang === 'en' ? 'Switch to Russian' : 'Переключить на английский';
   }
-  
+
   if (typeof renderInstalledApps === 'function') renderInstalledApps();
   if (typeof renderAllApps === 'function') renderAllApps();
 }
 
 function toggleLanguage() {
-  const current = getCurrentLanguage();
-  const newLang = current === 'en' ? 'ru' : 'en';
+  var current = getCurrentLanguage();
+  var newLang = current === 'en' ? 'ru' : 'en';
   setLanguage(newLang);
 }
 

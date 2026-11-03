@@ -3,35 +3,35 @@
 // ==========================================
 
 function openEditModal(module) {
-  const modal = document.getElementById('edit-modal');
+  var modal = document.getElementById('edit-modal');
   if (!modal) return;
 
-  document.getElementById('edit-modal-title').textContent = `✏️ ${module.name}`;
+  document.getElementById('edit-modal-title').textContent = '✏️ ' + module.name;
   document.getElementById('edit-preview-icon').textContent = module.icon;
   document.getElementById('edit-preview-name').textContent = module.name;
   document.getElementById('edit-preview-desc').textContent = module.description || t('noDescription');
 
-  const sourceCode = document.getElementById('edit-source-code');
+  var sourceCode = document.getElementById('edit-source-code');
   if (sourceCode) {
     sourceCode.value = module.content || '';
     sourceCode.style.display = 'none';
   }
 
-  const status = document.getElementById('edit-status');
+  var status = document.getElementById('edit-status');
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
   modal.classList.add('active');
 }
 
 function closeEditModal() {
-  const modal = document.getElementById('edit-modal');
+  var modal = document.getElementById('edit-modal');
   if (modal) modal.classList.remove('active');
 }
 
 function toggleCodeVisibility() {
-  const sourceCode = document.getElementById('edit-source-code');
-  const toggleBtn = document.getElementById('toggle-code-btn');
-  
+  var sourceCode = document.getElementById('edit-source-code');
+  var toggleBtn = document.getElementById('toggle-code-btn');
+
   if (!sourceCode || !toggleBtn) return;
 
   if (sourceCode.style.display === 'none') {
@@ -44,16 +44,16 @@ function toggleCodeVisibility() {
 }
 
 function copyCodeFromEditModal() {
-  const sourceCode = document.getElementById('edit-source-code');
+  var sourceCode = document.getElementById('edit-source-code');
   if (!sourceCode || !sourceCode.value) {
     showToast(t('noCode'), 'error');
     return;
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(sourceCode.value).then(() => {
+    navigator.clipboard.writeText(sourceCode.value).then(function() {
       showToast(t('codeCopied'), 'success');
-    }).catch(() => {
+    }).catch(function() {
       fallbackCopyCode(sourceCode.value);
     });
   } else {
@@ -62,7 +62,7 @@ function copyCodeFromEditModal() {
 }
 
 function fallbackCopyCode(text) {
-  const textarea = document.createElement('textarea');
+  var textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
@@ -85,13 +85,13 @@ function copyCodeWithInstruction(module) {
   }
 
   // Используем специальный промпт для редактирования
-  const prompt = getEditPrompt();
-  const fullText = `${prompt}\n\n${module.content}`;
+  var prompt = getEditPrompt();
+  var fullText = prompt + '\n\n' + module.content;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(fullText).then(() => {
+    navigator.clipboard.writeText(fullText).then(function() {
       showToast(t('promptCopied'), 'success', 3000);
-    }).catch(() => {
+    }).catch(function() {
       fallbackCopyWithInstruction(fullText);
     });
   } else {
@@ -100,7 +100,7 @@ function copyCodeWithInstruction(module) {
 }
 
 function fallbackCopyWithInstruction(text) {
-  const textarea = document.createElement('textarea');
+  var textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
@@ -117,8 +117,8 @@ function fallbackCopyWithInstruction(text) {
 
 // Копирует промпт для редактирования + код из модалки редактирования
 function copyEditPrompt() {
-  const sourceCode = document.getElementById('edit-source-code');
-  const status = document.getElementById('edit-status');
+  var sourceCode = document.getElementById('edit-source-code');
+  var status = document.getElementById('edit-status');
 
   if (!sourceCode || !sourceCode.value) {
     if (status) { status.textContent = t('noCode'); status.className = 'modal-status error'; }
@@ -126,13 +126,13 @@ function copyEditPrompt() {
   }
 
   // Используем специальный промпт для редактирования
-  const prompt = getEditPrompt();
-  const fullText = `${prompt}\n\n${sourceCode.value}`;
+  var prompt = getEditPrompt();
+  var fullText = prompt + '\n\n' + sourceCode.value;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(fullText).then(() => {
+    navigator.clipboard.writeText(fullText).then(function() {
       if (status) { status.textContent = t('promptCopied'); status.className = 'modal-status success'; }
-    }).catch(() => {
+    }).catch(function() {
       fallbackCopyEditPrompt(fullText, status);
     });
   } else {
@@ -141,7 +141,7 @@ function copyEditPrompt() {
 }
 
 function fallbackCopyEditPrompt(text, statusEl) {
-  const textarea = document.createElement('textarea');
+  var textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
