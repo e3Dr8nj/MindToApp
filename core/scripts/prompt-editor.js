@@ -1,5 +1,5 @@
 // ==========================================
-// РЕДАКТОР ПРОМПТОВ (упрощённый — один промпт)
+// РЕДАКТОР ПРОМПТОВ
 // ==========================================
 
 function openPromptsModal() {
@@ -34,7 +34,7 @@ function savePrompt() {
   const value = textarea.value.trim();
   if (!value) {
     if (status) {
-      status.textContent = '❌ Промпт не может быть пустым';
+      status.textContent = t('promptEmpty');
       status.className = 'modal-status error';
     }
     return;
@@ -43,13 +43,13 @@ function savePrompt() {
   setPrompt(value);
 
   if (status) {
-    status.textContent = '✅ Промпт сохранён!';
+    status.textContent = t('promptSaved');
     status.className = 'modal-status success';
   }
 }
 
 function resetPromptToDefault() {
-  if (!confirm('Сбросить промпт к стандартному значению?')) return;
+  if (!confirm(t('resetPromptConfirm'))) return;
 
   const textarea = document.getElementById('prompt-editor-textarea');
   const status = document.getElementById('prompt-editor-status');
@@ -58,7 +58,7 @@ function resetPromptToDefault() {
   if (textarea) textarea.value = defaultText;
 
   if (status) {
-    status.textContent = '✅ Промпт сброшен к стандартному';
+    status.textContent = t('promptReset');
     status.className = 'modal-status success';
   }
 }

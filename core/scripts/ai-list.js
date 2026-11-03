@@ -87,7 +87,7 @@ function renderAINetworksList() {
   const networks = getAINetworks();
 
   if (networks.length === 0) {
-    listContainer.innerHTML = '<div class="ai-dropdown-empty">Список пуст</div>';
+    listContainer.innerHTML = '<div class="ai-dropdown-empty">List is empty</div>';
     return;
   }
 
@@ -100,14 +100,13 @@ function renderAINetworksList() {
         <div class="ai-manager-url">${escapeHtml(network.url)}</div>
       </div>
       <div class="ai-manager-actions">
-        <button data-action="edit" data-index="${index}" title="Редактировать">✏️</button>
-        <button data-action="delete" data-index="${index}" title="Удалить" ${networks.length <= 1 ? 'disabled' : ''}>🗑</button>
+        <button data-action="edit" data-index="${index}" title="${t('edit')}">✏️</button>
+        <button data-action="delete" data-index="${index}" title="${t('delete')}" ${networks.length <= 1 ? 'disabled' : ''}>🗑</button>
       </div>
     `;
     listContainer.appendChild(item);
   });
 
-  // Обработчики кнопок
   listContainer.querySelectorAll('button[data-action="edit"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const index = parseInt(btn.dataset.index, 10);
@@ -118,7 +117,7 @@ function renderAINetworksList() {
   listContainer.querySelectorAll('button[data-action="delete"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const index = parseInt(btn.dataset.index, 10);
-      if (confirm(`Удалить нейросеть "${networks[index].name}"?`)) {
+      if (confirm(t('deleteNetwork', { name: networks[index].name }))) {
         networks.splice(index, 1);
         saveAINetworks(networks);
         renderAINetworksList();
@@ -129,7 +128,6 @@ function renderAINetworksList() {
 }
 
 function initAINetworksInUI() {
-  // 1. Заполняем select в конструкторе
   const selectEl = document.getElementById('builder-ai-select');
   if (selectEl) {
     selectEl.innerHTML = '';
@@ -142,7 +140,6 @@ function initAINetworksInUI() {
     });
   }
 
-  // 2. Заполняем выпадающий список в сайдбаре
   const dropdown = document.getElementById('sidebar-ai-dropdown');
   if (dropdown) {
     dropdown.innerHTML = '';

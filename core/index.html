@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -18,14 +18,16 @@
 <body>
   <!-- САЙДБАР -->
   <div id="sidebar" class="sidebar">
-    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Скопировать промпт">
+    <button id="language-toggle-btn" class="sidebar-btn language-toggle-btn" title="Switch to Russian">🇷🇺</button>
+
+    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Copy prompt">
       📋 prompt
     </button>
 
     <div class="sidebar-arrow">↓</div>
 
     <div class="sidebar-ai-wrapper">
-      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Наведите для списка нейросетей">
+      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Hover for AI list">
         🤖 AI
       </button>
       <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown"></div>
@@ -33,13 +35,13 @@
 
     <div class="sidebar-arrow">↓</div>
 
-    <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Создать приложение из буфера обмена">
-      🚀 Создать
+    <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">
+      🚀 Create
     </button>
 
     <div class="sidebar-spacer"></div>
 
-    <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Открыть URL из буфера">
+    <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">
       🔗 URL
     </button>
   </div>
@@ -52,43 +54,43 @@
     <!-- Экран 1: Рабочий стол -->
     <div id="home-screen" class="screen active">
       <header>
-        <h1>🏠 Мои приложения</h1>
-        <button id="burger-menu-btn" class="burger-menu-btn" title="Меню">☰</button>
+        <h1>🏠 My Apps</h1>
+        <button id="burger-menu-btn" class="burger-menu-btn" title="Menu">☰</button>
         <div class="header-buttons" id="header-menu">
-          <button id="refresh-btn" class="btn" title="Очистить кэш и обновить">🔄</button>
-          <button id="manage-themes-btn" class="btn" title="Управление темами оформления">🎨 Темы</button>
-          <button id="manage-ai-btn" class="btn" title="Редактировать список нейросетей">🤖 ИИ</button>
-          <button id="edit-prompts-btn" class="btn" title="Редактировать промпт">⚙️ Промпт</button>
-          <button id="builder-btn" class="btn btn-primary">🛠 Конструктор</button>
-          <button id="add-custom-btn" class="btn">➕ Добавить</button>
-          <button id="open-store-btn" class="btn">📦 Склад</button>
-          <button id="export-urls-btn" class="btn">📤 Экспорт ссылок</button>
+          <button id="refresh-btn" class="btn" title="Clear cache and refresh">🔄</button>
+          <button id="manage-themes-btn" class="btn" title="Manage themes">🎨 Themes</button>
+          <button id="manage-ai-btn" class="btn" title="Edit AI list">🤖 AI</button>
+          <button id="edit-prompts-btn" class="btn" title="Edit prompt">⚙️ Prompt</button>
+          <button id="builder-btn" class="btn btn-primary">🛠 Builder</button>
+          <button id="add-custom-btn" class="btn">➕ Add</button>
+          <button id="open-store-btn" class="btn">📦 Store</button>
+          <button id="export-urls-btn" class="btn">📤 Export URLs</button>
         </div>
       </header>
 
       <!-- Панель нейросетей -->
       <div id="ai-panel" class="ai-panel" style="display: none;">
         <div class="ai-panel-header">
-          <h2>🤖 Нейросети для создания приложений</h2>
-          <button id="ai-panel-close-btn" class="modal-close" title="Закрыть">&times;</button>
+          <h2>🤖 AI for creating apps</h2>
+          <button id="ai-panel-close-btn" class="modal-close" title="Close">&times;</button>
         </div>
-        <p class="ai-panel-hint">Список можно изменить кнопкой «🤖 ИИ».</p>
+        <p class="ai-panel-hint">You can change the list via «🤖 AI».</p>
         <div id="ai-panel-grid" class="ai-panel-grid"></div>
       </div>
 
       <!-- Панель конструктора -->
       <div id="builder-panel" class="builder-panel" style="display: none;">
         <div class="builder-panel-header">
-          <h2>🛠 Конструктор приложений</h2>
-          <button id="builder-close-btn" class="modal-close" title="Закрыть">&times;</button>
+          <h2>🛠 App Builder</h2>
+          <button id="builder-close-btn" class="modal-close" title="Close">&times;</button>
         </div>
         <div class="builder-container">
           <div class="builder-block">
             <div class="builder-block-number">1</div>
-            <h3 class="builder-block-title">💡 Опишите идею</h3>
-            <p class="builder-block-desc">Опишите, какое приложение вы хотите создать. Чем подробнее — тем лучше результат.</p>
-            <textarea id="builder-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage..."></textarea>
-            <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать промпт</button>
+            <h3 class="builder-block-title">💡 Describe your idea</h3>
+            <p class="builder-block-desc">Describe the app you want to create. The more details — the better the result.</p>
+            <textarea id="builder-idea-input" class="idea-input" placeholder="For example: Expense calculator with charts, dark theme, and history saved in localStorage..."></textarea>
+            <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Copy prompt</button>
             <div id="builder-status-1" class="modal-status"></div>
           </div>
 
@@ -96,21 +98,21 @@
 
           <div class="builder-block">
             <div class="builder-block-number">2</div>
-            <h3 class="builder-block-title">🤖 Отправьте в нейросеть</h3>
-            <p class="builder-block-desc">Вставьте скопированный промпт в любую нейросеть и дождитесь ответа.</p>
+            <h3 class="builder-block-title">🤖 Send to AI</h3>
+            <p class="builder-block-desc">Paste the copied prompt into any AI and wait for the response.</p>
             <select id="builder-ai-select" class="builder-select"></select>
-            <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Открыть нейросеть</button>
-            <p class="builder-hint">После получения ответа скопируйте весь HTML-код.</p>
+            <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Open AI</button>
+            <p class="builder-hint">After receiving the response, copy the entire HTML code.</p>
           </div>
 
           <div class="builder-arrow">→</div>
 
           <div class="builder-block">
             <div class="builder-block-number">3</div>
-            <h3 class="builder-block-title">🚀 Создайте приложение</h3>
-            <p class="builder-block-desc">Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".</p>
-            <textarea id="builder-code-input" class="code-input" placeholder="Вставьте сюда весь HTML-код от нейросети..."></textarea>
-            <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Создать приложение</button>
+            <h3 class="builder-block-title">🚀 Create app</h3>
+            <p class="builder-block-desc">Paste the HTML code returned by AI and click "Create".</p>
+            <textarea id="builder-code-input" class="code-input" placeholder="Paste the entire HTML code from AI here..."></textarea>
+            <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Create app</button>
             <div id="builder-status-3" class="modal-status"></div>
           </div>
         </div>
@@ -118,17 +120,17 @@
 
       <div id="installed-apps" class="app-grid"></div>
       <div id="empty-state" class="empty-state" style="display: none;">
-        <p>У вас пока нет установленных приложений</p>
-        <button id="go-to-store-btn" class="btn btn-primary">Перейти на склад</button>
+        <p>You don't have any installed apps yet</p>
+        <button id="go-to-store-btn" class="btn btn-primary">Go to store</button>
       </div>
     </div>
 
     <!-- Экран 2: Склад -->
     <div id="store-screen" class="screen">
       <header>
-        <button id="back-to-home-btn" class="btn">← Назад</button>
-        <h1>📦 Склад</h1>
-        <button id="add-custom-btn-store" class="btn">➕ Добавить</button>
+        <button id="back-to-home-btn" class="btn">← Back</button>
+        <h1>📦 Store</h1>
+        <button id="add-custom-btn-store" class="btn">➕ Add</button>
       </header>
       <div id="all-apps" class="app-grid"></div>
     </div>
@@ -136,8 +138,8 @@
     <!-- Экран 3: Запущенное приложение -->
     <div id="app-screen" class="screen">
       <header class="app-header">
-        <button id="close-app-btn" class="btn btn-back" title="Вернуться на главный экран">← Назад</button>
-        <h1 id="current-app-name">Приложение</h1>
+        <button id="close-app-btn" class="btn btn-back" title="Back to home">← Back</button>
+        <h1 id="current-app-name">Application</h1>
         <div class="header-spacer"></div>
       </header>
       <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
@@ -146,8 +148,8 @@
     <!-- Экран 4: Содержимое буфера обмена -->
     <div id="clipboard-screen" class="screen">
       <header class="app-header">
-        <button id="close-clipboard-screen-btn" class="btn btn-back" title="Закрыть">← Назад</button>
-        <h1>📋 Буфер обмена</h1>
+        <button id="close-clipboard-screen-btn" class="btn btn-back" title="Close">← Back</button>
+        <h1>📋 Clipboard</h1>
         <div class="header-spacer"></div>
       </header>
       <div id="clipboard-content-area" class="clipboard-content-area"></div>
@@ -158,35 +160,35 @@
   <div id="create-modal" class="modal">
     <div class="modal-content modal-create">
       <div class="modal-header">
-        <h2>✨ Создать приложение с AI</h2>
+        <h2>✨ Create app with AI</h2>
         <button class="modal-close" id="close-create-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <h3>1. Опишите свою идею:</h3>
-          <textarea id="user-idea-input" class="idea-input" placeholder="Например: Калькулятор расходов с графиками и сохранением истории в тёмной теме..."></textarea>
+          <h3>1. Describe your idea:</h3>
+          <textarea id="user-idea-input" class="idea-input" placeholder="For example: Expense calculator with charts and history in dark theme..."></textarea>
         </div>
         <div class="step-box">
-          <h3>2. Готовый промпт (обновляется автоматически):</h3>
+          <h3>2. Ready prompt (updates automatically):</h3>
           <div class="prompt-code-box">
             <textarea id="prompt-text" readonly></textarea>
           </div>
-          <button id="copy-prompt-btn" class="btn btn-small">📋 1. Скопировать промпт</button>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 1. Copy prompt</button>
         </div>
         <div class="step-box">
-          <h3>3. Вставьте промпт в нейросеть:</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте ссылку, вставьте промпт, дождитесь ответа и скопируйте HTML-код.</p>
+          <h3>3. Paste prompt into AI:</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Open the link, paste the prompt, wait for response and copy HTML code.</p>
           <div id="create-ai-links" class="ai-links"></div>
         </div>
         <div class="step-box">
-          <h3>4. Вставьте полученный HTML-код:</h3>
-          <textarea id="generated-code-input" class="code-input" placeholder="Вставьте сюда весь код index.html..."></textarea>
+          <h3>4. Paste the received HTML code:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Paste the entire index.html code here..."></textarea>
           <div id="create-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="cancel-create-btn" class="btn btn-secondary">Отмена</button>
-        <button id="confirm-create-btn" class="btn btn-primary">🚀 Создать приложение</button>
+        <button id="cancel-create-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-create-btn" class="btn btn-primary">🚀 Create app</button>
       </div>
     </div>
   </div>
@@ -195,45 +197,45 @@
   <div id="add-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>➕ Добавить модуль</h2>
+        <h2>➕ Add module</h2>
         <button class="modal-close" id="close-modal-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="tab" data-tab="url">
           <p class="modal-description">
-            Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>
-            Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.
+            Paste a direct link to the HTML file or folder.<br>
+            Supported: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.
           </p>
           <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
         </div>
         <div class="tab" data-tab="local" style="display: none;">
-          <p class="modal-description">Выберите <b>один файл .html</b> с вашего компьютера.</p>
+          <p class="modal-description">Select <b>one .html file</b> from your computer.</p>
           <input type="file" id="local-file-input" accept=".html" style="display: none;">
-          <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Выбрать файл .html</button>
+          <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Select .html file</button>
           <div id="selected-file-name" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
         </div>
         <div class="tab" data-tab="folder" style="display: none;">
-          <p class="modal-description">Выберите <b>папку</b> с модулем (должен быть index.html).</p>
+          <p class="modal-description">Select a <b>folder</b> with the module (must have index.html).</p>
           <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
-          <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📁 Выбрать папку</button>
+          <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📁 Select folder</button>
           <div id="selected-folder-info" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
-          <div class="folder-warning">⚠️ Работает в Chrome, Edge, Firefox. Не работает в Safari.</div>
+          <div class="folder-warning">⚠️ Works in Chrome, Edge, Firefox. Doesn't work in Safari.</div>
         </div>
         <div class="tab" data-tab="code" style="display: none;">
-          <p class="modal-description">Вставьте полный HTML-код приложения. Код должен содержать <code>&lt;script id="manifest"&gt;</code> в <code>&lt;head&gt;</code>.</p>
-          <textarea id="code-input-textarea" class="code-input" placeholder="Вставьте сюда HTML-код приложения..."></textarea>
+          <p class="modal-description">Paste the full HTML code of the app. Code must contain <code>&lt;script id="manifest"&gt;</code> in <code>&lt;head&gt;</code>.</p>
+          <textarea id="code-input-textarea" class="code-input" placeholder="Paste the app HTML code here..."></textarea>
         </div>
         <div class="tab-switcher">
-          <button class="tab-btn active" data-target="url">🔗 Ссылка</button>
-          <button class="tab-btn" data-target="local">📄 Файл</button>
-          <button class="tab-btn" data-target="folder">📁 Папка</button>
-          <button class="tab-btn" data-target="code">📋 Код</button>
+          <button class="tab-btn active" data-target="url">🔗 Link</button>
+          <button class="tab-btn" data-target="local">📄 File</button>
+          <button class="tab-btn" data-target="folder">📁 Folder</button>
+          <button class="tab-btn" data-target="code">📋 Code</button>
         </div>
         <div id="modal-status" class="modal-status"></div>
       </div>
       <div class="modal-footer">
-        <button id="cancel-modal-btn" class="btn btn-secondary">Отмена</button>
-        <button id="confirm-add-btn" class="btn btn-primary">Добавить</button>
+        <button id="cancel-modal-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-add-btn" class="btn btn-primary">Add</button>
       </div>
     </div>
   </div>
@@ -242,31 +244,31 @@
   <div id="edit-modal" class="modal">
     <div class="modal-content modal-edit">
       <div class="modal-header">
-        <h2 id="edit-modal-title">✏️ Редактировать</h2>
+        <h2 id="edit-modal-title">✏️ Edit</h2>
         <button class="modal-close" id="close-edit-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="edit-preview">
           <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
           <div class="edit-preview-info">
-            <div class="edit-preview-name" id="edit-preview-name">Название</div>
-            <div class="edit-preview-desc" id="edit-preview-desc">Описание</div>
+            <div class="edit-preview-name" id="edit-preview-name">Name</div>
+            <div class="edit-preview-desc" id="edit-preview-desc">Description</div>
           </div>
         </div>
         <div class="step-box">
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button id="toggle-code-btn" class="btn btn-secondary" style="flex: 1;">👁 Показать код</button>
-            <button id="copy-code-btn" class="btn btn-primary" style="flex: 1;">📋 Копировать код</button>
+            <button id="toggle-code-btn" class="btn btn-secondary" style="flex: 1;">👁 Show code</button>
+            <button id="copy-code-btn" class="btn btn-primary" style="flex: 1;">📋 Copy code</button>
           </div>
           <textarea id="edit-source-code" class="code-input" style="display: none;" readonly></textarea>
         </div>
         <div class="step-box">
-          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Копировать промпт + код для AI</button>
+          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Copy prompt + code for AI</button>
           <div id="edit-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="cancel-edit-btn" class="btn btn-secondary" style="width: 100%;">Закрыть</button>
+        <button id="cancel-edit-btn" class="btn btn-secondary" style="width: 100%;">Close</button>
       </div>
     </div>
   </div>
@@ -275,26 +277,26 @@
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
       <div class="modal-header">
-        <h2>📤 Поделиться приложением</h2>
+        <h2>📤 Share app</h2>
         <button class="modal-close" id="close-share-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="share-preview">
           <div class="share-preview-icon" id="share-preview-icon">📱</div>
           <div class="share-preview-info">
-            <div class="share-preview-name" id="share-preview-name">Название</div>
-            <div class="share-preview-desc" id="share-preview-desc">Описание</div>
+            <div class="share-preview-name" id="share-preview-name">Name</div>
+            <div class="share-preview-desc" id="share-preview-desc">Description</div>
           </div>
         </div>
         <div class="step-box">
-          <h3>📋 Шаг 1: Скопировать код</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Скопируйте весь HTML-код приложения в буфер обмена.</p>
-          <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Скопировать код</button>
+          <h3>📋 Step 1: Copy code</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Copy the entire HTML code of the app to clipboard.</p>
+          <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%;">📋 Copy code</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
         <div class="step-box">
-          <h3>🌐 Шаг 2: Разместить и получить ссылку</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Откройте сервис, вставьте код, сохраните и скопируйте ссылку.</p>
+          <h3>🌐 Step 2: Host and get link</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Open a service, paste the code, save it, and copy the link.</p>
           <div class="ai-links">
             <a href="https://gist.github.com" target="_blank" rel="noopener noreferrer" class="ai-link">GitHub Gist</a>
             <a href="https://privatebin.net/" target="_blank" rel="noopener noreferrer" class="ai-link">PrivateBin</a>
@@ -302,20 +304,20 @@
           </div>
         </div>
         <div class="step-box">
-          <h3>🔗 Шаг 3: Привяжите ссылку к приложению</h3>
+          <h3>🔗 Step 3: Bind link to app</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">
-            Вставьте ссылку на размещённое приложение. Она сохранится и будет доступна для экспорта.
+            Paste the link to the hosted app. It will be saved and available for export.
           </p>
           <input type="url" id="share-url-input" class="url-input" placeholder="https://...">
           <div id="share-url-status" class="modal-status"></div>
           <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-            <button id="bind-url-btn" class="btn btn-primary">🔗 Привязать ссылку</button>
-            <button id="unbind-url-btn" class="btn btn-secondary" style="display: none;">✂️ Отвязать</button>
+            <button id="bind-url-btn" class="btn btn-primary">🔗 Bind link</button>
+            <button id="unbind-url-btn" class="btn btn-secondary" style="display: none;">✂️ Unbind</button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="close-share-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
   </div>
@@ -324,35 +326,35 @@
   <div id="themes-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🎨 Управление темами</h2>
+        <h2>🎨 Manage themes</h2>
         <button class="modal-close" id="close-themes-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <h3>Системные темы</h3>
+          <h3>System themes</h3>
           <div class="themes-list">
             <div class="theme-item">
-              <span>☀️ Светлая</span>
-              <button class="btn btn-small" onclick="applyTheme('light')">Применить</button>
+              <span>☀️ Light</span>
+              <button class="btn btn-small" onclick="applyTheme('light')">Apply</button>
             </div>
             <div class="theme-item">
-              <span>🌆 Киберпанк</span>
-              <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Применить</button>
+              <span>🌆 Cyberpunk</span>
+              <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Apply</button>
             </div>
             <div class="theme-item">
-              <span>💬 Дискорд</span>
-              <button class="btn btn-small" onclick="applyTheme('discord')">Применить</button>
+              <span>💬 Discord</span>
+              <button class="btn btn-small" onclick="applyTheme('discord')">Apply</button>
             </div>
           </div>
         </div>
         <div class="step-box">
-          <h3>Пользовательские темы</h3>
+          <h3>Custom themes</h3>
           <div id="custom-themes-list" class="custom-themes-list"></div>
-          <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Добавить свою тему</button>
+          <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Add custom theme</button>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="close-themes-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="close-themes-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
   </div>
@@ -361,29 +363,29 @@
   <div id="add-theme-modal" class="modal">
     <div class="modal-content modal-create">
       <div class="modal-header">
-        <h2>➕ Добавить свою тему</h2>
+        <h2>➕ Add custom theme</h2>
         <button class="modal-close" id="close-add-theme-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <h3>1. Скопируйте шаблон темы</h3>
-          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Отправьте его ИИ и попросите изменить цвета.</p>
-          <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Скопировать шаблон</button>
+          <h3>1. Copy theme template</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Send it to AI and ask to change colors.</p>
+          <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Copy template</button>
         </div>
         <div class="step-box">
-          <h3>2. Отправьте шаблон в нейросеть</h3>
+          <h3>2. Send template to AI</h3>
           <div id="theme-ai-links" class="ai-links"></div>
         </div>
         <div class="step-box">
-          <h3>3. Вставьте результат</h3>
-          <input type="text" id="theme-name-input" class="url-input" placeholder="Название темы (например: Зелёная неон)" style="margin-bottom: 10px;">
-          <textarea id="theme-css-input" class="code-input" placeholder="Вставьте сюда CSS-код темы от ИИ..." style="height: 250px;"></textarea>
+          <h3>3. Paste the result</h3>
+          <input type="text" id="theme-name-input" class="url-input" placeholder="Theme name (e.g., Green Neon)" style="margin-bottom: 10px;">
+          <textarea id="theme-css-input" class="code-input" placeholder="Paste the CSS code from AI here..." style="height: 250px;"></textarea>
           <div id="add-theme-status" class="modal-status"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="cancel-add-theme-btn" class="btn btn-secondary">Отмена</button>
-        <button id="submit-theme-btn" class="btn btn-primary">Добавить тему</button>
+        <button id="cancel-add-theme-btn" class="btn btn-secondary">Cancel</button>
+        <button id="submit-theme-btn" class="btn btn-primary">Add theme</button>
       </div>
     </div>
   </div>
@@ -392,22 +394,21 @@
   <div id="prompts-modal" class="modal">
     <div class="modal-content" style="max-width: 800px;">
       <div class="modal-header">
-        <h2>⚙️ Редактор промпта</h2>
+        <h2>⚙️ Prompt editor</h2>
         <button class="modal-close" id="close-prompts-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
-            Этот промпт используется при создании и редактировании приложений.
-            Измените его, чтобы настроить поведение нейросети.
+            This prompt is used when creating and editing apps. Change it to customize AI behavior.
           </p>
           <textarea id="prompt-editor-textarea" class="code-input" style="height: 400px;"></textarea>
         </div>
         <div id="prompt-editor-status" class="modal-status"></div>
       </div>
       <div class="modal-footer">
-        <button id="reset-prompt-btn" class="btn btn-secondary">🔄 Сбросить к стандартному</button>
-        <button id="save-prompt-btn" class="btn btn-primary">💾 Сохранить изменения</button>
+        <button id="reset-prompt-btn" class="btn btn-secondary">🔄 Reset to default</button>
+        <button id="save-prompt-btn" class="btn btn-primary">💾 Save changes</button>
       </div>
     </div>
   </div>
@@ -416,40 +417,40 @@
   <div id="ai-manager-modal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
       <div class="modal-header">
-        <h2>🤖 Список нейросетей</h2>
+        <h2>🤖 AI list</h2>
         <button class="modal-close" id="close-ai-manager-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="step-box">
-          <h3>Ваши нейросети</h3>
+          <h3>Your AI</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
-            Порядок в списке = порядок в меню.
+            Order in list = order in menu.
           </p>
           <div id="ai-manager-list" class="ai-manager-list"></div>
         </div>
 
         <div class="step-box ai-editor-box" id="ai-editor-box" style="display: none;">
-          <h3 id="ai-editor-title">➕ Новая нейросеть</h3>
+          <h3 id="ai-editor-title">➕ New AI</h3>
           <input type="hidden" id="ai-edit-id">
 
-          <label for="ai-edit-name">Название</label>
-          <input type="text" id="ai-edit-name" class="url-input" placeholder="Например: Qwen Chat">
+          <label for="ai-edit-name">Name</label>
+          <input type="text" id="ai-edit-name" class="url-input" placeholder="For example: Qwen Chat">
 
-          <label for="ai-edit-url">Ссылка (URL)</label>
+          <label for="ai-edit-url">URL</label>
           <input type="url" id="ai-edit-url" class="url-input" placeholder="https://chat.qwenlm.ai">
 
           <div id="ai-editor-status" class="modal-status"></div>
 
           <div class="ai-editor-buttons">
-            <button id="save-ai-btn" class="btn btn-primary">💾 Сохранить</button>
-            <button id="cancel-ai-edit-btn" class="btn btn-secondary">Отмена</button>
+            <button id="save-ai-btn" class="btn btn-primary">💾 Save</button>
+            <button id="cancel-ai-edit-btn" class="btn btn-secondary">Cancel</button>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="add-ai-btn" class="btn btn-primary">➕ Добавить нейросеть</button>
-        <button id="reset-ai-list-btn" class="btn btn-secondary">🔄 Сбросить список</button>
-        <button id="close-ai-manager-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="add-ai-btn" class="btn btn-primary">➕ Add AI</button>
+        <button id="reset-ai-list-btn" class="btn btn-secondary">🔄 Reset list</button>
+        <button id="close-ai-manager-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
   </div>
@@ -458,22 +459,22 @@
   <div id="app-info-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="app-info-title">Приложение</h2>
+        <h2 id="app-info-title">Application</h2>
         <button class="modal-close" id="close-app-info-btn">&times;</button>
       </div>
       <div class="modal-body">
         <div class="app-info-preview">
           <div class="app-info-icon" id="app-info-icon">📱</div>
           <div class="app-info-details">
-            <div class="app-info-name" id="app-info-name">Название</div>
-            <div class="app-info-desc" id="app-info-desc">Описание</div>
+            <div class="app-info-name" id="app-info-name">Name</div>
+            <div class="app-info-desc" id="app-info-desc">Description</div>
           </div>
         </div>
         <div id="app-info-link-block" class="app-info-link-block" style="display: none;"></div>
         <div id="app-info-actions" class="app-info-actions"></div>
       </div>
       <div class="modal-footer">
-        <button id="close-app-info-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="close-app-info-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
   </div>
@@ -482,30 +483,31 @@
   <div id="export-urls-modal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
       <div class="modal-header">
-        <h2>📤 Экспорт ссылок</h2>
+        <h2>📤 Export URLs</h2>
         <button class="modal-close" id="close-export-urls-btn">&times;</button>
       </div>
       <div class="modal-body">
         <p style="font-size: 13px; color: var(--description-color); margin-bottom: 15px;">
-          Список приложений из «Мои приложения» с привязанными ссылками.
+          List of apps from "My Apps" with bound links.
         </p>
         <div id="export-urls-empty" class="export-urls-empty" style="display: none;">
-          <p>📭 Нет приложений с привязанными ссылками</p>
+          <p>📭 No apps with bound links</p>
           <p style="font-size: 14px; color: var(--description-color); margin-top: 10px;">
-            Привяжите ссылки через кнопку «📤» на карточках приложений.
+            Bind links via the "📤" button on app cards.
           </p>
         </div>
         <textarea id="export-urls-text" class="export-urls-text" readonly></textarea>
         <div id="export-urls-status" class="modal-status"></div>
       </div>
       <div class="modal-footer">
-        <button id="copy-export-urls-btn" class="btn btn-primary">📋 Скопировать список</button>
-        <button id="close-export-urls-footer-btn" class="btn btn-secondary">Закрыть</button>
+        <button id="copy-export-urls-btn" class="btn btn-primary">📋 Copy list</button>
+        <button id="close-export-urls-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
   </div>
 
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
+  <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
   <script src="scripts/prompt-editor.js"></script>
   <script src="scripts/db.js"></script>

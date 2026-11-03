@@ -12,6 +12,7 @@ async function init() {
   renderInstalledApps();
   setupEventListeners();
   updatePromptPreview();
+  applyLanguage();
 }
 
 // ==========================================
@@ -28,7 +29,7 @@ function toggleInstall(moduleId) {
 }
 
 async function removeCustomModule(moduleId) {
-  if (!confirm('Удалить этот модуль?')) return;
+  if (!confirm(t('deleteModule'))) return;
   const module = allModules.find(m => m.id === moduleId);
   if (module && module.isFolder) {
     try {
@@ -129,17 +130,16 @@ function openAppInfoModal(module, isInstalled) {
 
   if (iconEl) iconEl.textContent = module.icon;
   if (nameEl) nameEl.textContent = module.name;
-  if (descEl) descEl.textContent = module.description || 'Нет описания';
+  if (descEl) descEl.textContent = module.description || t('noDescription');
   if (titleEl) titleEl.textContent = module.name;
 
-  // Блок привязанной ссылки
   const linkBlock = document.getElementById('app-info-link-block');
   if (linkBlock) {
     const linkedUrl = getAppUrl(module.id);
     if (linkedUrl) {
       linkBlock.style.display = 'block';
       linkBlock.innerHTML = `
-        <div class="app-info-link-label">🔗 Привязанная ссылка:</div>
+        <div class="app-info-link-label">${t('linkedUrl')}</div>
         <a href="${escapeHtml(linkedUrl)}" target="_blank" rel="noopener noreferrer" class="app-info-link-url">${escapeHtml(linkedUrl)}</a>
       `;
     } else {
@@ -148,7 +148,6 @@ function openAppInfoModal(module, isInstalled) {
     }
   }
 
-  // Кнопки действий убраны — всё в меню ⚙️ на карточке
   const actions = document.getElementById('app-info-actions');
   if (actions) actions.innerHTML = '';
 
@@ -176,7 +175,7 @@ function convertGistToRaw(url) {
 
 async function loadHTMLFromURL(url) {
   const finalUrl = convertGistToRaw(url);
-  console.log('📥 Загружаю по ссылке:', finalUrl);
+  console.log('📥 Loading from link:', finalUrl);
 
   const response = await fetch(finalUrl);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -184,7 +183,7 @@ async function loadHTMLFromURL(url) {
   const html = await response.text();
 
   if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<script id="manifest"')) {
-    throw new Error('По ссылке нет HTML-кода');
+    throw new Error(t('noHtmlAtUrl'));
   }
 
   return html;
@@ -198,7 +197,7 @@ async function createFromClipboard() {
   const createBtn = document.getElementById('sidebar-create-btn');
 
   if (!navigator.clipboard || !navigator.clipboard.readText) {
-    showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
+    showToast(t('browserNotSupported'), 'error');
     return;
   }
 
@@ -208,12 +207,12 @@ async function createFromClipboard() {
       createBtn.disabled = true;
     }
 
-    showToast('📋 Чтение буфера обмена...', 'info', 2000);
+    showToast(t('reading'), 'info', 2000);
 
     const clipboardContent = await navigator.clipboard.readText();
 
     if (!clipboardContent || !clipboardContent.trim()) {
-      showToast('❌ Буфер обмена пуст', 'error');
+      showToast(t('emptyClipboard'), 'error');
       return;
     }
 
@@ -221,20 +220,20 @@ async function createFromClipboard() {
     let trimmedCode = trimmedContent;
 
     if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
-      showToast('🔗 Загружаю по ссылке...', 'info', 2000);
+      showToast(t('loadingByUrl'), 'info', 2000);
 
       try {
         trimmedCode = await loadHTMLFromURL(trimmedContent);
-        showToast('✅ Код загружен по ссылке', 'success', 2000);
+        showToast(t('codeLoaded'), 'success', 2000);
       } catch (loadError) {
-        console.error('Ошибка загрузки по ссылке:', loadError);
-        showToast(`❌ Не удалось загрузить: ${loadError.message}`, 'error');
+        console.error('Link load error:', loadError);
+        showToast(t('loadFailed', { message: loadError.message }), 'error');
         return;
       }
     }
 
     if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
-      showToast('❌ В буфере нет HTML-кода', 'error');
+      showToast(t('noHtml'), 'error');
       return;
     }
 
@@ -243,19 +242,19 @@ async function createFromClipboard() {
     const manifestScript = doc.getElementById('manifest');
 
     if (!manifestScript) {
-      showToast('❌ Не найден manifest в коде', 'error');
+      showToast(t('noManifest'), 'error');
       return;
     }
 
     const manifest = JSON.parse(manifestScript.textContent);
 
     if (!manifest.id || !manifest.name || !manifest.icon) {
-      showToast('❌ В manifest не хватает полей', 'error');
+      showToast(t('missingFields'), 'error');
       return;
     }
 
     if (allModules.some(m => m.id === manifest.id)) {
-      showToast('❌ Приложение с таким ID уже есть', 'error');
+      showToast(t('appExists'), 'error');
       return;
     }
 
@@ -263,7 +262,7 @@ async function createFromClipboard() {
       id: manifest.id,
       name: manifest.name,
       icon: manifest.icon,
-      description: manifest.description || 'Создано из буфера',
+      description: manifest.description || 'Created from clipboard',
       content: trimmedCode,
       isCustom: true,
       isLocal: true,
@@ -287,16 +286,16 @@ async function createFromClipboard() {
       isFolder: false
     });
 
-    showToast(`✅ "${manifest.name}" создано!`, 'success', 3000);
+    showToast(t('appCreated', { name: manifest.name }), 'success', 3000);
     renderInstalledApps();
     renderAllApps();
 
   } catch (error) {
-    console.error('Ошибка создания из буфера:', error);
-    showToast(`❌ Ошибка: ${error.message}`, 'error');
+    console.error('Clipboard creation error:', error);
+    showToast(`❌ ${error.message}`, 'error');
   } finally {
     if (createBtn) {
-      createBtn.innerHTML = '🚀 Создать';
+      createBtn.innerHTML = `🚀 ${t('create')}`;
       createBtn.disabled = false;
     }
   }
@@ -310,7 +309,7 @@ async function handleUrlFromClipboard() {
   const urlBtn = document.getElementById('sidebar-url-btn');
 
   if (!navigator.clipboard || !navigator.clipboard.readText) {
-    showToast('❌ Ваш браузер не поддерживает чтение буфера обмена', 'error');
+    showToast(t('browserNotSupported'), 'error');
     return;
   }
 
@@ -320,12 +319,12 @@ async function handleUrlFromClipboard() {
       urlBtn.disabled = true;
     }
 
-    showToast('📋 Чтение буфера обмена...', 'info', 1500);
+    showToast(t('reading'), 'info', 1500);
 
     const clipboardContent = await navigator.clipboard.readText();
 
     if (!clipboardContent || !clipboardContent.trim()) {
-      showToast('❌ Буфер обмена пуст', 'error');
+      showToast(t('emptyClipboard'), 'error');
       showClipboardScreen('');
       return;
     }
@@ -334,7 +333,7 @@ async function handleUrlFromClipboard() {
 
     const singleUrlPattern = /^https?:\/\/[^\s]+$/i;
     if (singleUrlPattern.test(trimmedContent)) {
-      showToast('🔗 Открываю URL...', 'success', 1500);
+      showToast(t('opening'), 'success', 1500);
       window.open(trimmedContent, '_blank', 'noopener,noreferrer');
       return;
     }
@@ -342,11 +341,11 @@ async function handleUrlFromClipboard() {
     showClipboardScreen(trimmedContent);
 
   } catch (error) {
-    console.error('Ошибка чтения буфера:', error);
-    showToast(`❌ Ошибка: ${error.message}`, 'error');
+    console.error('Clipboard read error:', error);
+    showToast(`❌ ${error.message}`, 'error');
   } finally {
     if (urlBtn) {
-      urlBtn.innerHTML = '🔗 URL';
+      urlBtn.innerHTML = `🔗 ${t('url')}`;
       urlBtn.disabled = false;
     }
   }
@@ -361,9 +360,9 @@ function showClipboardScreen(content) {
   if (!content || !content.trim()) {
     contentArea.innerHTML = `
       <div class="clipboard-empty">
-        <p>📋 Буфер обмена пуст</p>
+        <p>${t('clipboardEmpty')}</p>
         <p style="font-size: 14px; color: var(--description-color); margin-top: 10px;">
-          Скопируйте текст или ссылку и нажмите кнопку снова
+          ${t('clipboardEmptyDesc')}
         </p>
       </div>
     `;
@@ -478,22 +477,21 @@ function copyBuilderPrompt() {
   if (!ideaInput) return;
   const idea = ideaInput.value.trim();
   if (!idea) {
-    showStatus(statusEl, '❌ Сначала опишите идею приложения', 'error');
+    showStatus(statusEl, t('enterIdea'), 'error');
     return;
   }
 
-  // Единый промпт + идея пользователя
   const fullPrompt = `${getPrompt()}\n\n${idea}`;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
       if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт', 2000);
+        copyBtn.textContent = `✅ ${t('copied')}`;
+        setTimeout(() => copyBtn.textContent = `📋 ${t('copyPrompt')}`, 2000);
       }
-      showStatus(statusEl, '✅ Промпт скопирован! Теперь вставьте его в нейросеть.', 'success');
+      showStatus(statusEl, t('promptCopied'), 'success');
     }).catch(() => {
-      showStatus(statusEl, '❌ Не удалось скопировать', 'error');
+      showStatus(statusEl, t('copyFailed'), 'error');
     });
   } else {
     const textarea = document.createElement('textarea');
@@ -505,12 +503,12 @@ function copyBuilderPrompt() {
     try {
       document.execCommand('copy');
       if (copyBtn) {
-        copyBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => copyBtn.textContent = '📋 Скопировать промпт', 2000);
+        copyBtn.textContent = `✅ ${t('copied')}`;
+        setTimeout(() => copyBtn.textContent = `📋 ${t('copyPrompt')}`, 2000);
       }
-      showStatus(statusEl, '✅ Промпт скопирован! Теперь вставьте его в нейросеть.', 'success');
+      showStatus(statusEl, t('promptCopied'), 'success');
     } catch (e) {
-      showStatus(statusEl, '❌ Не удалось скопировать', 'error');
+      showStatus(statusEl, t('copyFailed'), 'error');
     }
     document.body.removeChild(textarea);
   }
@@ -531,35 +529,35 @@ function createFromBuilder() {
   if (!codeInput || !statusEl) return;
   const code = codeInput.value.trim();
   if (!code) {
-    showStatus(statusEl, '❌ Вставьте HTML-код от нейросети', 'error');
+    showStatus(statusEl, t('enterCode'), 'error');
     return;
   }
   if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
-    showStatus(statusEl, '❌ Это не похоже на HTML-код', 'error');
+    showStatus(statusEl, t('notHtml'), 'error');
     return;
   }
 
-  showStatus(statusEl, '⏳ Анализ кода...', 'loading');
+  showStatus(statusEl, t('analyzing'), 'loading');
 
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(code, 'text/html');
     const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) throw new Error('Не найден тег <script id="manifest"> в <head>');
+    if (!manifestScript) throw new Error('No <script id="manifest"> in <head>');
 
     const manifest = JSON.parse(manifestScript.textContent);
     if (!manifest.id || !manifest.name || !manifest.icon) {
-      throw new Error('В manifest не хватает полей id, name или icon');
+      throw new Error(t('missingFields'));
     }
     if (allModules.some(m => m.id === manifest.id)) {
-      throw new Error('Приложение с таким ID уже существует');
+      throw new Error(t('appExists'));
     }
 
     const newModule = {
       id: manifest.id,
       name: manifest.name,
       icon: manifest.icon,
-      description: manifest.description || 'Создано через конструктор',
+      description: manifest.description || 'Created via builder',
       content: code,
       isCustom: true,
       isLocal: true,
@@ -582,18 +580,18 @@ function createFromBuilder() {
       isFolder: false
     });
 
-    showStatus(statusEl, '✅ Приложение успешно создано!', 'success');
+    showStatus(statusEl, '✅', 'success');
     if (createBtn) {
-      createBtn.textContent = '✅ Создано!';
+      createBtn.textContent = `✅ ${t('created')}`;
       setTimeout(() => {
-        createBtn.textContent = '🚀 Создать приложение';
+        createBtn.textContent = `🚀 ${t('createApp')}`;
         closeBuilder();
         renderInstalledApps();
         renderAllApps();
       }, 1000);
     }
   } catch (error) {
-    showStatus(statusEl, `❌ Ошибка: ${error.message}`, 'error');
+    showStatus(statusEl, `❌ ${error.message}`, 'error');
   }
 }
 
@@ -609,7 +607,15 @@ function showStatus(element, message, type = '') {
 
 function setupEventListeners() {
   // ==========================================
-  // БУРГЕР-МЕНЮ (мобильные)
+  // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
+  // ==========================================
+  const languageToggleBtn = document.getElementById('language-toggle-btn');
+  if (languageToggleBtn) {
+    languageToggleBtn.addEventListener('click', toggleLanguage);
+  }
+
+  // ==========================================
+  // БУРГЕР-МЕНЮ
   // ==========================================
   const burgerBtn = document.getElementById('burger-menu-btn');
   const headerMenu = document.getElementById('header-menu');
@@ -683,9 +689,9 @@ function setupEventListeners() {
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(fullPrompt).then(() => {
-        showToast('✅ Промпт скопирован', 'success');
+        showToast(t('promptCopied'), 'success');
       }).catch(() => {
-        showToast('❌ Не удалось скопировать промпт', 'error');
+        showToast(t('copyFailed'), 'error');
       });
     } else {
       const textarea = document.createElement('textarea');
@@ -696,9 +702,9 @@ function setupEventListeners() {
       textarea.select();
       try {
         document.execCommand('copy');
-        showToast('✅ Промпт скопирован', 'success');
+        showToast(t('promptCopied'), 'success');
       } catch (e) {
-        showToast('❌ Не удалось скопировать промпт', 'error');
+        showToast(t('copyFailed'), 'error');
       }
       document.body.removeChild(textarea);
     }
@@ -817,9 +823,9 @@ function setupEventListeners() {
             btn.innerHTML = '✅';
             setTimeout(() => { btn.innerHTML = originalText; }, 2000);
           }
-          showToast('✅ Промпт скопирован', 'success');
+          showToast(t('promptCopied'), 'success');
         }).catch(() => {
-          showToast('❌ Не удалось скопировать промпт', 'error');
+          showToast(t('copyFailed'), 'error');
         });
       } else {
         const textarea = document.createElement('textarea');
@@ -836,9 +842,9 @@ function setupEventListeners() {
             btn.innerHTML = '✅';
             setTimeout(() => { btn.innerHTML = originalText; }, 2000);
           }
-          showToast('✅ Промпт скопирован', 'success');
+          showToast(t('promptCopied'), 'success');
         } catch (e) {
-          showToast('❌ Не удалось скопировать промпт', 'error');
+          showToast(t('copyFailed'), 'error');
         }
         document.body.removeChild(textarea);
       }
@@ -999,7 +1005,7 @@ function setupEventListeners() {
 }
 
 // ==========================================
-// УПРАВЛЕНИЕ НЕЙРОСЕТЯМИ (ВСТРОЕННЫЕ ФУНКЦИИ)
+// УПРАВЛЕНИЕ НЕЙРОСЕТЯМИ
 // ==========================================
 
 function showAIEditor(network) {
@@ -1014,12 +1020,12 @@ function showAIEditor(network) {
   editorBox.style.display = 'block';
 
   if (network) {
-    title.textContent = '✏️ Редактировать нейросеть';
+    title.textContent = t('editAI');
     idInput.value = network.id;
     nameInput.value = network.name;
     urlInput.value = network.url;
   } else {
-    title.textContent = '➕ Новая нейросеть';
+    title.textContent = t('newAI');
     idInput.value = '';
     nameInput.value = '';
     urlInput.value = '';
@@ -1039,12 +1045,12 @@ function saveAINetworkFromForm() {
   const url = urlInput.value.trim();
 
   if (!id || !name || !url) {
-    if (status) { status.textContent = '❌ Заполните все поля'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('fillAllFields'); status.className = 'modal-status error'; }
     return;
   }
 
   if (!/^https?:\/\//i.test(url)) {
-    if (status) { status.textContent = '❌ URL должен начинаться с http:// или https://'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('urlMustStart'); status.className = 'modal-status error'; }
     return;
   }
 
@@ -1061,7 +1067,7 @@ function saveAINetworkFromForm() {
 
   saveAINetworks(networks);
   
-  if (status) { status.textContent = '✅ Нейросеть сохранена!'; status.className = 'modal-status success'; }
+  if (status) { status.textContent = t('aiSaved'); status.className = 'modal-status success'; }
   
   setTimeout(() => {
     hideAIEditor();
@@ -1071,7 +1077,7 @@ function saveAINetworkFromForm() {
 }
 
 function resetAIList() {
-  if (!confirm('Сбросить список нейросетей к стандартному?')) return;
+  if (!confirm(t('resetListConfirm'))) return;
   resetAINetworks();
   renderAINetworksList();
   if (typeof initAINetworksInUI === 'function') initAINetworksInUI();

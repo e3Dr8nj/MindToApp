@@ -9,7 +9,7 @@ function openEditModal(module) {
   document.getElementById('edit-modal-title').textContent = `✏️ ${module.name}`;
   document.getElementById('edit-preview-icon').textContent = module.icon;
   document.getElementById('edit-preview-name').textContent = module.name;
-  document.getElementById('edit-preview-desc').textContent = module.description || 'Нет описания';
+  document.getElementById('edit-preview-desc').textContent = module.description || t('noDescription');
 
   const sourceCode = document.getElementById('edit-source-code');
   if (sourceCode) {
@@ -36,23 +36,23 @@ function toggleCodeVisibility() {
 
   if (sourceCode.style.display === 'none') {
     sourceCode.style.display = 'block';
-    toggleBtn.textContent = '🙈 Скрыть код';
+    toggleBtn.textContent = '🙈 Hide code';
   } else {
     sourceCode.style.display = 'none';
-    toggleBtn.textContent = '👁 Показать код';
+    toggleBtn.textContent = '👁 Show code';
   }
 }
 
 function copyCodeFromEditModal() {
   const sourceCode = document.getElementById('edit-source-code');
   if (!sourceCode || !sourceCode.value) {
-    showToast('❌ Нет кода для копирования', 'error');
+    showToast(t('noCode'), 'error');
     return;
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(sourceCode.value).then(() => {
-      showToast('✅ Код скопирован в буфер обмена!', 'success');
+      showToast(t('codeCopied'), 'success');
     }).catch(() => {
       fallbackCopyCode(sourceCode.value);
     });
@@ -70,17 +70,16 @@ function fallbackCopyCode(text) {
   textarea.select();
   try {
     document.execCommand('copy');
-    showToast('✅ Код скопирован в буфер обмена!', 'success');
+    showToast(t('codeCopied'), 'success');
   } catch (e) {
-    showToast('❌ Не удалось скопировать', 'error');
+    showToast(t('copyFailed'), 'error');
   }
   document.body.removeChild(textarea);
 }
 
-// Копирует промпт + код приложения (для меню ⚙️ → Редактировать)
 function copyCodeWithInstruction(module) {
   if (!module || !module.content) {
-    showToast('❌ У приложения нет кода', 'error');
+    showToast(t('noCode'), 'error');
     return;
   }
 
@@ -89,7 +88,7 @@ function copyCodeWithInstruction(module) {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(() => {
-      showToast('✅ Промпт скопирован! Вставьте его в нейросеть.', 'success', 3000);
+      showToast(t('promptCopied'), 'success', 3000);
     }).catch(() => {
       fallbackCopyWithInstruction(fullText);
     });
@@ -107,20 +106,19 @@ function fallbackCopyWithInstruction(text) {
   textarea.select();
   try {
     document.execCommand('copy');
-    showToast('✅ Промпт скопирован! Вставьте его в нейросеть.', 'success', 3000);
+    showToast(t('promptCopied'), 'success', 3000);
   } catch (e) {
-    showToast('❌ Не удалось скопировать', 'error');
+    showToast(t('copyFailed'), 'error');
   }
   document.body.removeChild(textarea);
 }
 
-// Копирует промпт + код из модалки редактирования
 function copyEditPrompt() {
   const sourceCode = document.getElementById('edit-source-code');
   const status = document.getElementById('edit-status');
 
   if (!sourceCode || !sourceCode.value) {
-    if (status) { status.textContent = '❌ Нет кода для копирования'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('noCode'); status.className = 'modal-status error'; }
     return;
   }
 
@@ -129,7 +127,7 @@ function copyEditPrompt() {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullText).then(() => {
-      if (status) { status.textContent = '✅ Промпт скопирован! Вставьте его в нейросеть.'; status.className = 'modal-status success'; }
+      if (status) { status.textContent = t('promptCopied'); status.className = 'modal-status success'; }
     }).catch(() => {
       fallbackCopyEditPrompt(fullText, status);
     });
@@ -147,9 +145,9 @@ function fallbackCopyEditPrompt(text, statusEl) {
   textarea.select();
   try {
     document.execCommand('copy');
-    if (statusEl) { statusEl.textContent = '✅ Промпт скопирован! Вставьте его в нейросеть.'; statusEl.className = 'modal-status success'; }
+    if (statusEl) { statusEl.textContent = t('promptCopied'); statusEl.className = 'modal-status success'; }
   } catch (e) {
-    if (statusEl) { statusEl.textContent = '❌ Не удалось скопировать'; statusEl.className = 'modal-status error'; }
+    if (statusEl) { statusEl.textContent = t('copyFailed'); statusEl.className = 'modal-status error'; }
   }
   document.body.removeChild(textarea);
 }

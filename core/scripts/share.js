@@ -19,7 +19,7 @@ function loadAppUrls() {
       }
     }
   } catch (e) {
-    console.error('Ошибка загрузки appUrls:', e);
+    console.error('Error loading appUrls:', e);
     appUrlBindings = {};
   }
 }
@@ -51,19 +51,16 @@ function openShareModal(module) {
   const modal = document.getElementById('share-modal');
   if (!modal) return;
 
-  // Заполняем превью
   const iconEl = document.getElementById('share-preview-icon');
   const nameEl = document.getElementById('share-preview-name');
   const descEl = document.getElementById('share-preview-desc');
   if (iconEl) iconEl.textContent = module.icon;
   if (nameEl) nameEl.textContent = module.name;
-  if (descEl) descEl.textContent = module.description || 'Нет описания';
+  if (descEl) descEl.textContent = module.description || t('noDescription');
 
-  // Очищаем статус копирования кода
   const status = document.getElementById('copy-code-status');
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
-  // Шаг 3: привязка ссылки
   const urlInput = document.getElementById('share-url-input');
   const bindBtn = document.getElementById('bind-url-btn');
   const unbindBtn = document.getElementById('unbind-url-btn');
@@ -73,14 +70,13 @@ function openShareModal(module) {
     const existingUrl = getAppUrl(module.id);
 
     if (existingUrl) {
-      // Ссылка уже привязана — показываем её
       urlInput.value = existingUrl;
-      bindBtn.textContent = '✏️ Изменить ссылку';
+      bindBtn.textContent = `✏️ ${t('edit')}`;
       unbindBtn.style.display = 'inline-block';
+      unbindBtn.textContent = `✂️ ${t('unbindUrl')}`;
     } else {
-      // Ссылка не привязана — поле пустое (без автозаполнения из буфера)
       urlInput.value = '';
-      bindBtn.textContent = '🔗 Привязать ссылку';
+      bindBtn.textContent = `🔗 ${t('bindUrl')}`;
       unbindBtn.style.display = 'none';
     }
 
@@ -99,7 +95,7 @@ function closeShareModal() {
 function copyAppCode() {
   if (!currentShareModule || !currentShareModule.content) {
     const status = document.getElementById('copy-code-status');
-    if (status) { status.textContent = '❌ У приложения нет кода'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('noCode'); status.className = 'modal-status error'; }
     return;
   }
 
@@ -107,7 +103,7 @@ function copyAppCode() {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(currentShareModule.content).then(() => {
-      if (status) { status.textContent = '✅ Код скопирован в буфер обмена!'; status.className = 'modal-status success'; }
+      if (status) { status.textContent = t('codeCopied'); status.className = 'modal-status success'; }
     }).catch(() => {
       fallbackCopy(currentShareModule.content, status);
     });
@@ -125,9 +121,9 @@ function fallbackCopy(text, statusEl) {
   textarea.select();
   try {
     document.execCommand('copy');
-    if (statusEl) { statusEl.textContent = '✅ Код скопирован в буфер обмена!'; statusEl.className = 'modal-status success'; }
+    if (statusEl) { statusEl.textContent = t('codeCopied'); statusEl.className = 'modal-status success'; }
   } catch (e) {
-    if (statusEl) { statusEl.textContent = '❌ Не удалось скопировать'; statusEl.className = 'modal-status error'; }
+    if (statusEl) { statusEl.textContent = t('copyFailed'); statusEl.className = 'modal-status error'; }
   }
   document.body.removeChild(textarea);
 }
@@ -153,22 +149,24 @@ function bindUrlToApp() {
   const url = urlInput.value.trim();
 
   if (!url) {
-    if (status) { status.textContent = '❌ Введите ссылку'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('enterUrl'); status.className = 'modal-status error'; }
     return;
   }
 
   if (!/^https?:\/\//i.test(url)) {
-    if (status) { status.textContent = '❌ Ссылка должна начинаться с https://'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('invalidUrl'); status.className = 'modal-status error'; }
     return;
   }
 
   setAppUrl(currentShareModule.id, url);
 
-  if (status) { status.textContent = '✅ Ссылка привязана к приложению!'; status.className = 'modal-status success'; }
-  if (bindBtn) bindBtn.textContent = '✏️ Изменить ссылку';
-  if (unbindBtn) unbindBtn.style.display = 'inline-block';
+  if (status) { status.textContent = t('urlBound'); status.className = 'modal-status success'; }
+  if (bindBtn) bindBtn.textContent = `✏️ ${t('edit')}`;
+  if (unbindBtn) {
+    unbindBtn.style.display = 'inline-block';
+    unbindBtn.textContent = `✂️ ${t('unbindUrl')}`;
+  }
 
-  // Обновляем карточки (чтобы значок 🔗 появился)
   renderInstalledApps();
   renderAllApps();
 }
@@ -176,7 +174,7 @@ function bindUrlToApp() {
 function unbindUrlFromApp() {
   if (!currentShareModule) return;
 
-  if (!confirm('Отвязать ссылку от этого приложения?')) return;
+  if (!confirm(`${t('unbindUrl')}?`)) return;
 
   removeAppUrl(currentShareModule.id);
 
@@ -186,11 +184,10 @@ function unbindUrlFromApp() {
   const status = document.getElementById('share-url-status');
 
   if (urlInput) urlInput.value = '';
-  if (bindBtn) bindBtn.textContent = '🔗 Привязать ссылку';
+  if (bindBtn) bindBtn.textContent = `🔗 ${t('bindUrl')}`;
   if (unbindBtn) unbindBtn.style.display = 'none';
-  if (status) { status.textContent = '✅ Ссылка отвязана'; status.className = 'modal-status success'; }
+  if (status) { status.textContent = t('urlUnbound'); status.className = 'modal-status success'; }
 
-  // Обновляем карточки
   renderInstalledApps();
   renderAllApps();
 }
@@ -228,7 +225,7 @@ function openExportUrlsModal() {
   const status = document.getElementById('export-urls-status');
 
   if (!modal) {
-    console.error('❌ Модалка export-urls-modal не найдена');
+    console.error('❌ export-urls-modal not found');
     return;
   }
 
@@ -260,13 +257,13 @@ function copyExportText() {
   const status = document.getElementById('export-urls-status');
 
   if (!textarea || !textarea.value) {
-    if (status) { status.textContent = '❌ Нечего копировать'; status.className = 'modal-status error'; }
+    if (status) { status.textContent = t('nothingToCopy'); status.className = 'modal-status error'; }
     return;
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(textarea.value).then(() => {
-      if (status) { status.textContent = '✅ Список скопирован в буфер обмена!'; status.className = 'modal-status success'; }
+      if (status) { status.textContent = t('listCopied'); status.className = 'modal-status success'; }
     }).catch(() => {
       fallbackCopy(textarea.value, status);
     });

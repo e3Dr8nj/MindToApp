@@ -1,28 +1,37 @@
+// ==========================================
+// РЕНДЕРИНГ КАРТОЧЕК ПРИЛОЖЕНИЙ
+// ==========================================
+
 function renderInstalledApps() {
   installedAppsContainer.innerHTML = '';
+
   if (installedModules.length === 0) {
     emptyState.style.display = 'block';
     installedAppsContainer.style.display = 'none';
     return;
   }
+
   emptyState.style.display = 'none';
   installedAppsContainer.style.display = 'grid';
+
   installedModules.forEach(moduleId => {
     const module = allModules.find(m => m.id === moduleId);
-    if (module) installedAppsContainer.appendChild(createAppCard(module, true, false));
+    if (module) {
+      installedAppsContainer.appendChild(createAppCard(module, true, false));
+    }
   });
 }
 
 function renderAllApps() {
   allAppsContainer.innerHTML = '';
-  
+
   const standardModules = allModules.filter(m => !m.isCustom);
-  
+
   if (standardModules.length === 0) {
-    allAppsContainer.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">Склад пуст</p>';
+    allAppsContainer.innerHTML = `<p style="color: white; text-align: center; grid-column: 1/-1;">${t('storeEmpty')}</p>`;
     return;
   }
-  
+
   standardModules.forEach(module => {
     const isInstalled = installedModules.includes(module.id);
     allAppsContainer.appendChild(createAppCard(module, isInstalled, true));
@@ -32,18 +41,16 @@ function renderAllApps() {
 function createAppCard(module, isInstalled, isOnStore) {
   const card = document.createElement('div');
   card.className = 'app-card';
-  
+
   if (isInstalled) {
     card.classList.add('app-card-installed');
   }
 
-  // Иконка приложения
   const icon = document.createElement('div');
   icon.className = 'app-card-icon';
   icon.textContent = module.icon;
   icon.title = module.name;
 
-  // Название
   const name = document.createElement('div');
   name.className = 'app-card-name';
   name.textContent = module.name;
@@ -52,57 +59,57 @@ function createAppCard(module, isInstalled, isOnStore) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Значок настроек (⚙️) в правом верхнем углу
+  // Значок настроек (⚙️)
   const settingsBadge = document.createElement('div');
   settingsBadge.className = 'app-card-settings-badge';
   settingsBadge.textContent = '⚙️';
-  settingsBadge.title = 'Настройки';
+  settingsBadge.title = t('settings');
   settingsBadge.addEventListener('click', (e) => {
     e.stopPropagation();
     showCardContextMenu(e, module, isInstalled, isOnStore, settingsBadge);
   });
   card.appendChild(settingsBadge);
 
-  // Значок привязанной ссылки (🔗) в левом верхнем углу
+  // Маркер привязанной ссылки (🔗)
   const linkedUrl = getAppUrl(module.id);
   if (linkedUrl) {
     const linkBadge = document.createElement('div');
     linkBadge.className = 'app-card-link-badge';
     linkBadge.textContent = '🔗';
-    linkBadge.title = `Привязана ссылка: ${linkedUrl}`;
+    linkBadge.title = `${t('linkedUrl')} ${linkedUrl}`;
     card.appendChild(linkBadge);
   }
 
-  // Кнопки действий под карточкой
   const actions = document.createElement('div');
   actions.className = 'app-card-actions';
 
   if (isOnStore) {
-    // === СКЛАД ===
     if (!isInstalled) {
-      // Неустановленное на складе: кнопка "Установить" с текстом
       const installBtn = document.createElement('button');
       installBtn.className = 'app-card-install-btn';
-      installBtn.textContent = 'Установить';
-      installBtn.title = 'Установить приложение';
+      installBtn.textContent = t('install');
+      installBtn.title = t('install');
       installBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleInstall(module.id);
       });
       actions.appendChild(installBtn);
 
-      // Клик по карточке — показать информацию
-      card.addEventListener('click', () => openAppInfoModal(module, isInstalled));
+      card.addEventListener('click', () => {
+        hideCardContextMenu();
+        openAppInfoModal(module, isInstalled);
+      });
     } else {
-      // Установленное на складе: нет кнопок под карточкой
-      // Клик по карточке — открыть приложение
-      card.addEventListener('click', () => openApp(module));
+      card.addEventListener('click', () => {
+        hideCardContextMenu();
+        openApp(module);
+      });
     }
   } else {
-    // === РАБОЧИЙ СТОЛ (Мои приложения) ===
-    // Все приложения здесь установлены, кнопок под карточкой нет
-    // Клик по карточке — открыть приложение
-    card.addEventListener('click', () => openApp(module));
+    card.addEventListener('click', () => {
+      hideCardContextMenu();
+      openApp(module);
+    });
   }
 
   card.appendChild(actions);
@@ -123,105 +130,96 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
   menu.addEventListener('click', (e) => e.stopPropagation());
 
   if (isOnStore) {
-    // === СКЛАД ===
-    // Только базовые действия: Информация, Установить/Открыть, Удалить
-
-    // Пункт "Информация"
-    const infoItem = createMenuItem('ℹ️', 'Информация', () => {
+    const infoItem = createMenuItem('ℹ️', t('info'), () => {
       hideCardContextMenu();
       openAppInfoModal(module, isInstalled);
     });
     menu.appendChild(infoItem);
 
     if (isInstalled) {
-      // Установленное на складе: Открыть + Удалить
-      const openItem = createMenuItem('🚀', 'Открыть', () => {
+      const openItem = createMenuItem('🚀', t('open'), () => {
         hideCardContextMenu();
         openApp(module);
       });
       menu.appendChild(openItem);
 
-      const deleteItem = createMenuItem('🗑', 'Удалить', () => {
+      const deleteItem = createMenuItem('🗑', t('delete'), () => {
         hideCardContextMenu();
         toggleInstall(module.id);
       }, 'delete');
       menu.appendChild(deleteItem);
     } else {
-      // Неустановленное на складе: Установить
-      const installItem = createMenuItem('✅', 'Установить', () => {
+      const installItem = createMenuItem('✅', t('install'), () => {
         hideCardContextMenu();
         toggleInstall(module.id);
       });
       menu.appendChild(installItem);
     }
-
   } else {
-    // === РАБОЧИЙ СТОЛ (Мои приложения) ===
-    // Полный набор действий
-
-    // Пункт "Информация"
-    const infoItem = createMenuItem('ℹ️', 'Информация', () => {
+    const infoItem = createMenuItem('ℹ️', t('info'), () => {
       hideCardContextMenu();
       openAppInfoModal(module, isInstalled);
     });
     menu.appendChild(infoItem);
 
-    // Пункт "Открыть"
-    const openItem = createMenuItem('🚀', 'Открыть', () => {
-      hideCardContextMenu();
-      openApp(module);
-    });
-    menu.appendChild(openItem);
+    if (isInstalled) {
+      const openItem = createMenuItem('🚀', t('open'), () => {
+        hideCardContextMenu();
+        openApp(module);
+      });
+      menu.appendChild(openItem);
+    }
 
-    // Пункт "Редактировать" (только если есть код)
     if (module.content) {
-      const editItem = createMenuItem('✏️', 'Редактировать', () => {
+      const editItem = createMenuItem('✏️', t('edit'), () => {
         hideCardContextMenu();
         copyCodeWithInstruction(module);
       });
       menu.appendChild(editItem);
     }
 
-    // Пункт "Поделиться" (только если есть код)
     if (module.content) {
-      const shareItem = createMenuItem('📤', 'Поделиться', () => {
+      const shareItem = createMenuItem('📤', t('share'), () => {
         hideCardContextMenu();
         openShareModal(module);
       });
       menu.appendChild(shareItem);
     }
 
-    // Пункт "Удалить"
-    const deleteItem = createMenuItem('🗑', 'Удалить', () => {
-      hideCardContextMenu();
-      if (module.isCustom) {
-        removeCustomModule(module.id);
-      } else {
-        toggleInstall(module.id);
-      }
-    }, 'delete');
-    menu.appendChild(deleteItem);
+    if (isInstalled) {
+      const deleteItem = createMenuItem('🗑', t('delete'), () => {
+        hideCardContextMenu();
+        if (module.isCustom) {
+          removeCustomModule(module.id);
+        } else {
+          toggleInstall(module.id);
+        }
+      }, 'delete');
+      menu.appendChild(deleteItem);
+    }
   }
 
-  // Позиционируем меню под иконкой ⚙️
   document.body.appendChild(menu);
-  
+
   const rect = anchorElement.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
-  
+
   let top = rect.bottom + 5;
   let left = rect.right - menuRect.width;
-  
+
   if (top + menuRect.height > window.innerHeight) {
     top = rect.top - menuRect.height - 5;
   }
   if (left < 0) {
     left = rect.left;
   }
-  
+  if (top < 5) {
+    top = 5;
+  }
+
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
-  
+
   currentContextMenu = menu;
 
   setTimeout(() => {
@@ -231,12 +229,14 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
 
 function createMenuItem(icon, text, onClick, className = '') {
   const item = document.createElement('div');
-  item.className = `app-card-context-menu-item ${className}`;
+  item.className = `app-card-context-menu-item ${className}`.trim();
   item.innerHTML = `<span class="menu-icon">${icon}</span><span class="menu-text">${text}</span>`;
+
   item.addEventListener('click', (e) => {
     e.stopPropagation();
     onClick();
   });
+
   return item;
 }
 
@@ -259,10 +259,12 @@ function showScreen(screen) {
   const storeScreenEl = document.getElementById('store-screen');
   const appScreenEl = document.getElementById('app-screen');
   const clipboardScreenEl = document.getElementById('clipboard-screen');
-  
+
   [homeScreenEl, storeScreenEl, appScreenEl, clipboardScreenEl].forEach(s => {
     if (s) s.classList.remove('active');
   });
-  
+
+  hideCardContextMenu();
+
   if (screen) screen.classList.add('active');
 }
