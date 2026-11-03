@@ -46,11 +46,13 @@ function createAppCard(module, isInstalled, isOnStore) {
     card.classList.add('app-card-installed');
   }
 
+  // Иконка приложения
   const icon = document.createElement('div');
   icon.className = 'app-card-icon';
   icon.textContent = module.icon;
   icon.title = module.name;
 
+  // Название приложения
   const name = document.createElement('div');
   name.className = 'app-card-name';
   name.textContent = module.name;
@@ -59,7 +61,10 @@ function createAppCard(module, isInstalled, isOnStore) {
   card.appendChild(icon);
   card.appendChild(name);
 
-  // Значок настроек (⚙️)
+  // ==========================================
+  // ЗНАЧОК НАСТРОЕК (⚙️) — ПРАВЫЙ ВЕРХНИЙ УГОЛ
+  // ==========================================
+
   const settingsBadge = document.createElement('div');
   settingsBadge.className = 'app-card-settings-badge';
   settingsBadge.textContent = '⚙️';
@@ -70,7 +75,10 @@ function createAppCard(module, isInstalled, isOnStore) {
   });
   card.appendChild(settingsBadge);
 
-  // Маркер привязанной ссылки (🔗)
+  // ==========================================
+  // МАРКЕР ПРИВЯЗАННОЙ ССЫЛКИ (🔗)
+  // ==========================================
+
   const linkedUrl = getAppUrl(module.id);
   if (linkedUrl) {
     const linkBadge = document.createElement('div');
@@ -80,11 +88,17 @@ function createAppCard(module, isInstalled, isOnStore) {
     card.appendChild(linkBadge);
   }
 
+  // ==========================================
+  // КНОПКИ ПОД КАРТОЧКОЙ
+  // ==========================================
+
   const actions = document.createElement('div');
   actions.className = 'app-card-actions';
 
   if (isOnStore) {
+    // === СКЛАД ===
     if (!isInstalled) {
+      // Неустановленное приложение: только кнопка "Установить"
       const installBtn = document.createElement('button');
       installBtn.className = 'app-card-install-btn';
       installBtn.textContent = t('install');
@@ -95,17 +109,21 @@ function createAppCard(module, isInstalled, isOnStore) {
       });
       actions.appendChild(installBtn);
 
+      // Клик по карточке — информация
       card.addEventListener('click', () => {
         hideCardContextMenu();
         openAppInfoModal(module, isInstalled);
       });
     } else {
+      // Установленное приложение на складе: клик открывает приложение
       card.addEventListener('click', () => {
         hideCardContextMenu();
         openApp(module);
       });
     }
   } else {
+    // === МОИ ПРИЛОЖЕНИЯ ===
+    // Кнопок под карточкой нет, всё в меню ⚙️
     card.addEventListener('click', () => {
       hideCardContextMenu();
       openApp(module);
@@ -130,6 +148,10 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
   menu.addEventListener('click', (e) => e.stopPropagation());
 
   if (isOnStore) {
+    // ==========================================
+    // СКЛАД
+    // ==========================================
+
     const infoItem = createMenuItem('ℹ️', t('info'), () => {
       hideCardContextMenu();
       openAppInfoModal(module, isInstalled);
@@ -155,7 +177,12 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
       });
       menu.appendChild(installItem);
     }
+
   } else {
+    // ==========================================
+    // МОИ ПРИЛОЖЕНИЯ
+    // ==========================================
+
     const infoItem = createMenuItem('ℹ️', t('info'), () => {
       hideCardContextMenu();
       openAppInfoModal(module, isInstalled);
@@ -199,6 +226,10 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
     }
   }
 
+  // ==========================================
+  // ПОЗИЦИОНИРОВАНИЕ МЕНЮ
+  // ==========================================
+
   document.body.appendChild(menu);
 
   const rect = anchorElement.getBoundingClientRect();
@@ -210,9 +241,11 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
   if (top + menuRect.height > window.innerHeight) {
     top = rect.top - menuRect.height - 5;
   }
+
   if (left < 0) {
     left = rect.left;
   }
+
   if (top < 5) {
     top = 5;
   }
@@ -230,7 +263,26 @@ function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElemen
 function createMenuItem(icon, text, onClick, className = '') {
   const item = document.createElement('div');
   item.className = `app-card-context-menu-item ${className}`.trim();
-  item.innerHTML = `<span class="menu-icon">${icon}</span><span class="menu-text">${text}</span>`;
+
+  // Исправление задвоения иконок:
+  // если текст уже начинается с этой же иконки, не добавляем её повторно
+  let displayText = String(text || '').trim();
+  const menuIcon = String(icon || '').trim();
+
+  if (menuIcon && displayText.startsWith(menuIcon)) {
+    displayText = displayText.slice(menuIcon.length).trim();
+  }
+
+  const iconSpan = document.createElement('span');
+  iconSpan.className = 'menu-icon';
+  iconSpan.textContent = menuIcon;
+
+  const textSpan = document.createElement('span');
+  textSpan.className = 'menu-text';
+  textSpan.textContent = displayText;
+
+  item.appendChild(iconSpan);
+  item.appendChild(textSpan);
 
   item.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -253,6 +305,10 @@ function hideCardContextMenuOnClickOutside(e) {
     hideCardContextMenu();
   }
 }
+
+// ==========================================
+// ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
+// ==========================================
 
 function showScreen(screen) {
   const homeScreenEl = document.getElementById('home-screen');
