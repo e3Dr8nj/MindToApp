@@ -295,7 +295,7 @@ async function createFromClipboard() {
     showToast(`❌ ${error.message}`, 'error');
   } finally {
     if (createBtn) {
-      createBtn.innerHTML = `🚀 ${t('create')}`;
+      createBtn.innerHTML = t('create');
       createBtn.disabled = false;
     }
   }
@@ -345,7 +345,7 @@ async function handleUrlFromClipboard() {
     showToast(`❌ ${error.message}`, 'error');
   } finally {
     if (urlBtn) {
-      urlBtn.innerHTML = `🔗 ${t('url')}`;
+      urlBtn.innerHTML = t('url');
       urlBtn.disabled = false;
     }
   }
@@ -486,8 +486,8 @@ function copyBuilderPrompt() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(fullPrompt).then(() => {
       if (copyBtn) {
-        copyBtn.textContent = `✅ ${t('copied')}`;
-        setTimeout(() => copyBtn.textContent = `📋 ${t('copyPrompt')}`, 2000);
+        copyBtn.textContent = t('copied');
+        setTimeout(() => copyBtn.textContent = t('copyPrompt'), 2000);
       }
       showStatus(statusEl, t('promptCopied'), 'success');
     }).catch(() => {
@@ -503,8 +503,8 @@ function copyBuilderPrompt() {
     try {
       document.execCommand('copy');
       if (copyBtn) {
-        copyBtn.textContent = `✅ ${t('copied')}`;
-        setTimeout(() => copyBtn.textContent = `📋 ${t('copyPrompt')}`, 2000);
+        copyBtn.textContent = t('copied');
+        setTimeout(() => copyBtn.textContent = t('copyPrompt'), 2000);
       }
       showStatus(statusEl, t('promptCopied'), 'success');
     } catch (e) {
@@ -582,9 +582,9 @@ function createFromBuilder() {
 
     showStatus(statusEl, '✅', 'success');
     if (createBtn) {
-      createBtn.textContent = `✅ ${t('created')}`;
+      createBtn.textContent = t('created');
       setTimeout(() => {
-        createBtn.textContent = `🚀 ${t('createApp')}`;
+        createBtn.textContent = t('createApp');
         closeBuilder();
         renderInstalledApps();
         renderAllApps();
@@ -606,17 +606,13 @@ function showStatus(element, message, type = '') {
 // ==========================================
 
 function setupEventListeners() {
-  // ==========================================
   // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
-  // ==========================================
   const languageToggleBtn = document.getElementById('language-toggle-btn');
   if (languageToggleBtn) {
     languageToggleBtn.addEventListener('click', toggleLanguage);
   }
 
-  // ==========================================
   // БУРГЕР-МЕНЮ
-  // ==========================================
   const burgerBtn = document.getElementById('burger-menu-btn');
   const headerMenu = document.getElementById('header-menu');
 
@@ -639,9 +635,7 @@ function setupEventListeners() {
     });
   }
 
-  // ==========================================
   // НАВИГАЦИЯ
-  // ==========================================
   const openStoreBtn = document.getElementById('open-store-btn');
   const backToHomeBtn = document.getElementById('back-to-home-btn');
   const goToStoreBtn = document.getElementById('go-to-store-btn');
@@ -652,9 +646,7 @@ function setupEventListeners() {
   if (goToStoreBtn) goToStoreBtn.addEventListener('click', () => { renderAllApps(); showScreen(storeScreen); });
   if (closeAppBtn) closeAppBtn.addEventListener('click', closeApp);
 
-  // ==========================================
   // КОНСТРУКТОР
-  // ==========================================
   const builderBtn = document.getElementById('builder-btn');
   const builderCloseBtn = document.getElementById('builder-close-btn');
   const builderCopyPromptBtn = document.getElementById('builder-copy-prompt-btn');
@@ -667,9 +659,7 @@ function setupEventListeners() {
   if (builderOpenAiBtn) builderOpenAiBtn.addEventListener('click', openSelectedAI);
   if (builderCreateBtn) builderCreateBtn.addEventListener('click', createFromBuilder);
 
-  // ==========================================
   // СТАРАЯ МОДАЛКА СОЗДАНИЯ
-  // ==========================================
   const createAppBtn = document.getElementById('create-app-btn');
   const closeCreateBtn = document.getElementById('close-create-btn');
   const cancelCreateBtn = document.getElementById('cancel-create-btn');
@@ -717,15 +707,11 @@ function setupEventListeners() {
   });
   if (userIdeaInput) userIdeaInput.addEventListener('input', updatePromptPreview);
 
-  // ==========================================
   // КЭШ
-  // ==========================================
   const refreshBtn = document.getElementById('refresh-btn');
   if (refreshBtn) refreshBtn.addEventListener('click', refreshApp);
 
-  // ==========================================
   // ДОБАВЛЕНИЕ МОДУЛЯ
-  // ==========================================
   const addCustomBtn = document.getElementById('add-custom-btn');
   const addCustomBtnStore = document.getElementById('add-custom-btn-store');
   const closeModalBtn = document.getElementById('close-modal-btn');
@@ -762,9 +748,7 @@ function setupEventListeners() {
     if (folderInput) folderInput.click();
   });
 
-  // ==========================================
   // ШАРИНГ И ПРИВЯЗКА ССЫЛОК
-  // ==========================================
   const closeShareBtn = document.getElementById('close-share-btn');
   const closeShareFooterBtn = document.getElementById('close-share-footer-btn');
   const copyAppCodeBtn = document.getElementById('copy-app-code-btn');
@@ -781,9 +765,7 @@ function setupEventListeners() {
   if (bindUrlBtn) bindUrlBtn.addEventListener('click', bindUrlToApp);
   if (unbindUrlBtn) unbindUrlBtn.addEventListener('click', unbindUrlFromApp);
 
-  // ==========================================
   // ЭКСПОРТ ССЫЛОК
-  // ==========================================
   const exportUrlsBtn = document.getElementById('export-urls-btn');
   const closeExportUrlsBtn = document.getElementById('close-export-urls-btn');
   const closeExportUrlsFooterBtn = document.getElementById('close-export-urls-footer-btn');
@@ -798,18 +780,14 @@ function setupEventListeners() {
     if (e.target === exportUrlsModal) closeExportUrlsModal();
   });
 
-  // ==========================================
   // ВКЛАДКИ
-  // ==========================================
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (typeof switchTab === 'function') switchTab(btn.dataset.target);
     });
   });
 
-  // ==========================================
   // САЙДБАР: КОПИРОВАНИЕ ПРОМПТА
-  // ==========================================
   const sidebarPromptBtn = document.getElementById('sidebar-prompt-btn');
   if (sidebarPromptBtn) {
     sidebarPromptBtn.addEventListener('click', () => {
@@ -851,33 +829,23 @@ function setupEventListeners() {
     });
   }
 
-  // ==========================================
   // САЙДБАР: СОЗДАНИЕ ИЗ БУФЕРА
-  // ==========================================
   const sidebarCreateBtn = document.getElementById('sidebar-create-btn');
   if (sidebarCreateBtn) sidebarCreateBtn.addEventListener('click', createFromClipboard);
 
-  // ==========================================
   // САЙДБАР: ОБРАБОТКА URL ИЗ БУФЕРА
-  // ==========================================
   const sidebarUrlBtn = document.getElementById('sidebar-url-btn');
   if (sidebarUrlBtn) sidebarUrlBtn.addEventListener('click', handleUrlFromClipboard);
 
-  // ==========================================
   // ЭКРАН БУФЕРА ОБМЕНА
-  // ==========================================
   const closeClipboardScreenBtn = document.getElementById('close-clipboard-screen-btn');
   if (closeClipboardScreenBtn) closeClipboardScreenBtn.addEventListener('click', closeClipboardScreen);
 
-  // ==========================================
   // ПАНЕЛЬ НЕЙРОСЕТЕЙ
-  // ==========================================
   const aiPanelCloseBtn = document.getElementById('ai-panel-close-btn');
   if (aiPanelCloseBtn) aiPanelCloseBtn.addEventListener('click', closeAIPanel);
 
-  // ==========================================
   // УПРАВЛЕНИЕ ТЕМАМИ
-  // ==========================================
   const manageThemesBtn = document.getElementById('manage-themes-btn');
   const closeThemesBtn = document.getElementById('close-themes-btn');
   const closeThemesFooterBtn = document.getElementById('close-themes-footer-btn');
@@ -902,9 +870,7 @@ function setupEventListeners() {
     if (e.target === themesModal) themesModal.classList.remove('active');
   });
 
-  // ==========================================
-  // ДОБАВЛЕНИЕ ТЕМЫ
-  // ==========================================
+  // ДОБАВЛЕНИЕ ТЕМЫ — С ОТЛАДКОЙ
   const addThemeBtn = document.getElementById('add-theme-btn');
   const closeAddThemeBtn = document.getElementById('close-add-theme-btn');
   const cancelAddThemeBtn = document.getElementById('cancel-add-theme-btn');
@@ -912,14 +878,34 @@ function setupEventListeners() {
   const submitThemeBtn = document.getElementById('submit-theme-btn');
   const addThemeModal = document.getElementById('add-theme-modal');
 
+  console.log('🔍 [app.js] addThemeBtn:', addThemeBtn);
+  console.log('🔍 [app.js] copyThemeTemplateBtn:', copyThemeTemplateBtn);
+  console.log('🔍 [app.js] typeof copyThemeTemplate:', typeof copyThemeTemplate);
+
   if (addThemeBtn) addThemeBtn.addEventListener('click', () => {
     if (typeof openAddThemeModal === 'function') openAddThemeModal();
   });
   if (closeAddThemeBtn) closeAddThemeBtn.addEventListener('click', closeAddThemeModal);
   if (cancelAddThemeBtn) cancelAddThemeBtn.addEventListener('click', closeAddThemeModal);
-  if (copyThemeTemplateBtn) copyThemeTemplateBtn.addEventListener('click', () => {
-    if (typeof copyThemeTemplate === 'function') copyThemeTemplate();
-  });
+  
+  if (copyThemeTemplateBtn) {
+    copyThemeTemplateBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      console.log('🎨 [app.js] Клик по кнопке шаблона темы');
+      console.log('🔍 [app.js] typeof copyThemeTemplate:', typeof copyThemeTemplate);
+      
+      if (typeof copyThemeTemplate === 'function') {
+        console.log('✅ [app.js] Вызываем copyThemeTemplate()');
+        copyThemeTemplate();
+      } else {
+        console.error('❌ [app.js] Функция copyThemeTemplate не найдена!');
+        showToast('❌ Function not found', 'error');
+      }
+    });
+  } else {
+    console.error('❌ [app.js] Кнопка copy-theme-template-btn не найдена в DOM!');
+  }
+  
   if (submitThemeBtn) submitThemeBtn.addEventListener('click', () => {
     if (typeof submitCustomTheme === 'function') submitCustomTheme();
   });
@@ -927,9 +913,7 @@ function setupEventListeners() {
     if (e.target === addThemeModal) closeAddThemeModal();
   });
 
-  // ==========================================
   // РЕДАКТОР ПРОМПТА
-  // ==========================================
   const editPromptsBtn = document.getElementById('edit-prompts-btn');
   const closePromptsBtn = document.getElementById('close-prompts-btn');
   const savePromptBtn = document.getElementById('save-prompt-btn');
@@ -944,9 +928,7 @@ function setupEventListeners() {
     if (e.target === promptsModal) closePromptsModal();
   });
 
-  // ==========================================
   // УПРАВЛЕНИЕ СПИСКОМ НЕЙРОСЕТЕЙ
-  // ==========================================
   const manageAiBtn = document.getElementById('manage-ai-btn');
   const closeAiManagerBtn = document.getElementById('close-ai-manager-btn');
   const closeAiManagerFooterBtn = document.getElementById('close-ai-manager-footer-btn');
@@ -967,9 +949,7 @@ function setupEventListeners() {
   if (cancelAiEditBtn) cancelAiEditBtn.addEventListener('click', hideAIEditor);
   if (resetAiListBtn) resetAiListBtn.addEventListener('click', resetAIList);
 
-  // ==========================================
   // МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
-  // ==========================================
   const closeAppInfoBtn = document.getElementById('close-app-info-btn');
   const closeAppInfoFooterBtn = document.getElementById('close-app-info-footer-btn');
   const appInfoModal = document.getElementById('app-info-modal');
@@ -980,9 +960,7 @@ function setupEventListeners() {
     if (e.target === appInfoModal) closeAppInfoModal();
   });
 
-  // ==========================================
   // ESCAPE — ЗАКРЫТИЕ ВСЕХ МОДАЛОК
-  // ==========================================
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeCreateModal();
@@ -1066,9 +1044,9 @@ function saveAINetworkFromForm() {
   }
 
   saveAINetworks(networks);
-  
+
   if (status) { status.textContent = t('aiSaved'); status.className = 'modal-status success'; }
-  
+
   setTimeout(() => {
     hideAIEditor();
     if (typeof renderAINetworksList === 'function') renderAINetworksList();
