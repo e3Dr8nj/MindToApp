@@ -190,15 +190,22 @@ function getThemeTemplate() {
 }
 
 function copyThemeTemplate() {
+  console.log('🎨 copyThemeTemplate() вызвана');
+  
   const template = getThemeTemplate();
+  console.log('📋 Шаблон получен, длина:', template.length);
+  console.log('📋 Первые 100 символов:', template.substring(0, 100));
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(template).then(() => {
+      console.log('✅ Шаблон скопирован через clipboard API');
       showToast('✅ Theme template copied!', 'success');
-    }).catch(() => {
+    }).catch((err) => {
+      console.error('❌ Ошибка clipboard API:', err);
       fallbackCopyTheme(template);
     });
   } else {
+    console.log('⚠️ clipboard API недоступен, используем fallback');
     fallbackCopyTheme(template);
   }
 }
@@ -275,17 +282,23 @@ function openAddThemeModal() {
     // Проверяем, что функция getAINetworks доступна
     if (typeof getAINetworks === 'function') {
       const networks = getAINetworks();
-      networks.forEach(network => {
-        const link = document.createElement('a');
-        link.href = network.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.className = 'ai-link';
-        link.textContent = network.name;
-        themeAiLinks.appendChild(link);
-      });
+      console.log('🤖 Загружено нейросетей:', networks.length);
+      
+      if (networks.length === 0) {
+        themeAiLinks.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px; text-align: center;">No AI networks configured</div>';
+      } else {
+        networks.forEach(network => {
+          const link = document.createElement('a');
+          link.href = network.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.className = 'ai-link';
+          link.textContent = network.name;
+          themeAiLinks.appendChild(link);
+        });
+      }
     } else {
-      console.warn('getAINetworks function not available');
+      console.warn('⚠️ getAINetworks function not available');
       themeAiLinks.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px;">AI networks not loaded</div>';
     }
   }
