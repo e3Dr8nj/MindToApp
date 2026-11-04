@@ -29,8 +29,8 @@ const translations = {
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
-    // Кнопка переключения языка (показывает, на какой язык переключится)
-    languageToggle: '🇷🇺 RU',
+    // Кнопка показывает ТЕКУЩИЙ язык интерфейса
+    languageToggle: 'EN',
     languageToggleTitle: 'Switch to Russian',
     describeIdea: '💡 Describe your idea',
     describeIdeaPlaceholder: 'For example: Expense calculator with charts, dark theme, and history saved in localStorage...',
@@ -155,8 +155,8 @@ const translations = {
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
-    // Кнопка переключения языка (показывает, на какой язык переключится)
-    languageToggle: '🇬🇧 EN',
+    // Кнопка показывает ТЕКУЩИЙ язык интерфейса
+    languageToggle: 'RU',
     languageToggleTitle: 'Переключить на английский',
     describeIdea: '💡 Опишите идею',
     describeIdeaPlaceholder: 'Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage...',
