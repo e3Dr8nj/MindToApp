@@ -1,271 +1,320 @@
 // ==========================================
-// ПОЛЬЗОВАТЕЛЬСКИЕ ТЕМЫ
+// ПОЛЬЗОВАТЕЛЬСКИЕ ТЕМЫ ОФОРМЛЕНИЯ
 // ==========================================
 
-// Загрузка пользовательских тем из localStorage
-function loadCustomThemes() {
-  try {
-    const stored = localStorage.getItem('customThemes');
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.error('Ошибка загрузки тем:', e);
-    return [];
+const DEFAULT_CUSTOM_THEMES = [];
+
+function initCustomThemes() {
+  const stored = localStorage.getItem('customThemes');
+  if (!stored) {
+    localStorage.setItem('customThemes', JSON.stringify(DEFAULT_CUSTOM_THEMES));
   }
 }
 
-// Сохранение пользовательских тем
+function getCustomThemes() {
+  const stored = localStorage.getItem('customThemes');
+  return stored ? JSON.parse(stored) : DEFAULT_CUSTOM_THEMES;
+}
+
 function saveCustomThemes(themes) {
   localStorage.setItem('customThemes', JSON.stringify(themes));
 }
 
-// Применение всех пользовательских тем (при загрузке)
-function applyAllCustomThemes() {
-  const themes = loadCustomThemes();
-  
-  const oldStyles = document.querySelectorAll('[id^="custom-theme-"]');
-  oldStyles.forEach(s => s.remove());
-  
-  if (themes.length > 0) {
-    const style = document.createElement('style');
-    style.id = 'custom-themes-style';
-    
-    let css = '';
-    themes.forEach(theme => {
-      css += `body[data-theme="${theme.id}"] {\n`;
-      for (const [key, value] of Object.entries(theme.variables)) {
-        css += `  ${key}: ${value};\n`;
-      }
-      css += `}\n`;
-    });
-    
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
+function addCustomTheme(name, css) {
+  const themes = getCustomThemes();
+  const id = 'custom-' + Date.now();
+  themes.push({ id, name, css });
+  saveCustomThemes(themes);
+  return id;
 }
 
-// Парсинг CSS темы
-function parseThemeCSS(css, themeName) {
-  const variables = {};
-  
-  const match = css.match(/body\[data-theme="([^"]+)"\]\s*\{([^}]+)\}/);
-  if (!match) {
-    throw new Error('Не найден блок body[data-theme="..."]');
-  }
-  
-  const themeId = match[1];
-  const variablesBlock = match[2];
-  
-  const varMatches = variablesBlock.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g);
-  for (const varMatch of varMatches) {
-    variables[varMatch[1]] = varMatch[2].trim();
-  }
-  
-  if (Object.keys(variables).length === 0) {
-    throw new Error('Не найдены CSS-переменные');
-  }
-  
-  return {
-    id: themeId,
-    name: themeName || themeId,
-    variables
-  };
+function removeCustomTheme(id) {
+  let themes = getCustomThemes();
+  themes = themes.filter(t => t.id !== id);
+  saveCustomThemes(themes);
 }
 
-// Добавление новой темы
-function addCustomTheme(css, themeName) {
-  try {
-    const theme = parseThemeCSS(css, themeName);
-    
-    const themes = loadCustomThemes();
-    const existingIndex = themes.findIndex(t => t.id === theme.id);
-    
-    if (existingIndex >= 0) {
-      themes[existingIndex] = theme;
-    } else {
-      themes.push(theme);
-    }
-    
-    saveCustomThemes(themes);
-    applyAllCustomThemes();
-    
-    THEMES[theme.id] = {
-      name: theme.name,
-      icon: '🎨',
-      isCustom: true
-    };
-    
-    return theme;
-  } catch (error) {
-    throw error;
+function renderCustomThemesList() {
+  const list = document.getElementById('custom-themes-list');
+  if (!list) return;
+
+  list.innerHTML = '';
+  const themes = getCustomThemes();
+
+  if (themes.length === 0) {
+    list.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px; text-align: center;">No custom themes yet</div>';
+    return;
   }
+
+  themes.forEach(theme => {
+    const item = document.createElement('div');
+    item.className = 'custom-theme-item';
+    item.innerHTML = `
+      <div class="custom-theme-info">
+        <span class="custom-theme-name">${escapeHtml(theme.name)}</span>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button class="btn btn-small" onclick="applyTheme('${theme.id}')">Apply</button>
+        <button class="delete-theme-btn" onclick="deleteCustomTheme('${theme.id}')" title="Delete">×</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
 }
 
-// Удаление темы
-function deleteCustomTheme(themeId) {
-  if (!confirm(`Удалить тему "${themeId}"?`)) return;
-  
-  const themes = loadCustomThemes();
-  const filtered = themes.filter(t => t.id !== themeId);
-  saveCustomThemes(filtered);
-  
-  delete THEMES[themeId];
-  
-  if (currentTheme === themeId) {
-    applyTheme('light');
-  }
-  
-  applyAllCustomThemes();
+function deleteCustomTheme(id) {
+  if (!confirm('Delete this theme?')) return;
+  removeCustomTheme(id);
   renderCustomThemesList();
 }
 
-// Отрисовка списка пользовательских тем
-function renderCustomThemesList() {
-  const container = $('custom-themes-list');
-  if (!container) return;
-  
-  const themes = loadCustomThemes();
-  
-  if (themes.length === 0) {
-    container.innerHTML = '<p style="color: var(--description-color); text-align: center; padding: 20px;">Нет пользовательских тем</p>';
+// ==========================================
+// ШАБЛОН ТЕМЫ ДЛЯ КОПИРОВАНИЯ
+// ==========================================
+
+function getThemeTemplate() {
+  return `/* ==========================================
+   CUSTOM THEME TEMPLATE
+   ==========================================
+   Скопируйте этот шаблон, отправьте в нейросеть
+   и попросите изменить цвета на желаемые.
+   Все переменные ниже обязательны.
+   ========================================== */
+
+:root {
+  /* === Основные цвета === */
+  --bg-gradient-start: #1a1a2e;
+  --bg-gradient-end: #16213e;
+  --text-color: #e0e0e0;
+  --heading-color: #ffffff;
+  --description-color: #a0a0a0;
+
+  /* === Карточки === */
+  --card-bg: #1e1e2f;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: rgba(0, 0, 0, 0.5);
+
+  /* === Кнопки (общие) === */
+  --btn-bg: #2a2a3e;
+  --btn-hover-bg: #3a3a4e;
+
+  /* === Основные кнопки === */
+  --btn-primary-bg: #667eea;
+  --btn-primary-color: #ffffff;
+  --btn-primary-hover-bg: #5568d3;
+
+  /* === Вторичные кнопки === */
+  --btn-secondary-bg: #3a3a4e;
+  --btn-secondary-color: #e0e0e0;
+  --btn-secondary-hover-bg: #4a4a5e;
+
+  /* === Кнопка "Назад" === */
+  --btn-back-bg: #667eea;
+  --btn-back-hover-bg: #5568d3;
+  --btn-back-shadow: rgba(102, 126, 234, 0.3);
+
+  /* === Кнопка "Удалить" === */
+  --delete-btn-bg: #e74c3c;
+
+  /* === Кнопка "Поделиться" / "Установить" === */
+  --share-btn-bg: #2ecc71;
+  --share-btn-hover-bg: #27ae60;
+
+  /* === Акцентный цвет (основной) === */
+  --accent-color: #667eea;
+  --accent-hover: #5568d3;
+
+  /* === Поля ввода === */
+  --input-border: #3a3a4e;
+  --input-focus-border: #667eea;
+
+  /* === Поле кода === */
+  --code-input-bg: #0f0f1a;
+  --code-input-text: #e0e0e0;
+  --code-input-border: #3a3a4e;
+
+  /* === Блок кода (промпт) === */
+  --code-bg: #0f0f1a;
+  --code-text: #e0e0e0;
+
+  /* === Модалки === */
+  --modal-bg: #1e1e2f;
+  --modal-shadow: rgba(0, 0, 0, 0.5);
+  --modal-heading-color: #ffffff;
+  --modal-description-color: #a0a0a0;
+  --modal-close-color: #a0a0a0;
+  --modal-close-hover-bg: #3a3a4e;
+  --modal-close-hover-color: #ffffff;
+
+  /* === Статусы === */
+  --status-error-bg: rgba(231, 76, 60, 0.2);
+  --status-error-color: #e74c3c;
+  --status-success-bg: rgba(46, 204, 113, 0.2);
+  --status-success-color: #2ecc71;
+  --status-loading-bg: rgba(102, 126, 234, 0.2);
+  --status-loading-color: #667eea;
+
+  /* === Вкладки === */
+  --tab-bg: #2a2a3e;
+  --tab-color: #a0a0a0;
+  --tab-active-bg: #667eea;
+  --tab-active-color: #ffffff;
+  --tab-hover-color: #ffffff;
+
+  /* === Предупреждение о папке === */
+  --folder-warning-bg: rgba(241, 196, 15, 0.1);
+  --folder-warning-color: #f1c40f;
+
+  /* === Превью (редактирование / шаринг) === */
+  --edit-preview-bg: #2a2a3e;
+  --edit-preview-name-color: #ffffff;
+  --edit-preview-desc-color: #a0a0a0;
+
+  /* === Ссылки на нейросети === */
+  --ai-link-bg: #2a2a3e;
+  --ai-link-color: #667eea;
+  --ai-link-hover-bg: #3a3a4e;
+  --ai-link-hover-color: #8899ff;
+  --ai-link-hover-shadow: rgba(102, 126, 234, 0.3);
+
+  /* === Хедер приложения === */
+  --app-header-bg: #1e1e2f;
+  --app-header-text: #ffffff;
+  --app-header-shadow: rgba(0, 0, 0, 0.3);
+
+  /* === Toast-уведомления === */
+  --toast-info-bg: #667eea;
+  --toast-success-bg: #2ecc71;
+  --toast-error-bg: #e74c3c;
+}`;
+}
+
+function copyThemeTemplate() {
+  const template = getThemeTemplate();
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(template).then(() => {
+      showToast('✅ Theme template copied!', 'success');
+    }).catch(() => {
+      fallbackCopyTheme(template);
+    });
+  } else {
+    fallbackCopyTheme(template);
+  }
+}
+
+function fallbackCopyTheme(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showToast('✅ Theme template copied!', 'success');
+  } catch (e) {
+    showToast('❌ Failed to copy', 'error');
+  }
+  document.body.removeChild(textarea);
+}
+
+function submitCustomTheme() {
+  const nameInput = document.getElementById('theme-name-input');
+  const cssInput = document.getElementById('theme-css-input');
+  const status = document.getElementById('add-theme-status');
+
+  if (!nameInput || !cssInput) return;
+
+  const name = nameInput.value.trim();
+  const css = cssInput.value.trim();
+
+  if (!name) {
+    if (status) { status.textContent = '❌ Enter theme name'; status.className = 'modal-status error'; }
     return;
   }
-  
-  container.innerHTML = themes.map(theme => `
-    <div class="custom-theme-item">
-      <div class="custom-theme-info">
-        <span class="custom-theme-name">🎨 ${theme.name}</span>
-        <button class="btn btn-small" onclick="applyTheme('${theme.id}')">Применить</button>
-      </div>
-      <button class="delete-theme-btn" onclick="deleteCustomTheme('${theme.id}')" title="Удалить">×</button>
-    </div>
-  `).join('');
-}
 
-// Открытие модалки добавления темы
-function openAddThemeModal() {
-  const modal = $('add-theme-modal');
-  if (modal) {
-    modal.classList.add('active');
-    
-    const nameInput = $('theme-name-input');
-    const cssInput = $('theme-css-input');
-    const status = $('add-theme-status');
-    
-    if (nameInput) nameInput.value = '';
-    if (cssInput) cssInput.value = '';
-    if (status) {
-      status.textContent = '';
-      status.className = 'modal-status';
-    }
+  if (!css) {
+    if (status) { status.textContent = '❌ Paste CSS code'; status.className = 'modal-status error'; }
+    return;
   }
+
+  if (!css.includes(':root')) {
+    if (status) { status.textContent = '❌ CSS must contain :root block'; status.className = 'modal-status error'; }
+    return;
+  }
+
+  const id = addCustomTheme(name, css);
+
+  if (status) { status.textContent = '✅ Theme added!'; status.className = 'modal-status success'; }
+
+  setTimeout(() => {
+    nameInput.value = '';
+    cssInput.value = '';
+    if (status) { status.textContent = ''; status.className = 'modal-status'; }
+    closeAddThemeModal();
+    renderCustomThemesList();
+  }, 1000);
 }
 
-// Закрытие модалки
+function openAddThemeModal() {
+  const modal = document.getElementById('add-theme-modal');
+  const nameInput = document.getElementById('theme-name-input');
+  const cssInput = document.getElementById('theme-css-input');
+  const status = document.getElementById('add-theme-status');
+
+  if (nameInput) nameInput.value = '';
+  if (cssInput) cssInput.value = '';
+  if (status) { status.textContent = ''; status.className = 'modal-status'; }
+
+  // Заполняем ссылки на нейросети в модалке
+  const themeAiLinks = document.getElementById('theme-ai-links');
+  if (themeAiLinks) {
+    themeAiLinks.innerHTML = '';
+    const networks = getAINetworks();
+    networks.forEach(network => {
+      const link = document.createElement('a');
+      link.href = network.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'ai-link';
+      link.textContent = network.name;
+      themeAiLinks.appendChild(link);
+    });
+  }
+
+  if (modal) modal.classList.add('active');
+}
+
 function closeAddThemeModal() {
-  const modal = $('add-theme-modal');
+  const modal = document.getElementById('add-theme-modal');
   if (modal) modal.classList.remove('active');
 }
 
-// Копирование шаблона темы
-function copyThemeTemplate() {
-  const templateBtn = $('copy-theme-template-btn');
-  
-  // Используем getPrompt() из prompts.js
-  const template = getPrompt('THEME_TEMPLATE');
-  
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(template).then(() => {
-      if (templateBtn) {
-        templateBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => templateBtn.textContent = '📋 Скопировать шаблон', 2000);
-      }
-    }).catch(err => {
-      console.error('Ошибка копирования:', err);
-    });
-  } else {
-    const textarea = document.createElement('textarea');
-    textarea.value = template;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-      document.execCommand('copy');
-      if (templateBtn) {
-        templateBtn.textContent = '✅ Скопировано!';
-        setTimeout(() => templateBtn.textContent = '📋 Скопировать шаблон', 2000);
-      }
-    } catch (e) {
-      console.error('Ошибка копирования:', e);
-    }
-    document.body.removeChild(textarea);
-  }
-}
+// ==========================================
+// ПРИМЕНЕНИЕ ТЕМЫ
+// ==========================================
 
-// Добавление темы из модалки
-function submitCustomTheme() {
-  const nameInput = $('theme-name-input');
-  const cssInput = $('theme-css-input');
-  const status = $('add-theme-status');
-  
-  if (!nameInput || !cssInput) return;
-  
-  const themeName = nameInput.value.trim();
-  const css = cssInput.value.trim();
-  
-  if (!themeName) {
-    if (status) {
-      status.textContent = '❌ Введите название темы';
-      status.className = 'modal-status error';
-    }
+function applyTheme(themeId) {
+  // Удаляем все пользовательские стили тем
+  document.querySelectorAll('style[data-custom-theme]').forEach(el => el.remove());
+
+  if (!themeId || themeId === 'light' || themeId === 'cyberpunk' || themeId === 'discord') {
+    // Системная тема — переключаем через стандартный механизм
+    if (typeof setTheme === 'function') setTheme(themeId || 'light');
     return;
   }
-  
-  if (!css) {
-    if (status) {
-      status.textContent = '❌ Вставьте CSS-код темы';
-      status.className = 'modal-status error';
-    }
-    return;
-  }
-  
-  try {
-    const themeId = themeName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substr(2, 6);
-    const processedCSS = css.replace(/НАЗВАНИЕ_ТЕМЫ/g, themeId);
-    
-    const theme = addCustomTheme(processedCSS, themeName);
-    
-    if (status) {
-      status.textContent = `✅ Тема "${theme.name}" добавлена!`;
-      status.className = 'modal-status success';
-    }
-    
-    setTimeout(() => {
-      closeAddThemeModal();
-      renderCustomThemesList();
-    }, 1500);
-    
-  } catch (error) {
-    if (status) {
-      status.textContent = `❌ Ошибка: ${error.message}`;
-      status.className = 'modal-status error';
-    }
-  }
-}
 
-// Инициализация пользовательских тем при загрузке
-function initCustomThemes() {
-  const themes = loadCustomThemes();
-  
-  themes.forEach(theme => {
-    THEMES[theme.id] = {
-      name: theme.name,
-      icon: '🎨',
-      isCustom: true
-    };
-  });
-  
-  applyAllCustomThemes();
-  
-  console.log(`🎨 Загружено пользовательских тем: ${themes.length}`);
+  // Пользовательская тема
+  const themes = getCustomThemes();
+  const theme = themes.find(t => t.id === themeId);
+  if (!theme) return;
+
+  const style = document.createElement('style');
+  style.setAttribute('data-custom-theme', themeId);
+  style.textContent = theme.css;
+  document.head.appendChild(style);
+
+  // Сохраняем выбор
+  localStorage.setItem('currentTheme', themeId);
 }
