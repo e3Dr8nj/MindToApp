@@ -312,29 +312,53 @@ function closeAddThemeModal() {
 }
 
 // ==========================================
-// ПРИМЕНЕНИЕ ТЕМЫ
+// ПРИМЕНЕНИЕ ТЕМЫ (С ОТЛАДКОЙ)
 // ==========================================
 
 function applyTheme(themeId) {
+  console.log('🎨 [applyTheme] Вызвана с themeId:', themeId);
+  
   // Удаляем все пользовательские стили тем
-  document.querySelectorAll('style[data-custom-theme]').forEach(el => el.remove());
+  document.querySelectorAll('style[data-custom-theme]').forEach(el => {
+    console.log('🗑️ [applyTheme] Удаляю старый стиль:', el.getAttribute('data-custom-theme'));
+    el.remove();
+  });
 
   if (!themeId || themeId === 'light' || themeId === 'cyberpunk' || themeId === 'discord') {
+    console.log('🔵 [applyTheme] Системная тема:', themeId || 'light');
     // Системная тема — переключаем через стандартный механизм
-    if (typeof setTheme === 'function') setTheme(themeId || 'light');
+    if (typeof setTheme === 'function') {
+      setTheme(themeId || 'light');
+      console.log('✅ [applyTheme] setTheme() вызван');
+    } else {
+      console.error('❌ [applyTheme] Функция setTheme() не найдена!');
+    }
     return;
   }
 
   // Пользовательская тема
+  console.log('🟢 [applyTheme] Кастомная тема:', themeId);
   const themes = getCustomThemes();
+  console.log('📋 [applyTheme] Всего тем:', themes.length);
+  
   const theme = themes.find(t => t.id === themeId);
-  if (!theme) return;
+  if (!theme) {
+    console.error('❌ [applyTheme] Тема не найдена:', themeId);
+    return;
+  }
+  
+  console.log('✅ [applyTheme] Тема найдена:', theme.name);
+  console.log('📝 [applyTheme] CSS длина:', theme.css.length);
+  console.log('📝 [applyTheme] CSS первые 200 символов:', theme.css.substring(0, 200));
 
   const style = document.createElement('style');
   style.setAttribute('data-custom-theme', themeId);
   style.textContent = theme.css;
   document.head.appendChild(style);
+  
+  console.log('✅ [applyTheme] Стиль добавлен в <head>');
 
   // Сохраняем выбор
   localStorage.setItem('currentTheme', themeId);
+  console.log('💾 [applyTheme] Тема сохранена в localStorage');
 }

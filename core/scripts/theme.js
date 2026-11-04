@@ -1,70 +1,54 @@
 // ==========================================
-// СИСТЕМА ТЕМ
+// СИСТЕМНЫЕ ТЕМЫ ОФОРМЛЕНИЯ
 // ==========================================
 
-const THEMES = {
-  light: {
-    name: 'Светлая',
-    icon: '☀️'
-  },
-  cyberpunk: {
-    name: 'Киберпанк',
-    icon: '🌆'
-  },
-  discord: {
-    name: 'Дискорд',
-    icon: '💬'
-  }
-};
+const AVAILABLE_THEMES = ['light', 'cyberpunk', 'discord'];
 
-let currentTheme = localStorage.getItem('mindtoapp_theme') || 'light';
-
-// Применение темы
-function applyTheme(themeName) {
-  // Защита: если тема не найдена, переключаемся на light
-  if (!THEMES[themeName]) {
-    console.warn(`⚠️ Тема "${themeName}" не найдена, переключаемся на light`);
-    themeName = 'light';
-    localStorage.setItem('mindtoapp_theme', 'light');
-  }
-  
-  if (!document.body) {
-    console.warn('document.body ещё не доступен, ждём загрузки DOM');
-    setTimeout(() => applyTheme(themeName), 100);
-    return;
-  }
-  
-  currentTheme = themeName;
-  document.body.setAttribute('data-theme', themeName);
-  localStorage.setItem('mindtoapp_theme', themeName);
-  updateThemeButton();
-  
-  console.log(`✅ Тема применена: ${themeName}`);
-}
-
-// Переключение на следующую тему
-function cycleTheme() {
-  const themeKeys = Object.keys(THEMES);
-  const currentIndex = themeKeys.indexOf(currentTheme);
-  const nextIndex = (currentIndex + 1) % themeKeys.length;
-  const nextTheme = themeKeys[nextIndex];
-  
-  console.log(`🔄 Переключение темы: ${currentTheme} → ${nextTheme}`);
-  applyTheme(nextTheme);
-}
-
-// Обновление текста кнопки темы
-function updateThemeButton() {
-  const themeBtn = $('theme-toggle-btn');
-  if (themeBtn) {
-    const theme = THEMES[currentTheme];
-    themeBtn.textContent = `${theme.icon} ${theme.name}`;
-    themeBtn.title = `Текущая тема: ${theme.name}. Нажмите для переключения.`;
-  }
-}
-
-// Инициализация темы при загрузке
 function initTheme() {
-  console.log(`🎨 Инициализация темы: ${currentTheme}`);
-  applyTheme(currentTheme);
+  console.log('🎨 [initTheme] Загрузка темы при старте');
+  
+  const savedTheme = localStorage.getItem('currentTheme');
+  console.log('💾 [initTheme] Сохранённая тема:', savedTheme);
+  
+  if (savedTheme) {
+    console.log('🔄 [initTheme] Применяю сохранённую тему:', savedTheme);
+    applyTheme(savedTheme);
+  } else {
+    console.log('🔵 [initTheme] Нет сохранённой темы, применяю light');
+    applyTheme('light');
+  }
+}
+
+function setTheme(themeName) {
+  console.log('🎨 [setTheme] Установка темы:', themeName);
+  
+  // Удаляем все системные темы
+  AVAILABLE_THEMES.forEach(theme => {
+    const link = document.querySelector(`link[data-theme="${theme}"]`);
+    if (link) {
+      link.disabled = true;
+      console.log('🔴 [setTheme] Отключена тема:', theme);
+    }
+  });
+  
+  // Активируем выбранную тему
+  if (AVAILABLE_THEMES.includes(themeName)) {
+    const link = document.querySelector(`link[data-theme="${themeName}"]`);
+    if (link) {
+      link.disabled = false;
+      console.log('🟢 [setTheme] Активирована тема:', themeName);
+    } else {
+      console.error('❌ [setTheme] Ссылка на тему не найдена:', themeName);
+    }
+  } else {
+    console.error('❌ [setTheme] Неизвестная тема:', themeName);
+  }
+  
+  // Сохраняем выбор
+  localStorage.setItem('currentTheme', themeName);
+  console.log('💾 [setTheme] Тема сохранена в localStorage');
+}
+
+function getCurrentTheme() {
+  return localStorage.getItem('currentTheme') || 'light';
 }
