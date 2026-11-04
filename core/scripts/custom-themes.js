@@ -267,20 +267,27 @@ function openAddThemeModal() {
   if (cssInput) cssInput.value = '';
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
-  // Заполняем ссылки на нейросети в модалке
+  // Заполняем список нейросетей из общего хранилища
   const themeAiLinks = document.getElementById('theme-ai-links');
   if (themeAiLinks) {
     themeAiLinks.innerHTML = '';
-    const networks = getAINetworks();
-    networks.forEach(network => {
-      const link = document.createElement('a');
-      link.href = network.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.className = 'ai-link';
-      link.textContent = network.name;
-      themeAiLinks.appendChild(link);
-    });
+    
+    // Проверяем, что функция getAINetworks доступна
+    if (typeof getAINetworks === 'function') {
+      const networks = getAINetworks();
+      networks.forEach(network => {
+        const link = document.createElement('a');
+        link.href = network.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.className = 'ai-link';
+        link.textContent = network.name;
+        themeAiLinks.appendChild(link);
+      });
+    } else {
+      console.warn('getAINetworks function not available');
+      themeAiLinks.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px;">AI networks not loaded</div>';
+    }
   }
 
   if (modal) modal.classList.add('active');
