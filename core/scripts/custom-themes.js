@@ -65,71 +65,48 @@ function deleteCustomTheme(id) {
 }
 
 function getThemeTemplate() {
-  return `/* ==========================================
-   CUSTOM THEME TEMPLATE
-   ==========================================
-   Скопируйте этот шаблон, отправьте в нейросеть
-   и попросите изменить цвета на желаемые.
-   Все переменные ниже обязательны.
-   ========================================== */
+  return `Generate a custom CSS theme for my app based on the user's request below.
 
+REQUIREMENTS:
+1. Return ONLY the CSS code inside a single \`\`\`css ... \`\`\` markdown block.
+2. The CSS must contain ONLY a :root { ... } block with CSS variables.
+3. Do NOT add any explanations, comments outside the code, or text before/after the code block.
+4. The result must be ready to copy with one click.
+5. Keep ALL the variables listed below — do not remove any of them. Only change their values.
+
+REQUIRED VARIABLES (keep all of them, change only values):
 :root {
-  /* === Основные цвета === */
   --bg-gradient-start: #1a1a2e;
   --bg-gradient-end: #16213e;
   --text-color: #e0e0e0;
   --heading-color: #ffffff;
   --description-color: #a0a0a0;
-
-  /* === Карточки === */
   --card-bg: #1e1e2f;
   --card-shadow: rgba(0, 0, 0, 0.3);
   --card-shadow-hover: rgba(0, 0, 0, 0.5);
-
-  /* === Кнопки (общие) === */
   --btn-bg: #2a2a3e;
   --btn-hover-bg: #3a3a4e;
-
-  /* === Основные кнопки === */
   --btn-primary-bg: #667eea;
   --btn-primary-color: #ffffff;
   --btn-primary-hover-bg: #5568d3;
-
-  /* === Вторичные кнопки === */
   --btn-secondary-bg: #3a3a4e;
   --btn-secondary-color: #e0e0e0;
   --btn-secondary-hover-bg: #4a4a5e;
-
-  /* === Кнопка "Назад" === */
   --btn-back-bg: #667eea;
   --btn-back-hover-bg: #5568d3;
   --btn-back-shadow: rgba(102, 126, 234, 0.3);
-
-  /* === Кнопка "Удалить" === */
   --delete-btn-bg: #e74c3c;
-
-  /* === Кнопка "Поделиться" / "Установить" === */
   --share-btn-bg: #2ecc71;
   --share-btn-hover-bg: #27ae60;
-
-  /* === Акцентный цвет (основной) === */
   --accent-color: #667eea;
   --accent-hover: #5568d3;
-
-  /* === Поля ввода === */
   --input-border: #3a3a4e;
   --input-focus-border: #667eea;
-
-  /* === Поле кода === */
   --code-input-bg: #0f0f1a;
   --code-input-text: #e0e0e0;
   --code-input-border: #3a3a4e;
-
-  /* === Блок кода (промпт) === */
   --code-bg: #0f0f1a;
   --code-text: #e0e0e0;
-
-  /* === Модалки === */
   --modal-bg: #1e1e2f;
   --modal-shadow: rgba(0, 0, 0, 0.5);
   --modal-heading-color: #ffffff;
@@ -137,48 +114,37 @@ function getThemeTemplate() {
   --modal-close-color: #a0a0a0;
   --modal-close-hover-bg: #3a3a4e;
   --modal-close-hover-color: #ffffff;
-
-  /* === Статусы === */
   --status-error-bg: rgba(231, 76, 60, 0.2);
   --status-error-color: #e74c3c;
   --status-success-bg: rgba(46, 204, 113, 0.2);
   --status-success-color: #2ecc71;
   --status-loading-bg: rgba(102, 126, 234, 0.2);
   --status-loading-color: #667eea;
-
-  /* === Вкладки === */
   --tab-bg: #2a2a3e;
   --tab-color: #a0a0a0;
   --tab-active-bg: #667eea;
   --tab-active-color: #ffffff;
   --tab-hover-color: #ffffff;
-
-  /* === Предупреждение о папке === */
   --folder-warning-bg: rgba(241, 196, 15, 0.1);
   --folder-warning-color: #f1c40f;
-
-  /* === Превью (редактирование / шаринг) === */
   --edit-preview-bg: #2a2a3e;
   --edit-preview-name-color: #ffffff;
   --edit-preview-desc-color: #a0a0a0;
-
-  /* === Ссылки на нейросети === */
   --ai-link-bg: #2a2a3e;
   --ai-link-color: #667eea;
   --ai-link-hover-bg: #3a3a4e;
   --ai-link-hover-color: #8899ff;
   --ai-link-hover-shadow: rgba(102, 126, 234, 0.3);
-
-  /* === Хедер приложения === */
   --app-header-bg: #1e1e2f;
   --app-header-text: #ffffff;
   --app-header-shadow: rgba(0, 0, 0, 0.3);
-
-  /* === Toast-уведомления === */
   --toast-info-bg: #667eea;
   --toast-success-bg: #2ecc71;
   --toast-error-bg: #e74c3c;
-}`;
+}
+
+USER REQUEST:
+[USER WILL DESCRIBE THE DESIRED THEME HERE]`;
 }
 
 function copyThemeTemplate() {
