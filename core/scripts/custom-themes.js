@@ -1,7 +1,3 @@
-// ==========================================
-// ПОЛЬЗОВАТЕЛЬСКИЕ ТЕМЫ ОФОРМЛЕНИЯ
-// ==========================================
-
 const DEFAULT_CUSTOM_THEMES = [];
 
 function initCustomThemes() {
@@ -67,10 +63,6 @@ function deleteCustomTheme(id) {
   removeCustomTheme(id);
   renderCustomThemesList();
 }
-
-// ==========================================
-// ШАБЛОН ТЕМЫ ДЛЯ КОПИРОВАНИЯ
-// ==========================================
 
 function getThemeTemplate() {
   return `/* ==========================================
@@ -190,22 +182,15 @@ function getThemeTemplate() {
 }
 
 function copyThemeTemplate() {
-  console.log('🎨 [custom-themes.js] copyThemeTemplate() вызвана');
-  
   const template = getThemeTemplate();
-  console.log('📋 [custom-themes.js] Шаблон получен, длина:', template.length);
-  console.log('📋 [custom-themes.js] Первые 100 символов:', template.substring(0, 100));
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(template).then(() => {
-      console.log('✅ [custom-themes.js] Шаблон скопирован через clipboard API');
       showToast('✅ Theme template copied!', 'success');
-    }).catch((err) => {
-      console.error('❌ [custom-themes.js] Ошибка clipboard API:', err);
+    }).catch(() => {
       fallbackCopyTheme(template);
     });
   } else {
-    console.log('⚠️ [custom-themes.js] clipboard API недоступен, используем fallback');
     fallbackCopyTheme(template);
   }
 }
@@ -274,15 +259,12 @@ function openAddThemeModal() {
   if (cssInput) cssInput.value = '';
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
-  // Заполняем список нейросетей из общего хранилища
   const themeAiLinks = document.getElementById('theme-ai-links');
   if (themeAiLinks) {
     themeAiLinks.innerHTML = '';
     
-    // Проверяем, что функция getAINetworks доступна
     if (typeof getAINetworks === 'function') {
       const networks = getAINetworks();
-      console.log('🤖 [custom-themes.js] Загружено нейросетей:', networks.length);
       
       if (networks.length === 0) {
         themeAiLinks.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px; text-align: center;">No AI networks configured</div>';
@@ -298,7 +280,6 @@ function openAddThemeModal() {
         });
       }
     } else {
-      console.warn('⚠️ [custom-themes.js] getAINetworks function not available');
       themeAiLinks.innerHTML = '<div style="color: var(--description-color); font-size: 13px; padding: 10px;">AI networks not loaded</div>';
     }
   }
@@ -311,54 +292,24 @@ function closeAddThemeModal() {
   if (modal) modal.classList.remove('active');
 }
 
-// ==========================================
-// ПРИМЕНЕНИЕ ТЕМЫ (С ОТЛАДКОЙ)
-// ==========================================
-
 function applyTheme(themeId) {
-  console.log('🎨 [applyTheme] Вызвана с themeId:', themeId);
-  
-  // Удаляем все пользовательские стили тем
-  document.querySelectorAll('style[data-custom-theme]').forEach(el => {
-    console.log('🗑️ [applyTheme] Удаляю старый стиль:', el.getAttribute('data-custom-theme'));
-    el.remove();
-  });
+  document.querySelectorAll('style[data-custom-theme]').forEach(el => el.remove());
 
   if (!themeId || themeId === 'light' || themeId === 'cyberpunk' || themeId === 'discord') {
-    console.log('🔵 [applyTheme] Системная тема:', themeId || 'light');
-    // Системная тема — переключаем через стандартный механизм
     if (typeof setTheme === 'function') {
       setTheme(themeId || 'light');
-      console.log('✅ [applyTheme] setTheme() вызван');
-    } else {
-      console.error('❌ [applyTheme] Функция setTheme() не найдена!');
     }
     return;
   }
 
-  // Пользовательская тема
-  console.log('🟢 [applyTheme] Кастомная тема:', themeId);
   const themes = getCustomThemes();
-  console.log('📋 [applyTheme] Всего тем:', themes.length);
-  
   const theme = themes.find(t => t.id === themeId);
-  if (!theme) {
-    console.error('❌ [applyTheme] Тема не найдена:', themeId);
-    return;
-  }
-  
-  console.log('✅ [applyTheme] Тема найдена:', theme.name);
-  console.log('📝 [applyTheme] CSS длина:', theme.css.length);
-  console.log('📝 [applyTheme] CSS первые 200 символов:', theme.css.substring(0, 200));
+  if (!theme) return;
 
   const style = document.createElement('style');
   style.setAttribute('data-custom-theme', themeId);
   style.textContent = theme.css;
   document.head.appendChild(style);
-  
-  console.log('✅ [applyTheme] Стиль добавлен в <head>');
 
-  // Сохраняем выбор
   localStorage.setItem('currentTheme', themeId);
-  console.log('💾 [applyTheme] Тема сохранена в localStorage');
 }
