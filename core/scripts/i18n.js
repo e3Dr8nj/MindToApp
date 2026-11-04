@@ -29,6 +29,9 @@ const translations = {
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
+    // Кнопка переключения языка (показывает, на какой язык переключится)
+    languageToggle: '🇷🇺 RU',
+    languageToggleTitle: 'Switch to Russian',
     describeIdea: '💡 Describe your idea',
     describeIdeaPlaceholder: 'For example: Expense calculator with charts, dark theme, and history saved in localStorage...',
     copyPrompt: '📋 Copy prompt',
@@ -152,6 +155,9 @@ const translations = {
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
+    // Кнопка переключения языка (показывает, на какой язык переключится)
+    languageToggle: '🇬🇧 EN',
+    languageToggleTitle: 'Переключить на английский',
     describeIdea: '💡 Опишите идею',
     describeIdeaPlaceholder: 'Например: Калькулятор расходов с графиками, тёмной темой и сохранением истории в localStorage...',
     copyPrompt: '📋 Скопировать промпт',
@@ -329,10 +335,11 @@ function applyLanguage() {
     }
   });
 
+  // Обновляем кнопку переключения языка в хедере
   var langBtn = document.getElementById('language-toggle-btn');
   if (langBtn) {
-    langBtn.textContent = lang === 'en' ? '🇷🇺' : '🇬🇧';
-    langBtn.title = lang === 'en' ? 'Switch to Russian' : 'Переключить на английский';
+    langBtn.textContent = t('languageToggle');
+    langBtn.title = t('languageToggleTitle');
   }
 
   if (typeof renderInstalledApps === 'function') renderInstalledApps();
