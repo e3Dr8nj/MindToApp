@@ -386,3 +386,4 @@ function setupEventListeners() {
     }
   });
 }
+ init();
