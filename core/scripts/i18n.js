@@ -147,6 +147,7 @@ const translations = {
     aiListDesc: 'Order in list = order in menu.',
     aiYourAI: 'Your AI',
     newAI: '➕ New AI',
+    editAI: '✏️ Edit AI',
     aiEditName: 'Name',
     aiEditUrl: 'URL',
     aiNamePlaceholder: 'For example: Qwen Chat',
@@ -308,7 +309,7 @@ const translations = {
     addTabFile: '📄 Файл',
     addTabFolder: '📁 Папка',
     addTabCode: '📋 Код',
-    addUrlDesc: 'Вставьте прямую ссылку на файл с HTML-кодом или на папку.<br>Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.',
+    addUrlDesc: 'Вставьте прямую ссылку на HTML-файл или папку.<br>Поддерживаются: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.',
     addUrlPlaceholder: 'https://example.com/module/',
     addFileDesc: 'Выберите <b>один файл .html</b> с вашего компьютера.',
     addSelectFile: '📂 Выбрать файл .html',
@@ -373,6 +374,7 @@ const translations = {
     aiListDesc: 'Порядок в списке = порядок в меню.',
     aiYourAI: 'Ваши нейросети',
     newAI: '➕ Новая нейросеть',
+    editAI: '✏️ Редактировать нейросеть',
     aiEditName: 'Название',
     aiEditUrl: 'Ссылка (URL)',
     aiNamePlaceholder: 'Например: Qwen Chat',
@@ -488,14 +490,6 @@ function t(key, params) {
 
 function applyTranslation(el, key, isHtml) {
   var text = t(key);
-  var currentText = (isHtml ? el.innerHTML : el.textContent).trim();
-
-  if (currentText && text) {
-    var firstChars = text.slice(0, 2);
-    if (currentText.startsWith(firstChars)) {
-      text = text.slice(firstChars.length).trim();
-    }
-  }
 
   if (isHtml) {
     el.innerHTML = text;
@@ -550,7 +544,7 @@ function applyLanguage() {
     // Пустое состояние
     { selector: '#empty-state > p', key: 'noInstalledApps' },
 
-    // Модалка добавления темы - описания шагов
+    // Модалка добавления темы
     { selector: '#add-theme-modal .step-box:nth-child(1) > h3', key: 'themeStep1' },
     { selector: '#add-theme-modal .step-box:nth-child(1) > p', key: 'themeStep1Desc' },
     { selector: '#copy-theme-template-btn', key: 'themeCopyTemplate' },
@@ -564,7 +558,60 @@ function applyLanguage() {
     { selector: '#themes-modal .modal-header h2', key: 'themesTitle' },
     { selector: '#themes-modal .step-box:nth-child(1) > h3', key: 'themesSystemTitle' },
     { selector: '#themes-modal .step-box:nth-child(2) > h3', key: 'themesCustomTitle' },
-    { selector: '#add-theme-btn', key: 'themesAddCustom' }
+    { selector: '#add-theme-btn', key: 'themesAddCustom' },
+
+    // Модалка редактора промпта
+    { selector: '#prompts-modal .modal-header h2', key: 'promptEditorTitle' },
+    { selector: '#prompts-modal .step-box > p', key: 'promptEditorDesc' },
+    { selector: '#reset-prompt-btn', key: 'resetToDefault' },
+    { selector: '#save-prompt-btn', key: 'saveChanges' },
+
+    // Модалка AI менеджера
+    { selector: '#ai-manager-modal .modal-header h2', key: 'aiListTitle' },
+    { selector: '#ai-manager-modal .step-box:nth-child(1) > h3', key: 'aiYourAI' },
+    { selector: '#ai-manager-modal .step-box:nth-child(1) > p', key: 'aiListDesc' },
+    { selector: '#add-ai-btn', key: 'addAI' },
+    { selector: '#reset-ai-list-btn', key: 'resetList' },
+
+    // Модалка добавления модуля
+    { selector: '#add-modal .modal-header h2', key: 'addModuleTitle' },
+    { selector: '#add-modal .tab[data-tab="url"] > p.modal-description', key: 'addUrlDesc', isHtml: true },
+    { selector: '#add-modal .tab[data-tab="local"] > p.modal-description', key: 'addFileDesc', isHtml: true },
+    { selector: '#select-file-btn', key: 'addSelectFile' },
+    { selector: '#add-modal .tab[data-tab="folder"] > p.modal-description', key: 'addFolderDesc', isHtml: true },
+    { selector: '#select-folder-btn', key: 'addSelectFolder' },
+    { selector: '#add-modal .folder-warning', key: 'addFolderWarning' },
+    { selector: '#add-modal .tab[data-tab="code"] > p.modal-description', key: 'addCodeDesc', isHtml: true },
+    { selector: '#add-modal .tab-switcher .tab-btn:nth-child(1)', key: 'addTabLink' },
+    { selector: '#add-modal .tab-switcher .tab-btn:nth-child(2)', key: 'addTabFile' },
+    { selector: '#add-modal .tab-switcher .tab-btn:nth-child(3)', key: 'addTabFolder' },
+    { selector: '#add-modal .tab-switcher .tab-btn:nth-child(4)', key: 'addTabCode' },
+    { selector: '#confirm-add-btn', key: 'addBtn' },
+
+    // Модалка шеринга
+    { selector: '#share-modal .modal-header h2', key: 'shareTitle' },
+    { selector: '#share-modal .step-box:nth-child(1) > h3', key: 'shareStep1' },
+    { selector: '#share-modal .step-box:nth-child(1) > p', key: 'shareStep1Desc' },
+    { selector: '#copy-app-code-btn', key: 'shareCopyCode' },
+    { selector: '#share-modal .step-box:nth-child(2) > h3', key: 'shareStep2' },
+    { selector: '#share-modal .step-box:nth-child(2) > p', key: 'shareStep2Desc' },
+    { selector: '#share-modal .step-box:nth-child(3) > h3', key: 'shareStep3' },
+    { selector: '#share-modal .step-box:nth-child(3) > p', key: 'shareStep3Desc' },
+    { selector: '#bind-url-btn', key: 'bindUrl' },
+    { selector: '#unbind-url-btn', key: 'unbindUrl' },
+
+    // Модалка экспорта ссылок
+    { selector: '#export-urls-modal .modal-header h2', key: 'exportUrlsTitle' },
+    { selector: '#export-urls-modal .modal-body > p', key: 'exportDesc' },
+    { selector: '#export-urls-empty > p:first-child', key: 'noLinkedApps' },
+    { selector: '#export-urls-empty > p:last-child', key: 'noLinkedAppsDesc' },
+    { selector: '#copy-export-urls-btn', key: 'copyList' },
+
+    // Модалка редактирования
+    { selector: '#edit-modal .modal-header h2', key: 'editTitle' },
+    { selector: '#toggle-code-btn', key: 'editShowCode' },
+    { selector: '#copy-code-btn', key: 'editCopyCode' },
+    { selector: '#copy-edit-prompt-btn', key: 'editCopyPromptCode' }
   ];
 
   textUpdates.forEach(function(item) {
@@ -600,7 +647,7 @@ function applyLanguage() {
     }
   });
 
-  // Перерисовываем карточки приложений
+  // Перерисовываем карточки приложений и списки
   if (typeof renderInstalledApps === 'function') renderInstalledApps();
   if (typeof renderAllApps === 'function') renderAllApps();
   if (typeof renderCustomThemesList === 'function') renderCustomThemesList();
