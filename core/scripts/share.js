@@ -83,7 +83,6 @@ function openShareModal(module) {
     if (urlStatus) { urlStatus.textContent = ''; urlStatus.className = 'modal-status'; }
   }
 
-  // Обновляем видимость блока шеринга в Telegram
   updateTelegramShareBlock();
 
   modal.classList.add('active');
@@ -170,7 +169,6 @@ function bindUrlToApp() {
     unbindBtn.textContent = t('unbindUrl');
   }
 
-  // Обновляем видимость блока шеринга в Telegram
   updateTelegramShareBlock();
 
   renderInstalledApps();
@@ -194,7 +192,6 @@ function unbindUrlFromApp() {
   if (unbindBtn) unbindBtn.style.display = 'none';
   if (status) { status.textContent = t('urlUnbound'); status.className = 'modal-status success'; }
 
-  // Обновляем видимость блока шеринга в Telegram
   updateTelegramShareBlock();
 
   renderInstalledApps();
@@ -202,7 +199,7 @@ function unbindUrlFromApp() {
 }
 
 // ==========================================
-// ШАРИНГ В TELEGRAM
+// ШАРИНГ В TELEGRAM (ССЫЛКА)
 // ==========================================
 
 function shareToTelegram() {
@@ -231,6 +228,75 @@ function updateTelegramShareBlock() {
 
   const linkedUrl = getAppUrl(currentShareModule.id);
   block.style.display = linkedUrl ? 'block' : 'none';
+}
+
+// ==========================================
+// ШАРИНГ HTML-ФАЙЛА
+// ==========================================
+
+function sanitizeFileName(name) {
+  return name
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+    .replace(/\s+/g, '_')
+    .trim()
+    .substring(0, 100) || 'app';
+}
+
+function shareHtmlFile() {
+  if (!currentShareModule || !currentShareModule.content) {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
+  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
+  const file = new File([blob], fileName, { type: 'text/html' });
+
+  // Проверяем поддержку Web Share API с файлами
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    const shareData = {
+      files: [file],
+      title: currentShareModule.name,
+      text: currentShareModule.description || ''
+    };
+
+    navigator.share(shareData)
+      .then(() => {
+        console.log('✅ File shared successfully');
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          console.error('Share error:', err);
+          showToast(t('fileShareFailed'), 'error', 4000);
+          setTimeout(() => downloadHtmlFile(), 500);
+        }
+      });
+  } else {
+    // Fallback: скачиваем файл
+    showToast(t('fileShareFailed'), 'error', 4000);
+    setTimeout(() => downloadHtmlFile(), 500);
+  }
+}
+
+function downloadHtmlFile() {
+  if (!currentShareModule || !currentShareModule.content) {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
+  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(t('fileDownloaded', { name: fileName }), 'success');
 }
 
 // ==========================================

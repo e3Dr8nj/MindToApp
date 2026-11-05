@@ -181,6 +181,7 @@ function setupEventListeners() {
   const bindUrlBtn = document.getElementById('bind-url-btn');
   const unbindUrlBtn = document.getElementById('unbind-url-btn');
   const shareTelegramBtn = document.getElementById('share-telegram-btn');
+  const shareFileBtn = document.getElementById('share-file-btn');
 
   if (closeShareBtn) closeShareBtn.addEventListener('click', closeShareModal);
   if (closeShareFooterBtn) closeShareFooterBtn.addEventListener('click', closeShareModal);
@@ -191,6 +192,7 @@ function setupEventListeners() {
   if (bindUrlBtn) bindUrlBtn.addEventListener('click', bindUrlToApp);
   if (unbindUrlBtn) unbindUrlBtn.addEventListener('click', unbindUrlFromApp);
   if (shareTelegramBtn) shareTelegramBtn.addEventListener('click', shareToTelegram);
+  if (shareFileBtn) shareFileBtn.addEventListener('click', shareHtmlFile);
 
   // ЭКСПОРТ ССЫЛОК
   const exportUrlsBtn = document.getElementById('export-urls-btn');
