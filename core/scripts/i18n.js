@@ -17,7 +17,6 @@ const translations = {
       'Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.'
     ].join('\n'),
 
-    // === Навигация и заголовки ===
     myApps: '🏠 My Apps',
     store: '📦 Store',
     themes: '🎨 Themes',
@@ -29,13 +28,9 @@ const translations = {
     refresh: '🔄',
     languageToggle: 'EN',
     languageToggleTitle: 'Switch to Russian',
-
-    // === Сайдбар ===
     prompt: '📋 prompt',
     create: '🚀 Create',
     url: '🔗 URL',
-
-    // === Конструктор ===
     builderTitle: '🛠 App Builder',
     builderCloseTitle: 'Close',
     describeIdea: '💡 Describe your idea',
@@ -49,8 +44,6 @@ const translations = {
     createApp: '🚀 Create app',
     createAppDesc: 'Paste the HTML code returned by AI and click "Create".',
     codeInputPlaceholder: 'Paste the entire HTML code from AI here...',
-
-    // === Старая модалка создания ===
     createModalTitle: '✨ Create app with AI',
     createStep1: '1. Describe your idea:',
     createStep2: '2. Ready prompt (updates automatically):',
@@ -61,22 +54,14 @@ const translations = {
     createStep4Placeholder: 'Paste the entire index.html code here...',
     cancel: 'Cancel',
     createAppBtn: '🚀 Create app',
-
-    // === Склад ===
     storeEmpty: 'Store is empty',
     install: 'Install',
     noInstalledApps: "You don't have any installed apps yet",
     goToStore: 'Go to store',
-
-    // === Экран приложения ===
     application: 'Application',
-
-    // === Буфер обмена ===
     clipboard: '📋 Clipboard',
     clipboardEmpty: '📋 Clipboard is empty',
     clipboardEmptyDesc: 'Copy text or link and press the button again',
-
-    // === Модалка добавления модуля ===
     addModuleTitle: '➕ Add module',
     addTabLink: '🔗 Link',
     addTabFile: '📄 File',
@@ -92,8 +77,6 @@ const translations = {
     addCodeDesc: 'Paste the full HTML code of the app. Code must contain <code>&lt;script id="manifest"&gt;</code> in <code>&lt;head&gt;</code>.',
     addCodePlaceholder: 'Paste the app HTML code here...',
     addBtn: 'Add',
-
-    // === Модалка редактирования ===
     editTitle: '✏️ Edit',
     editName: 'Name',
     editDescription: 'Description',
@@ -101,8 +84,6 @@ const translations = {
     editCopyCode: '📋 Copy code',
     editCopyPromptCode: '📋 Copy prompt + code for AI',
     close: 'Close',
-
-    // === Модалка шеринга ===
     shareTitle: '📤 Share app',
     shareStep1: '📋 Step 1: Copy code',
     shareStep1Desc: 'Copy the entire HTML code of the app to clipboard.',
@@ -114,16 +95,15 @@ const translations = {
     shareUrlPlaceholder: 'https://...',
     bindUrl: '🔗 Bind link',
     unbindUrl: '✂️ Unbind',
-
-    // === Модалка тем ===
+    shareTelegramStep: '📱 Step 4: Share to Telegram',
+    shareTelegramDesc: 'Send the app link to a Telegram chat or channel.',
+    shareTelegram: '📱 Share to Telegram',
     themesTitle: '🎨 Manage themes',
     themesSystemTitle: 'System themes',
     themesCustomTitle: 'Custom themes',
     themesApply: 'Apply',
     themesNoCustom: 'No custom themes yet',
     themesAddCustom: '➕ Add custom theme',
-
-    // === Модалка добавления темы ===
     addThemeTitle: '➕ Add custom theme',
     themeStep1: '1. Copy theme template',
     themeStep1Desc: 'Copy the template below and send it to AI.',
@@ -135,14 +115,10 @@ const translations = {
     themeNamePlaceholder: 'Theme name (e.g., Green Neon)',
     themeCssPlaceholder: 'Paste the CSS code from AI here...',
     addThemeBtn: 'Add theme',
-
-    // === Модалка промпта ===
     promptEditorTitle: '⚙️ Prompt editor',
     promptEditorDesc: 'This prompt is used when creating and editing apps. Change it to customize AI behavior.',
     resetToDefault: '🔄 Reset to default',
     saveChanges: '💾 Save changes',
-
-    // === Модалка AI менеджера ===
     aiListTitle: '🤖 AI list',
     aiListDesc: 'Order in list = order in menu.',
     aiYourAI: 'Your AI',
@@ -155,18 +131,12 @@ const translations = {
     save: '💾 Save',
     addAI: '➕ Add AI',
     resetList: '🔄 Reset list',
-
-    // === Модалка информации о приложении ===
     appInfoTitle: 'Application',
-
-    // === Модалка экспорта ссылок ===
     exportUrlsTitle: '📤 Export URLs',
     exportDesc: 'List of apps from "My Apps" with bound links.',
     noLinkedApps: '📭 No apps with bound links',
     noLinkedAppsDesc: 'Bind links via the "📤" button on app cards.',
     copyList: '📋 Copy list',
-
-    // === Меню карточки ===
     info: 'ℹ️ Info',
     open: '🚀 Open',
     edit: '✏️ Edit',
@@ -175,8 +145,6 @@ const translations = {
     settings: 'Settings',
     noDescription: 'No description',
     linkedUrl: '🔗 Linked URL:',
-
-    // === Уведомления ===
     promptCopied: '✅ Prompt copied',
     codeCopied: '✅ Code copied to clipboard!',
     listCopied: '✅ List copied to clipboard!',
@@ -218,8 +186,6 @@ const translations = {
     noAiNetworks: 'No AI networks configured',
     aiNotLoaded: 'AI networks not loaded',
     noCustomThemes: 'No custom themes yet',
-
-    // === Подсказки ===
     back: '← Back',
     copied: '✅ Copied!',
     opening: '🔗 Opening URL...',
@@ -244,7 +210,6 @@ const translations = {
       'Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.'
     ].join('\n'),
 
-    // === Навигация и заголовки ===
     myApps: '🏠 Мои приложения',
     store: '📦 Склад',
     themes: '🎨 Темы',
@@ -256,13 +221,9 @@ const translations = {
     refresh: '🔄',
     languageToggle: 'RU',
     languageToggleTitle: 'Переключить на английский',
-
-    // === Сайдбар ===
     prompt: '📋 prompt',
     create: '🚀 Создать',
     url: '🔗 URL',
-
-    // === Конструктор ===
     builderTitle: '🛠 Конструктор приложений',
     builderCloseTitle: 'Закрыть',
     describeIdea: '💡 Опишите идею',
@@ -276,8 +237,6 @@ const translations = {
     createApp: '🚀 Создайте приложение',
     createAppDesc: 'Вставьте HTML-код, который вернула нейросеть, и нажмите "Создать".',
     codeInputPlaceholder: 'Вставьте сюда весь HTML-код от нейросети...',
-
-    // === Старая модалка создания ===
     createModalTitle: '✨ Создать приложение с ИИ',
     createStep1: '1. Опишите свою идею:',
     createStep2: '2. Готовый промпт (обновляется автоматически):',
@@ -288,22 +247,14 @@ const translations = {
     createStep4Placeholder: 'Вставьте сюда весь код index.html...',
     cancel: 'Отмена',
     createAppBtn: '🚀 Создать приложение',
-
-    // === Склад ===
     storeEmpty: 'Склад пуст',
     install: 'Установить',
     noInstalledApps: 'У вас пока нет установленных приложений',
     goToStore: 'Перейти на склад',
-
-    // === Экран приложения ===
     application: 'Приложение',
-
-    // === Буфер обмена ===
     clipboard: '📋 Буфер обмена',
     clipboardEmpty: '📋 Буфер обмена пуст',
     clipboardEmptyDesc: 'Скопируйте текст или ссылку и нажмите кнопку снова',
-
-    // === Модалка добавления модуля ===
     addModuleTitle: '➕ Добавить модуль',
     addTabLink: '🔗 Ссылка',
     addTabFile: '📄 Файл',
@@ -319,8 +270,6 @@ const translations = {
     addCodeDesc: 'Вставьте полный HTML-код приложения. Код должен содержать <code>&lt;script id="manifest"&gt;</code> в <code>&lt;head&gt;</code>.',
     addCodePlaceholder: 'Вставьте сюда HTML-код приложения...',
     addBtn: 'Добавить',
-
-    // === Модалка редактирования ===
     editTitle: '✏️ Редактировать',
     editName: 'Название',
     editDescription: 'Описание',
@@ -328,8 +277,6 @@ const translations = {
     editCopyCode: '📋 Копировать код',
     editCopyPromptCode: '📋 Копировать промпт + код для ИИ',
     close: 'Закрыть',
-
-    // === Модалка шеринга ===
     shareTitle: '📤 Поделиться приложением',
     shareStep1: '📋 Шаг 1: Скопировать код',
     shareStep1Desc: 'Скопируйте весь HTML-код приложения в буфер обмена.',
@@ -341,16 +288,15 @@ const translations = {
     shareUrlPlaceholder: 'https://...',
     bindUrl: '🔗 Привязать ссылку',
     unbindUrl: '✂️ Отвязать',
-
-    // === Модалка тем ===
+    shareTelegramStep: '📱 Шаг 4: Поделиться в Telegram',
+    shareTelegramDesc: 'Отправьте ссылку на приложение в чат или канал Telegram.',
+    shareTelegram: '📱 Поделиться в Telegram',
     themesTitle: '🎨 Управление темами',
     themesSystemTitle: 'Системные темы',
     themesCustomTitle: 'Пользовательские темы',
     themesApply: 'Применить',
     themesNoCustom: 'Пользовательских тем пока нет',
     themesAddCustom: '➕ Добавить свою тему',
-
-    // === Модалка добавления темы ===
     addThemeTitle: '➕ Добавить свою тему',
     themeStep1: '1. Скопируйте шаблон темы',
     themeStep1Desc: 'Скопируйте шаблон ниже и отправьте его в нейросеть.',
@@ -362,14 +308,10 @@ const translations = {
     themeNamePlaceholder: 'Название темы (например: Зелёная неон)',
     themeCssPlaceholder: 'Вставьте сюда CSS-код от нейросети...',
     addThemeBtn: 'Добавить тему',
-
-    // === Модалка промпта ===
     promptEditorTitle: '⚙️ Редактор промпта',
     promptEditorDesc: 'Этот промпт используется при создании и редактировании приложений. Измените его, чтобы настроить поведение нейросети.',
     resetToDefault: '🔄 Сбросить к стандартному',
     saveChanges: '💾 Сохранить изменения',
-
-    // === Модалка AI менеджера ===
     aiListTitle: '🤖 Список нейросетей',
     aiListDesc: 'Порядок в списке = порядок в меню.',
     aiYourAI: 'Ваши нейросети',
@@ -382,18 +324,12 @@ const translations = {
     save: '💾 Сохранить',
     addAI: '➕ Добавить нейросеть',
     resetList: '🔄 Сбросить список',
-
-    // === Модалка информации о приложении ===
     appInfoTitle: 'Приложение',
-
-    // === Модалка экспорта ссылок ===
     exportUrlsTitle: '📤 Экспорт ссылок',
     exportDesc: 'Список приложений из «Мои приложения» с привязанными ссылками.',
     noLinkedApps: '📭 Нет приложений с привязанными ссылками',
     noLinkedAppsDesc: 'Привяжите ссылки через кнопку «📤» на карточках приложений.',
     copyList: '📋 Скопировать список',
-
-    // === Меню карточки ===
     info: 'ℹ️ Информация',
     open: '🚀 Открыть',
     edit: '✏️ Редактировать',
@@ -402,8 +338,6 @@ const translations = {
     settings: 'Настройки',
     noDescription: 'Нет описания',
     linkedUrl: '🔗 Привязанная ссылка:',
-
-    // === Уведомления ===
     promptCopied: '✅ Промпт скопирован',
     codeCopied: '✅ Код скопирован в буфер обмена!',
     listCopied: '✅ Список скопирован в буфер обмена!',
@@ -445,8 +379,6 @@ const translations = {
     noAiNetworks: 'Нейросети не настроены',
     aiNotLoaded: 'Нейросети не загружены',
     noCustomThemes: 'Пользовательских тем пока нет',
-
-    // === Подсказки ===
     back: '← Назад',
     copied: '✅ Скопировано!',
     opening: '🔗 Открываю URL...',
@@ -457,10 +389,6 @@ const translations = {
     codeLoaded: '✅ Код загружен по ссылке'
   }
 };
-
-// ==========================================
-// ФУНКЦИИ УПРАВЛЕНИЯ ЯЗЫКОМ
-// ==========================================
 
 function getCurrentLanguage() {
   return localStorage.getItem('language') || 'en';
@@ -502,12 +430,9 @@ function applyLanguage() {
   var lang = getCurrentLanguage();
 
   var textUpdates = [
-    // Заголовки экранов
     { selector: '#home-screen > header > h1', key: 'myApps' },
     { selector: '#store-screen > header > h1', key: 'store' },
     { selector: '#clipboard-screen > header > h1', key: 'clipboard' },
-
-    // Кнопки навигации
     { selector: '#open-store-btn', key: 'store' },
     { selector: '#manage-themes-btn', key: 'themes' },
     { selector: '#manage-ai-btn', key: 'ai' },
@@ -517,18 +442,12 @@ function applyLanguage() {
     { selector: '#add-custom-btn-store', key: 'add' },
     { selector: '#export-urls-btn', key: 'exportUrls' },
     { selector: '#go-to-store-btn', key: 'goToStore' },
-
-    // Кнопки "Назад"
     { selector: '#close-app-btn', key: 'back', isHtml: true },
     { selector: '#close-clipboard-screen-btn', key: 'back', isHtml: true },
     { selector: '#back-to-home-btn', key: 'back', isHtml: true },
-
-    // Сайдбар
     { selector: '#sidebar-prompt-btn', key: 'prompt', isHtml: true },
     { selector: '#sidebar-create-btn', key: 'create', isHtml: true },
     { selector: '#sidebar-url-btn', key: 'url', isHtml: true },
-
-    // Конструктор
     { selector: '#builder-panel > .builder-panel-header > h2', key: 'builderTitle' },
     { selector: '#builder-panel .builder-block:nth-child(1) .builder-block-title', key: 'describeIdea' },
     { selector: '#builder-panel .builder-block:nth-child(1) .builder-block-desc', key: 'describeIdeaDesc' },
@@ -540,11 +459,7 @@ function applyLanguage() {
     { selector: '#builder-panel .builder-block:nth-child(5) .builder-block-title', key: 'createApp' },
     { selector: '#builder-panel .builder-block:nth-child(5) .builder-block-desc', key: 'createAppDesc' },
     { selector: '#builder-create-btn', key: 'createApp' },
-
-    // Пустое состояние
     { selector: '#empty-state > p', key: 'noInstalledApps' },
-
-    // Модалка добавления темы
     { selector: '#add-theme-modal .step-box:nth-child(1) > h3', key: 'themeStep1' },
     { selector: '#add-theme-modal .step-box:nth-child(1) > p', key: 'themeStep1Desc' },
     { selector: '#copy-theme-template-btn', key: 'themeCopyTemplate' },
@@ -553,27 +468,19 @@ function applyLanguage() {
     { selector: '#add-theme-modal .step-box:nth-child(3) > h3', key: 'themeStep3' },
     { selector: '#add-theme-modal .step-box:nth-child(3) > p', key: 'themeStep3Desc' },
     { selector: '#submit-theme-btn', key: 'addThemeBtn' },
-
-    // Модалка тем
     { selector: '#themes-modal .modal-header h2', key: 'themesTitle' },
     { selector: '#themes-modal .step-box:nth-child(1) > h3', key: 'themesSystemTitle' },
     { selector: '#themes-modal .step-box:nth-child(2) > h3', key: 'themesCustomTitle' },
     { selector: '#add-theme-btn', key: 'themesAddCustom' },
-
-    // Модалка редактора промпта
     { selector: '#prompts-modal .modal-header h2', key: 'promptEditorTitle' },
     { selector: '#prompts-modal .step-box > p', key: 'promptEditorDesc' },
     { selector: '#reset-prompt-btn', key: 'resetToDefault' },
     { selector: '#save-prompt-btn', key: 'saveChanges' },
-
-    // Модалка AI менеджера
     { selector: '#ai-manager-modal .modal-header h2', key: 'aiListTitle' },
     { selector: '#ai-manager-modal .step-box:nth-child(1) > h3', key: 'aiYourAI' },
     { selector: '#ai-manager-modal .step-box:nth-child(1) > p', key: 'aiListDesc' },
     { selector: '#add-ai-btn', key: 'addAI' },
     { selector: '#reset-ai-list-btn', key: 'resetList' },
-
-    // Модалка добавления модуля
     { selector: '#add-modal .modal-header h2', key: 'addModuleTitle' },
     { selector: '#add-modal .tab[data-tab="url"] > p.modal-description', key: 'addUrlDesc', isHtml: true },
     { selector: '#add-modal .tab[data-tab="local"] > p.modal-description', key: 'addFileDesc', isHtml: true },
@@ -587,8 +494,6 @@ function applyLanguage() {
     { selector: '#add-modal .tab-switcher .tab-btn:nth-child(3)', key: 'addTabFolder' },
     { selector: '#add-modal .tab-switcher .tab-btn:nth-child(4)', key: 'addTabCode' },
     { selector: '#confirm-add-btn', key: 'addBtn' },
-
-    // Модалка шеринга
     { selector: '#share-modal .modal-header h2', key: 'shareTitle' },
     { selector: '#share-modal .step-box:nth-child(1) > h3', key: 'shareStep1' },
     { selector: '#share-modal .step-box:nth-child(1) > p', key: 'shareStep1Desc' },
@@ -599,15 +504,14 @@ function applyLanguage() {
     { selector: '#share-modal .step-box:nth-child(3) > p', key: 'shareStep3Desc' },
     { selector: '#bind-url-btn', key: 'bindUrl' },
     { selector: '#unbind-url-btn', key: 'unbindUrl' },
-
-    // Модалка экспорта ссылок
+    { selector: '#share-telegram-block > h3', key: 'shareTelegramStep' },
+    { selector: '#share-telegram-block > p', key: 'shareTelegramDesc' },
+    { selector: '#share-telegram-btn', key: 'shareTelegram' },
     { selector: '#export-urls-modal .modal-header h2', key: 'exportUrlsTitle' },
     { selector: '#export-urls-modal .modal-body > p', key: 'exportDesc' },
     { selector: '#export-urls-empty > p:first-child', key: 'noLinkedApps' },
     { selector: '#export-urls-empty > p:last-child', key: 'noLinkedAppsDesc' },
     { selector: '#copy-export-urls-btn', key: 'copyList' },
-
-    // Модалка редактирования
     { selector: '#edit-modal .modal-header h2', key: 'editTitle' },
     { selector: '#toggle-code-btn', key: 'editShowCode' },
     { selector: '#copy-code-btn', key: 'editCopyCode' },
@@ -621,14 +525,12 @@ function applyLanguage() {
     }
   });
 
-  // Обновляем кнопку переключения языка
   var langBtn = document.getElementById('language-toggle-btn');
   if (langBtn) {
     langBtn.textContent = t('languageToggle');
     langBtn.title = t('languageToggleTitle');
   }
 
-  // Обновляем placeholder'ы
   var placeholders = [
     { selector: '#builder-idea-input', key: 'describeIdeaPlaceholder' },
     { selector: '#builder-code-input', key: 'codeInputPlaceholder' },
@@ -647,7 +549,6 @@ function applyLanguage() {
     }
   });
 
-  // Перерисовываем карточки приложений и списки
   if (typeof renderInstalledApps === 'function') renderInstalledApps();
   if (typeof renderAllApps === 'function') renderAllApps();
   if (typeof renderCustomThemesList === 'function') renderCustomThemesList();

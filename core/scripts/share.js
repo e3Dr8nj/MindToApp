@@ -71,7 +71,6 @@ function openShareModal(module) {
 
     if (existingUrl) {
       urlInput.value = existingUrl;
-      // Используем переводы напрямую — эмодзи уже встроены в t('edit')
       bindBtn.textContent = t('edit');
       unbindBtn.style.display = 'inline-block';
       unbindBtn.textContent = t('unbindUrl');
@@ -83,6 +82,9 @@ function openShareModal(module) {
 
     if (urlStatus) { urlStatus.textContent = ''; urlStatus.className = 'modal-status'; }
   }
+
+  // Обновляем видимость блока шеринга в Telegram
+  updateTelegramShareBlock();
 
   modal.classList.add('active');
 }
@@ -162,12 +164,14 @@ function bindUrlToApp() {
   setAppUrl(currentShareModule.id, url);
 
   if (status) { status.textContent = t('urlBound'); status.className = 'modal-status success'; }
-  // Используем переводы напрямую — эмодзи уже встроены в t('edit') и t('unbindUrl')
   if (bindBtn) bindBtn.textContent = t('edit');
   if (unbindBtn) {
     unbindBtn.style.display = 'inline-block';
     unbindBtn.textContent = t('unbindUrl');
   }
+
+  // Обновляем видимость блока шеринга в Telegram
+  updateTelegramShareBlock();
 
   renderInstalledApps();
   renderAllApps();
@@ -186,13 +190,47 @@ function unbindUrlFromApp() {
   const status = document.getElementById('share-url-status');
 
   if (urlInput) urlInput.value = '';
-  // Используем перевод напрямую — эмодзи уже встроен в t('bindUrl')
   if (bindBtn) bindBtn.textContent = t('bindUrl');
   if (unbindBtn) unbindBtn.style.display = 'none';
   if (status) { status.textContent = t('urlUnbound'); status.className = 'modal-status success'; }
 
+  // Обновляем видимость блока шеринга в Telegram
+  updateTelegramShareBlock();
+
   renderInstalledApps();
   renderAllApps();
+}
+
+// ==========================================
+// ШАРИНГ В TELEGRAM
+// ==========================================
+
+function shareToTelegram() {
+  if (!currentShareModule) return;
+
+  const linkedUrl = getAppUrl(currentShareModule.id);
+  if (!linkedUrl) {
+    showToast(t('enterUrl'), 'error');
+    return;
+  }
+
+  const appName = currentShareModule.name || '';
+  const appDesc = currentShareModule.description || '';
+  const text = appDesc ? `${appName}\n${appDesc}` : appName;
+
+  const encodedUrl = encodeURIComponent(linkedUrl);
+  const encodedText = encodeURIComponent(text);
+
+  const telegramUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+  window.open(telegramUrl, '_blank', 'noopener,noreferrer');
+}
+
+function updateTelegramShareBlock() {
+  const block = document.getElementById('share-telegram-block');
+  if (!block || !currentShareModule) return;
+
+  const linkedUrl = getAppUrl(currentShareModule.id);
+  block.style.display = linkedUrl ? 'block' : 'none';
 }
 
 // ==========================================

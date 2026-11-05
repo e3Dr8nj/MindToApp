@@ -180,6 +180,7 @@ function setupEventListeners() {
   const shareModal = document.getElementById('share-modal');
   const bindUrlBtn = document.getElementById('bind-url-btn');
   const unbindUrlBtn = document.getElementById('unbind-url-btn');
+  const shareTelegramBtn = document.getElementById('share-telegram-btn');
 
   if (closeShareBtn) closeShareBtn.addEventListener('click', closeShareModal);
   if (closeShareFooterBtn) closeShareFooterBtn.addEventListener('click', closeShareModal);
@@ -189,6 +190,7 @@ function setupEventListeners() {
   });
   if (bindUrlBtn) bindUrlBtn.addEventListener('click', bindUrlToApp);
   if (unbindUrlBtn) unbindUrlBtn.addEventListener('click', unbindUrlFromApp);
+  if (shareTelegramBtn) shareTelegramBtn.addEventListener('click', shareToTelegram);
 
   // ЭКСПОРТ ССЫЛОК
   const exportUrlsBtn = document.getElementById('export-urls-btn');
@@ -386,4 +388,9 @@ function setupEventListeners() {
     }
   });
 }
- init();
+
+// ==========================================
+// ЗАПУСК ПЛАТФОРМЫ
+// ==========================================
+
+init();
