@@ -1,7 +1,3 @@
-// ==========================================
-// ИНИЦИАЛИЗАЦИЯ ПЛАТФОРМЫ
-// ==========================================
-
 async function init() {
   initCustomThemes();
   initTheme();
@@ -14,10 +10,6 @@ async function init() {
   updatePromptPreview();
   applyLanguage();
 }
-
-// ==========================================
-// УСТАНОВКА / УДАЛЕНИЕ МОДУЛЕЙ
-// ==========================================
 
 function toggleInstall(moduleId) {
   const index = installedModules.indexOf(moduleId);
@@ -50,10 +42,6 @@ async function removeCustomModule(moduleId) {
   renderInstalledApps();
   renderAllApps();
 }
-
-// ==========================================
-// ОТКРЫТИЕ / ЗАКРЫТИЕ ПРИЛОЖЕНИЯ + СКРЫТИЕ САЙДБАРА
-// ==========================================
 
 function openApp(module) {
   currentAppName.textContent = module.name;
@@ -94,10 +82,6 @@ async function refreshApp() {
   setTimeout(() => window.location.reload(), 500);
 }
 
-// ==========================================
-// TOAST УВЕДОМЛЕНИЯ
-// ==========================================
-
 function showToast(message, type = 'info', duration = 3000) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -114,10 +98,6 @@ function showToast(message, type = 'info', duration = 3000) {
     }, 300);
   }, duration);
 }
-
-// ==========================================
-// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
-// ==========================================
 
 function openAppInfoModal(module, isInstalled) {
   const modal = document.getElementById('app-info-modal');
@@ -159,10 +139,6 @@ function closeAppInfoModal() {
   if (modal) modal.classList.remove('active');
 }
 
-// ==========================================
-// ЗАГРУЗКА ПО ССЫЛКЕ
-// ==========================================
-
 function convertGistToRaw(url) {
   if (url.includes('gist.github.com') && !url.includes('gist.githubusercontent.com')) {
     return url.replace('gist.github.com', 'gist.githubusercontent.com').replace(/\/?$/, '/raw');
@@ -175,23 +151,15 @@ function convertGistToRaw(url) {
 
 async function loadHTMLFromURL(url) {
   const finalUrl = convertGistToRaw(url);
-  console.log('📥 Loading from link:', finalUrl);
-
   const response = await fetch(finalUrl);
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
   const html = await response.text();
 
   if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<script id="manifest"')) {
     throw new Error(t('noHtmlAtUrl'));
   }
-
   return html;
 }
-
-// ==========================================
-// СОЗДАНИЕ ИЗ БУФЕРА ОБМЕНА
-// ==========================================
 
 async function createFromClipboard() {
   const createBtn = document.getElementById('sidebar-create-btn');
@@ -208,7 +176,6 @@ async function createFromClipboard() {
     }
 
     showToast(t('reading'), 'info', 2000);
-
     const clipboardContent = await navigator.clipboard.readText();
 
     if (!clipboardContent || !clipboardContent.trim()) {
@@ -221,7 +188,6 @@ async function createFromClipboard() {
 
     if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
       showToast(t('loadingByUrl'), 'info', 2000);
-
       try {
         trimmedCode = await loadHTMLFromURL(trimmedContent);
         showToast(t('codeLoaded'), 'success', 2000);
@@ -301,10 +267,6 @@ async function createFromClipboard() {
   }
 }
 
-// ==========================================
-// ОБРАБОТКА URL ИЗ БУФЕРА ОБМЕНА
-// ==========================================
-
 async function handleUrlFromClipboard() {
   const urlBtn = document.getElementById('sidebar-url-btn');
 
@@ -320,7 +282,6 @@ async function handleUrlFromClipboard() {
     }
 
     showToast(t('reading'), 'info', 1500);
-
     const clipboardContent = await navigator.clipboard.readText();
 
     if (!clipboardContent || !clipboardContent.trim()) {
@@ -330,8 +291,8 @@ async function handleUrlFromClipboard() {
     }
 
     const trimmedContent = clipboardContent.trim();
-
     const singleUrlPattern = /^https?:\/\/[^\s]+$/i;
+
     if (singleUrlPattern.test(trimmedContent)) {
       showToast(t('opening'), 'success', 1500);
       window.open(trimmedContent, '_blank', 'noopener,noreferrer');
@@ -381,7 +342,6 @@ function showClipboardScreen(content) {
 
 function makeUrlsClickable(text) {
   const urlPattern = /(https?:\/\/[^\s<>"']+)/gi;
-
   let result = '';
   let lastIndex = 0;
   let match;
@@ -411,7 +371,6 @@ function makeUrlsClickable(text) {
   }
 
   result += escapeHtml(text.slice(lastIndex));
-
   return result;
 }
 
@@ -425,10 +384,6 @@ function closeClipboardScreen() {
   showScreen(homeScreen);
 }
 
-// ==========================================
-// ПАНЕЛЬ НЕЙРОСЕТЕЙ
-// ==========================================
-
 function openAIPanel() {
   const aiPanel = document.getElementById('ai-panel');
   if (!aiPanel) return;
@@ -440,10 +395,6 @@ function closeAIPanel() {
   const aiPanel = document.getElementById('ai-panel');
   if (aiPanel) aiPanel.style.display = 'none';
 }
-
-// ==========================================
-// КОНСТРУКТОР ПРИЛОЖЕНИЙ
-// ==========================================
 
 function openBuilder() {
   const ideaInput = document.getElementById('builder-idea-input');
@@ -600,16 +551,15 @@ function showStatus(element, message, type = '') {
   element.textContent = message;
   element.className = `modal-status ${type}`.trim();
 }
-
-// ==========================================
-// ОБРАБОТЧИКИ СОБЫТИЙ
-// ==========================================
-
 function setupEventListeners() {
   // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
   const languageToggleBtn = document.getElementById('language-toggle-btn');
   if (languageToggleBtn) {
-    languageToggleBtn.addEventListener('click', toggleLanguage);
+    languageToggleBtn.addEventListener('click', function() {
+      if (typeof toggleLanguage === 'function') {
+        toggleLanguage();
+      }
+    });
   }
 
   // БУРГЕР-МЕНЮ
@@ -658,6 +608,29 @@ function setupEventListeners() {
   if (builderCopyPromptBtn) builderCopyPromptBtn.addEventListener('click', copyBuilderPrompt);
   if (builderOpenAiBtn) builderOpenAiBtn.addEventListener('click', openSelectedAI);
   if (builderCreateBtn) builderCreateBtn.addEventListener('click', createFromBuilder);
+
+  // РЕДАКТИРОВАНИЕ ПРИЛОЖЕНИЯ
+  const toggleCodeBtn = document.getElementById('toggle-code-btn');
+  const copyCodeBtn = document.getElementById('copy-code-btn');
+  const copyEditPromptBtn = document.getElementById('copy-edit-prompt-btn');
+  const closeEditBtn = document.getElementById('close-edit-btn');
+  const cancelEditBtn = document.getElementById('cancel-edit-btn');
+  const editModal = document.getElementById('edit-modal');
+
+  if (toggleCodeBtn) toggleCodeBtn.addEventListener('click', () => {
+    if (typeof toggleCodeVisibility === 'function') toggleCodeVisibility();
+  });
+  if (copyCodeBtn) copyCodeBtn.addEventListener('click', () => {
+    if (typeof copyCodeFromEditModal === 'function') copyCodeFromEditModal();
+  });
+  if (copyEditPromptBtn) copyEditPromptBtn.addEventListener('click', () => {
+    if (typeof copyEditPrompt === 'function') copyEditPrompt();
+  });
+  if (closeEditBtn) closeEditBtn.addEventListener('click', closeEditModal);
+  if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeEditModal);
+  if (editModal) editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) closeEditModal();
+  });
 
   // СТАРАЯ МОДАЛКА СОЗДАНИЯ
   const createAppBtn = document.getElementById('create-app-btn');
@@ -870,7 +843,7 @@ function setupEventListeners() {
     if (e.target === themesModal) themesModal.classList.remove('active');
   });
 
-  // ДОБАВЛЕНИЕ ТЕМЫ — С ОТЛАДКОЙ
+  // ДОБАВЛЕНИЕ ТЕМЫ
   const addThemeBtn = document.getElementById('add-theme-btn');
   const closeAddThemeBtn = document.getElementById('close-add-theme-btn');
   const cancelAddThemeBtn = document.getElementById('cancel-add-theme-btn');
@@ -878,34 +851,14 @@ function setupEventListeners() {
   const submitThemeBtn = document.getElementById('submit-theme-btn');
   const addThemeModal = document.getElementById('add-theme-modal');
 
-  console.log('🔍 [app.js] addThemeBtn:', addThemeBtn);
-  console.log('🔍 [app.js] copyThemeTemplateBtn:', copyThemeTemplateBtn);
-  console.log('🔍 [app.js] typeof copyThemeTemplate:', typeof copyThemeTemplate);
-
   if (addThemeBtn) addThemeBtn.addEventListener('click', () => {
     if (typeof openAddThemeModal === 'function') openAddThemeModal();
   });
   if (closeAddThemeBtn) closeAddThemeBtn.addEventListener('click', closeAddThemeModal);
   if (cancelAddThemeBtn) cancelAddThemeBtn.addEventListener('click', closeAddThemeModal);
-  
-  if (copyThemeTemplateBtn) {
-    copyThemeTemplateBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('🎨 [app.js] Клик по кнопке шаблона темы');
-      console.log('🔍 [app.js] typeof copyThemeTemplate:', typeof copyThemeTemplate);
-      
-      if (typeof copyThemeTemplate === 'function') {
-        console.log('✅ [app.js] Вызываем copyThemeTemplate()');
-        copyThemeTemplate();
-      } else {
-        console.error('❌ [app.js] Функция copyThemeTemplate не найдена!');
-        showToast('❌ Function not found', 'error');
-      }
-    });
-  } else {
-    console.error('❌ [app.js] Кнопка copy-theme-template-btn не найдена в DOM!');
-  }
-  
+  if (copyThemeTemplateBtn) copyThemeTemplateBtn.addEventListener('click', () => {
+    if (typeof copyThemeTemplate === 'function') copyThemeTemplate();
+  });
   if (submitThemeBtn) submitThemeBtn.addEventListener('click', () => {
     if (typeof submitCustomTheme === 'function') submitCustomTheme();
   });
@@ -981,10 +934,6 @@ function setupEventListeners() {
     }
   });
 }
-
-// ==========================================
-// УПРАВЛЕНИЕ НЕЙРОСЕТЯМИ
-// ==========================================
 
 function showAIEditor(network) {
   const editorBox = document.getElementById('ai-editor-box');
