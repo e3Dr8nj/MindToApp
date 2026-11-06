@@ -1985,3 +1985,52 @@ h1 {
 .import-log-success { color: var(--status-success-color); }
 .import-log-warning { color: var(--folder-warning-color); }
 .import-log-error { color: var(--status-error-color); }
+/* ==========================================
+   ЭКСПОРТ / ИМПОРТ - ЛОГИ
+   ========================================== */
+
+#import-folder-path,
+#export-folder-path {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-color);
+  word-break: break-all;
+  background: var(--code-input-bg);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  margin: 10px 0;
+}
+
+#import-log,
+#export-log {
+  max-height: 250px;
+  overflow-y: auto;
+  background: var(--code-input-bg);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid var(--input-border);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.import-log-line,
+.export-log-line {
+  padding: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.import-log-info, .export-log-info { color: var(--text-color); }
+.import-log-success, .export-log-success { color: var(--status-success-color); }
+.import-log-warning, .export-log-warning { color: var(--folder-warning-color); }
+.import-log-error, .export-log-error { color: var(--status-error-color); }
+
+.sidebar-export-btn {
+  background: var(--btn-primary-bg);
+}
+
+.sidebar-export-btn:hover {
+  background: var(--btn-primary-hover-bg);
+}

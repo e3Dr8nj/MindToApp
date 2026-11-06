@@ -24,6 +24,7 @@ const translations = {
     promptBtn: '⚙️ Prompt',
     builder: '🛠 Builder',
     add: '➕ Add',
+    exportBtn: '📤 Export',
     importBtn: '📥 Import',
     exportUrls: '📤 Export URLs',
     refresh: '🔄',
@@ -200,6 +201,23 @@ const translations = {
     loadingByUrl: '🔗 Loading by link...',
     codeLoaded: '✅ Code loaded from link',
 
+    // === ЭКСПОРТ ===
+    exportModalTitle: '📤 Export apps to folder',
+    exportDesc: 'Select a folder to save all your installed applications as individual HTML files. Filenames will be formatted as Name_ID.html.',
+    exportNoApps: '❌ No installed apps with local content to export.',
+    exportSelectedFolder: 'Selected folder:',
+    exportNoFolderSelected: 'Folder not selected',
+    exportSelectFolderBtn: '📁 Select Export Folder',
+    exportRunBtn: '🚀 Start Export',
+    exportRunning: 'Exporting...',
+    exportSuccess: '✅ Successfully exported {count} apps!',
+    exportFailed: '❌ Export failed: {error}',
+    exportFileSaved: 'Saved',
+    exportFileError: 'Error',
+    exportFolderSelected: '✅ Folder selected',
+    exportFolderCleared: 'Folder cleared',
+    // ============================
+
     // === ИМПОРТ ===
     importModalTitle: '📥 Import apps from folder',
     importDesc: 'Select a folder with HTML files. The system will recursively scan all subfolders and create apps from files with a valid manifest. Apps with existing IDs will be skipped.',
@@ -246,6 +264,7 @@ const translations = {
     promptBtn: '⚙️ Промпт',
     builder: '🛠 Конструктор',
     add: '➕ Добавить',
+    exportBtn: '📤 Экспорт',
     importBtn: '📥 Импорт',
     exportUrls: '📤 Экспорт ссылок',
     refresh: '🔄',
@@ -422,6 +441,23 @@ const translations = {
     loadingByUrl: '🔗 Загружаю по ссылке...',
     codeLoaded: '✅ Код загружен по ссылке',
 
+    // === ЭКСПОРТ ===
+    exportModalTitle: '📤 Экспорт приложений в папку',
+    exportDesc: 'Выберите папку для сохранения всех установленных приложений в виде отдельных HTML-файлов. Имена файлов будут в формате Название_ID.html.',
+    exportNoApps: '❌ Нет установленных приложений с локальным контентом для экспорта.',
+    exportSelectedFolder: 'Выбранная папка:',
+    exportNoFolderSelected: 'Папка не выбрана',
+    exportSelectFolderBtn: '📁 Выбрать папку для экспорта',
+    exportRunBtn: '🚀 Начать экспорт',
+    exportRunning: 'Экспортирую...',
+    exportSuccess: '✅ Успешно экспортировано приложений: {count}',
+    exportFailed: '❌ Ошибка экспорта: {error}',
+    exportFileSaved: 'Сохранено',
+    exportFileError: 'Ошибка',
+    exportFolderSelected: '✅ Папка выбрана',
+    exportFolderCleared: 'Папка очищена',
+    // ============================
+
     // === ИМПОРТ ===
     importModalTitle: '📥 Импорт приложений из папки',
     importDesc: 'Выберите папку с HTML-файлами. Система рекурсивно просканирует все вложенные папки и создаст приложения из файлов с корректным manifest. Приложения с существующими ID будут пропущены.',
@@ -497,6 +533,7 @@ function applyLanguage() {
     { selector: '#builder-btn', key: 'builder' },
     { selector: '#add-custom-btn', key: 'add' },
     { selector: '#add-custom-btn-store', key: 'add' },
+    { selector: '#sidebar-export-btn', key: 'exportBtn', isHtml: true },
     { selector: '#sidebar-import-btn', key: 'importBtn', isHtml: true },
     { selector: '#export-urls-btn', key: 'exportUrls' },
     { selector: '#go-to-store-btn', key: 'goToStore' },
@@ -577,6 +614,13 @@ function applyLanguage() {
     { selector: '#toggle-code-btn', key: 'editShowCode' },
     { selector: '#copy-code-btn', key: 'editCopyCode' },
     { selector: '#copy-edit-prompt-btn', key: 'editCopyPromptCode' },
+
+    // === ЭКСПОРТ ===
+    { selector: '#export-modal .modal-header h2', key: 'exportModalTitle' },
+    { selector: '#export-modal-desc', key: 'exportDesc' },
+    { selector: '#export-select-folder-btn', key: 'exportSelectFolderBtn' },
+    { selector: '#export-run-btn', key: 'exportRunBtn' },
+    // ============================
 
     // === ИМПОРТ ===
     { selector: '#import-modal .modal-header h2', key: 'importModalTitle' },

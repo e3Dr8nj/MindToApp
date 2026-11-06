@@ -28,7 +28,8 @@
 
     <div class="sidebar-spacer"></div>
 
-    <!-- НОВАЯ КНОПКА ИМПОРТ (выше URL) -->
+    <!-- КНОПКА ЭКСПОРТ (выше импорта) -->
+    <button id="sidebar-export-btn" class="sidebar-btn sidebar-export-btn" title="Export apps to folder">📤 Export</button>
     <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
     <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
   </div>
@@ -303,7 +304,42 @@
     </div>
   </div>
 
-  <!-- НОВАЯ МОДАЛКА ИМПОРТА -->
+  <!-- НОВАЯ МОДАЛКА ЭКСПОРТА -->
+  <div id="export-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📤 Экспорт приложений в папку</h2>
+        <button class="modal-close" id="close-export-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <p id="export-modal-desc" style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Выберите папку для сохранения всех установленных приложений в виде отдельных HTML-файлов. Имена файлов будут в формате Название_ID.html.
+          </p>
+
+          <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: var(--description-color); margin-bottom: 5px;">📁 Выбранная папка:</div>
+            <div id="export-folder-path" style="font-size: 14px; color: var(--text-color); font-weight: 500; word-break: break-all;">Папка не выбрана</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="export-select-folder-btn" class="btn btn-secondary" style="flex: 1;">📁 Выбрать папку для экспорта</button>
+            <button id="export-clear-btn" class="btn btn-secondary" style="flex: 0 0 auto;">🗑 Очистить</button>
+          </div>
+
+          <div id="export-status" class="modal-status" style="margin-top: 15px;"></div>
+
+          <div id="export-log" class="export-log" style="display: none; margin-top: 15px; max-height: 250px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="export-run-btn" class="btn btn-primary">🚀 Начать экспорт</button>
+        <button id="close-export-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ИМПОРТА -->
   <div id="import-modal" class="modal">
     <div class="modal-content" style="max-width: 700px;">
       <div class="modal-header">
@@ -524,6 +560,7 @@
   <script src="scripts/add.js"></script>
   <script src="scripts/share.js"></script>
   <script src="scripts/import.js"></script>
+  <script src="scripts/export.js"></script>
   <script src="scripts/app-core.js"></script>
   <script src="scripts/app-clipboard.js"></script>
   <script src="scripts/app-builder.js"></script>
