@@ -188,6 +188,25 @@ function setupEventListeners() {
   const sidebarUrlBtn = document.getElementById('sidebar-url-btn');
   if (sidebarUrlBtn) sidebarUrlBtn.addEventListener('click', handleUrlFromClipboard);
 
+  // ИМПОРТ ИЗ ПАПКИ
+  const sidebarImportBtn = document.getElementById('sidebar-import-btn');
+  const importModal = document.getElementById('import-modal');
+  const closeImportBtn = document.getElementById('close-import-btn');
+  const closeImportFooterBtn = document.getElementById('close-import-footer-btn');
+  const importSelectBtn = document.getElementById('import-select-folder-btn');
+  const importClearBtn = document.getElementById('import-clear-btn');
+  const importRunBtn = document.getElementById('import-run-btn');
+  const importFolderInput = document.getElementById('import-folder-input');
+
+  if (sidebarImportBtn) sidebarImportBtn.addEventListener('click', () => { if (typeof openImportModal === 'function') openImportModal(); });
+  if (closeImportBtn) closeImportBtn.addEventListener('click', closeImportModal);
+  if (closeImportFooterBtn) closeImportFooterBtn.addEventListener('click', closeImportModal);
+  if (importSelectBtn) importSelectBtn.addEventListener('click', () => { if (typeof selectImportFolder === 'function') selectImportFolder(); });
+  if (importClearBtn) importClearBtn.addEventListener('click', () => { if (typeof clearImportFolder === 'function') clearImportFolder(); });
+  if (importRunBtn) importRunBtn.addEventListener('click', () => { if (typeof runImport === 'function') runImport(); });
+  if (importFolderInput) importFolderInput.addEventListener('change', (e) => { if (typeof handleFallbackFolderSelect === 'function') handleFallbackFolderSelect(e); });
+  if (importModal) importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImportModal(); });
+
   const closeClipboardScreenBtn = document.getElementById('close-clipboard-screen-btn');
   if (closeClipboardScreenBtn) closeClipboardScreenBtn.addEventListener('click', closeClipboardScreen);
 
@@ -263,7 +282,7 @@ function setupEventListeners() {
     if (e.key === 'Escape') {
       closeCreateModal(); closeAddModal(); closeShareModal(); closeBuilder(); closeAIPanel();
       closeAddThemeModal(); closePromptsModal(); closeAIManagerModal(); closeAppInfoModal();
-      closeClipboardScreen(); closeExportUrlsModal(); hideCardContextMenu();
+      closeClipboardScreen(); closeExportUrlsModal(); closeImportModal(); hideCardContextMenu();
       const tModal = document.getElementById('themes-modal'); if (tModal) tModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');
     }

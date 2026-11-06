@@ -25,7 +25,11 @@
     </div>
     <div class="sidebar-arrow">↓</div>
     <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">🚀 Create</button>
+
     <div class="sidebar-spacer"></div>
+
+    <!-- НОВАЯ КНОПКА ИМПОРТ (выше URL) -->
+    <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
     <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
   </div>
 
@@ -239,7 +243,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ШАРИНГА -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
       <div class="modal-header">
@@ -255,24 +258,20 @@
           </div>
         </div>
 
-        <!-- Блок "Поделиться файлом" -->
         <div class="step-box" id="share-file-block">
           <h3>📤 Поделиться файлом</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Отправьте HTML-файл через Telegram, WhatsApp или другие приложения.</p>
           <button id="share-file-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📤 Поделиться файлом</button>
         </div>
 
-        <!-- Разделитель "или" -->
         <div id="share-or-divider" style="text-align: center; color: var(--description-color); font-size: 14px; margin: 15px 0; font-weight: 500;">— или —</div>
 
-        <!-- Шаг 1 -->
         <div class="step-box">
           <h3>1️⃣ Скопируйте код приложения</h3>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать код</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
 
-        <!-- Шаг 2 -->
         <div class="step-box">
           <h3>2️⃣ Разместите код и получите ссылку</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Выберите сервис, вставьте код и сохраните:</p>
@@ -283,7 +282,6 @@
           </div>
         </div>
 
-        <!-- Шаг 3 -->
         <div class="step-box">
           <h3>3️⃣ Привяжите ссылку к приложению</h3>
           <input type="url" id="share-url-input" class="url-input" placeholder="https://..." style="margin-bottom: 10px;">
@@ -294,7 +292,6 @@
           </div>
         </div>
 
-        <!-- Шаг 4 -->
         <div class="step-box" id="share-telegram-block" style="display: none;">
           <h3>4️⃣ Поделитесь ссылкой в Telegram</h3>
           <button id="share-telegram-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📱 Поделиться в Telegram</button>
@@ -302,6 +299,46 @@
       </div>
       <div class="modal-footer">
         <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- НОВАЯ МОДАЛКА ИМПОРТА -->
+  <div id="import-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📥 Импорт приложений из папки</h2>
+        <button class="modal-close" id="close-import-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <p id="import-modal-desc" style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Выберите папку с HTML-файлами. Система рекурсивно просканирует все вложенные папки и создаст приложения из файлов с корректным manifest. Приложения с существующими ID будут пропущены.
+          </p>
+          <p id="import-default-hint" style="font-size: 12px; color: var(--accent-color); margin-bottom: 15px; font-style: italic;">
+            💡 По умолчанию: папка загрузок Telegram
+          </p>
+
+          <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: var(--description-color); margin-bottom: 5px;">📁 Выбранная папка:</div>
+            <div id="import-folder-path" style="font-size: 14px; color: var(--text-color); font-weight: 500; word-break: break-all;">Папка не выбрана</div>
+          </div>
+
+          <input type="file" id="import-folder-input" webkitdirectory directory multiple style="display: none;">
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="import-select-folder-btn" class="btn btn-secondary" style="flex: 1;">📁 Выбрать папку</button>
+            <button id="import-clear-btn" class="btn btn-secondary" style="flex: 0 0 auto;">🗑 Очистить</button>
+          </div>
+
+          <div id="import-status" class="modal-status" style="margin-top: 15px;"></div>
+
+          <div id="import-log" class="import-log" style="display: none; margin-top: 15px; max-height: 250px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="import-run-btn" class="btn btn-primary">🚀 Начать импорт</button>
+        <button id="close-import-footer-btn" class="btn btn-secondary">Закрыть</button>
       </div>
     </div>
   </div>
@@ -486,6 +523,7 @@
   <script src="scripts/edit.js"></script>
   <script src="scripts/add.js"></script>
   <script src="scripts/share.js"></script>
+  <script src="scripts/import.js"></script>
   <script src="scripts/app-core.js"></script>
   <script src="scripts/app-clipboard.js"></script>
   <script src="scripts/app-builder.js"></script>

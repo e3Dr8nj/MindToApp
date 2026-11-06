@@ -1972,3 +1972,23 @@ h1 {
     font-size: 14px;
   }
 }
+/* ==========================================
+   ИМПОРТ - ЛОГ
+   ========================================== */
+
+.import-log {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.import-log-line {
+  padding: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.import-log-info { color: var(--text-color); }
+.import-log-success { color: var(--status-success-color); }
+.import-log-warning { color: var(--folder-warning-color); }
+.import-log-error { color: var(--status-error-color); }

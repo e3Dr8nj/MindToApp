@@ -24,6 +24,7 @@ const translations = {
     promptBtn: '⚙️ Prompt',
     builder: '🛠 Builder',
     add: '➕ Add',
+    importBtn: '📥 Import',
     exportUrls: '📤 Export URLs',
     refresh: '🔄',
     languageToggle: 'EN',
@@ -85,7 +86,6 @@ const translations = {
     editCopyPromptCode: '📋 Copy prompt + code for AI',
     close: 'Close',
 
-    // === ШАРИНГ ===
     shareTitle: '📤 Share app',
     shareFileBtn: '📤 Share as file',
     shareFileTitle: '📤 Share as file',
@@ -102,7 +102,6 @@ const translations = {
     shareTelegramBtn: '📱 Share in Telegram',
     fileDownloaded: '✅ File downloaded: {name}',
     fileShareFailed: '❌ File sharing not supported. Downloading instead...',
-    // ============================
 
     themesTitle: '🎨 Manage themes',
     themesSystemTitle: 'System themes',
@@ -199,7 +198,31 @@ const translations = {
     analyzing: '⏳ Analyzing code...',
     created: '✅ Created!',
     loadingByUrl: '🔗 Loading by link...',
-    codeLoaded: '✅ Code loaded from link'
+    codeLoaded: '✅ Code loaded from link',
+
+    // === ИМПОРТ ===
+    importModalTitle: '📥 Import apps from folder',
+    importDesc: 'Select a folder with HTML files. The system will recursively scan all subfolders and create apps from files with a valid manifest. Apps with existing IDs will be skipped.',
+    importDefaultFolder: 'Default: Telegram Downloads folder',
+    importSelectedFolder: 'Selected folder:',
+    importNoFolderSelected: 'Folder not selected',
+    importSelectFolderBtn: '📁 Select folder',
+    importClearFolderBtn: '🗑 Clear',
+    importRunBtn: '🚀 Start import',
+    importSelectFolderFirst: '❌ Select a folder first',
+    importPermissionDenied: '❌ Access to folder denied',
+    importScanning: '⏳ Scanning folder...',
+    importRunning: 'Importing...',
+    importNoManifest: 'No manifest found',
+    importAlreadyExists: 'App already exists',
+    importCreated: 'Created',
+    importError: 'Error',
+    importSummary: '✅ Found: {found} | Imported: {imported} | Skipped: {skipped} | Errors: {errors}',
+    importSuccess: '✅ Imported {count} apps!',
+    importNoFiles: '❌ No HTML files found in the folder',
+    importFolderSelected: '✅ Folder selected',
+    importFolderCleared: 'Folder cleared'
+    // ============================
   },
 
   ru: {
@@ -223,6 +246,7 @@ const translations = {
     promptBtn: '⚙️ Промпт',
     builder: '🛠 Конструктор',
     add: '➕ Добавить',
+    importBtn: '📥 Импорт',
     exportUrls: '📤 Экспорт ссылок',
     refresh: '🔄',
     languageToggle: 'RU',
@@ -284,7 +308,6 @@ const translations = {
     editCopyPromptCode: '📋 Копировать промпт + код для ИИ',
     close: 'Закрыть',
 
-    // === ШАРИНГ ===
     shareTitle: '📤 Поделиться приложением',
     shareFileBtn: '📤 Поделиться файлом',
     shareFileTitle: '📤 Поделиться файлом',
@@ -301,7 +324,6 @@ const translations = {
     shareTelegramBtn: '📱 Поделиться в Telegram',
     fileDownloaded: '✅ Файл скачан: {name}',
     fileShareFailed: '❌ Отправка файлов не поддерживается. Скачиваю файл...',
-    // ============================
 
     themesTitle: '🎨 Управление темами',
     themesSystemTitle: 'Системные темы',
@@ -398,7 +420,31 @@ const translations = {
     analyzing: '⏳ Анализ кода...',
     created: '✅ Создано!',
     loadingByUrl: '🔗 Загружаю по ссылке...',
-    codeLoaded: '✅ Код загружен по ссылке'
+    codeLoaded: '✅ Код загружен по ссылке',
+
+    // === ИМПОРТ ===
+    importModalTitle: '📥 Импорт приложений из папки',
+    importDesc: 'Выберите папку с HTML-файлами. Система рекурсивно просканирует все вложенные папки и создаст приложения из файлов с корректным manifest. Приложения с существующими ID будут пропущены.',
+    importDefaultFolder: 'По умолчанию: папка загрузок Telegram',
+    importSelectedFolder: 'Выбранная папка:',
+    importNoFolderSelected: 'Папка не выбрана',
+    importSelectFolderBtn: '📁 Выбрать папку',
+    importClearFolderBtn: '🗑 Очистить',
+    importRunBtn: '🚀 Начать импорт',
+    importSelectFolderFirst: '❌ Сначала выберите папку',
+    importPermissionDenied: '❌ Доступ к папке запрещён',
+    importScanning: '⏳ Сканирование папки...',
+    importRunning: 'Импортирую...',
+    importNoManifest: 'Manifest не найден',
+    importAlreadyExists: 'Приложение уже существует',
+    importCreated: 'Создано',
+    importError: 'Ошибка',
+    importSummary: '✅ Найдено: {found} | Импортировано: {imported} | Пропущено: {skipped} | Ошибок: {errors}',
+    importSuccess: '✅ Импортировано приложений: {count}',
+    importNoFiles: '❌ В папке не найдено HTML-файлов',
+    importFolderSelected: '✅ Папка выбрана',
+    importFolderCleared: 'Папка очищена'
+    // ============================
   }
 };
 
@@ -451,6 +497,7 @@ function applyLanguage() {
     { selector: '#builder-btn', key: 'builder' },
     { selector: '#add-custom-btn', key: 'add' },
     { selector: '#add-custom-btn-store', key: 'add' },
+    { selector: '#sidebar-import-btn', key: 'importBtn', isHtml: true },
     { selector: '#export-urls-btn', key: 'exportUrls' },
     { selector: '#go-to-store-btn', key: 'goToStore' },
     { selector: '#close-app-btn', key: 'back', isHtml: true },
@@ -506,7 +553,6 @@ function applyLanguage() {
     { selector: '#add-modal .tab-switcher .tab-btn:nth-child(4)', key: 'addTabCode' },
     { selector: '#confirm-add-btn', key: 'addBtn' },
 
-    // === ШАРИНГ ===
     { selector: '#share-modal .modal-header h2', key: 'shareTitle' },
     { selector: '#share-file-block > h3', key: 'shareFileTitle' },
     { selector: '#share-file-block > p', key: 'shareFileDesc' },
@@ -521,7 +567,6 @@ function applyLanguage() {
     { selector: '#unbind-url-btn', key: 'shareUnbindUrl' },
     { selector: '#share-telegram-block > h3', key: 'shareStep4' },
     { selector: '#share-telegram-btn', key: 'shareTelegramBtn' },
-    // ============================
 
     { selector: '#export-urls-modal .modal-header h2', key: 'exportUrlsTitle' },
     { selector: '#export-urls-modal .modal-body > p', key: 'exportDesc' },
@@ -531,7 +576,16 @@ function applyLanguage() {
     { selector: '#edit-modal .modal-header h2', key: 'editTitle' },
     { selector: '#toggle-code-btn', key: 'editShowCode' },
     { selector: '#copy-code-btn', key: 'editCopyCode' },
-    { selector: '#copy-edit-prompt-btn', key: 'editCopyPromptCode' }
+    { selector: '#copy-edit-prompt-btn', key: 'editCopyPromptCode' },
+
+    // === ИМПОРТ ===
+    { selector: '#import-modal .modal-header h2', key: 'importModalTitle' },
+    { selector: '#import-modal-desc', key: 'importDesc' },
+    { selector: '#import-default-hint', key: 'importDefaultFolder' },
+    { selector: '#import-select-folder-btn', key: 'importSelectFolderBtn' },
+    { selector: '#import-clear-btn', key: 'importClearFolderBtn' },
+    { selector: '#import-run-btn', key: 'importRunBtn' }
+    // ============================
   ];
 
   textUpdates.forEach(function(item) {
