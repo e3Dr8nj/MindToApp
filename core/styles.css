@@ -175,13 +175,11 @@ h1 {
   line-height: 1.3;
 }
 
-/* Установленное приложение */
 .app-card-installed {
   border: 2px solid var(--share-btn-bg);
   background: linear-gradient(135deg, var(--card-bg) 0%, rgba(46, 204, 113, 0.05) 100%);
 }
 
-/* Значок настроек (⚙️) в правом верхнем углу */
 .app-card-settings-badge {
   position: absolute;
   top: 6px;
@@ -207,7 +205,6 @@ h1 {
   transform: scale(1.15) rotate(45deg);
 }
 
-/* Значок привязанной ссылки (🔗) в левом верхнем углу */
 .app-card-link-badge {
   position: absolute;
   top: 6px;
@@ -224,7 +221,6 @@ h1 {
   pointer-events: none;
 }
 
-/* Кнопки действий под карточкой (круглые) */
 .app-card-actions {
   display: flex;
   gap: 4px;
@@ -263,10 +259,6 @@ h1 {
 .app-card-action-install:hover {
   background: var(--share-btn-bg);
 }
-
-/* ==========================================
-   КНОПКА "УСТАНОВИТЬ" НА СКЛАДЕ
-   ========================================== */
 
 .app-card-install-btn {
   width: 100%;
@@ -308,14 +300,8 @@ h1 {
 }
 
 @keyframes contextMenuFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .app-card-context-menu-item {
@@ -405,7 +391,6 @@ h1 {
   min-width: 120px;
 }
 
-/* Блок привязанной ссылки в инфо-модалке */
 .app-info-link-block {
   padding: 12px 16px;
   background: var(--edit-preview-bg);
@@ -500,7 +485,6 @@ h1 {
   min-height: 100px;
 }
 
-/* Кликабельные ссылки внутри текста буфера */
 .clipboard-inline-link {
   color: var(--ai-link-color);
   background: var(--ai-link-bg);
@@ -1228,14 +1212,12 @@ h1 {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Скрытый сайдбар (при открытом приложении) */
 .sidebar.sidebar-hidden {
   transform: translateX(-100%);
   opacity: 0;
   pointer-events: none;
 }
 
-/* Растягиваемый промежуток: прижимает URL к низу */
 .sidebar-spacer {
   flex: 1;
   min-height: 10px;
@@ -1306,7 +1288,6 @@ h1 {
   50% { transform: translateY(4px); }
 }
 
-/* Выпадающий список нейросетей */
 .sidebar-ai-wrapper {
   position: relative;
   padding-right: 200px;
@@ -1358,7 +1339,6 @@ h1 {
   border-color: var(--share-btn-bg);
 }
 
-/* Основной контент с отступом под сайдбар */
 .main-content {
   margin-left: 80px;
   min-height: 100vh;
@@ -1604,7 +1584,6 @@ h1 {
   text-align: center;
   line-height: 1.5;
 }
-
 /* ==========================================
    БУРГЕР-МЕНЮ
    ========================================== */
@@ -1688,7 +1667,6 @@ h1 {
     margin-left: 60px;
   }
 
-  /* БУРГЕР-МЕНЮ */
   .burger-menu-btn {
     display: block;
   }
@@ -1723,7 +1701,6 @@ h1 {
     position: relative;
   }
 
-  /* Карточки на мобильных */
   .app-grid {
     grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
     gap: 10px;
@@ -1754,7 +1731,6 @@ h1 {
     padding: 6px 10px;
   }
 
-  /* Экран буфера на мобильных */
   .clipboard-content-area {
     padding: 20px 15px;
   }
@@ -1764,7 +1740,6 @@ h1 {
     padding: 15px;
   }
 
-  /* Экспорт ссылок на мобильных */
   .export-urls-text {
     height: 260px;
     font-size: 12px;
@@ -1955,7 +1930,6 @@ h1 {
     font-size: 16px;
   }
 
-  /* Экспорт ссылок на маленьких экранах */
   .export-urls-text {
     height: 220px;
     font-size: 11px;
@@ -1972,14 +1946,33 @@ h1 {
     font-size: 14px;
   }
 }
+
 /* ==========================================
-   ИМПОРТ - ЛОГ
+   ИМПОРТ ПРИЛОЖЕНИЙ
    ========================================== */
 
-.import-log {
+#import-folder-path {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-color);
+  word-break: break-all;
+  background: var(--code-input-bg);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  margin: 10px 0;
+}
+
+#import-log {
+  max-height: 250px;
+  overflow-y: auto;
+  background: var(--code-input-bg);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid var(--input-border);
   font-family: 'Courier New', monospace;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .import-log-line {
