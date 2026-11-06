@@ -84,9 +84,13 @@ const translations = {
     editCopyCode: '📋 Copy code',
     editCopyPromptCode: '📋 Copy prompt + code for AI',
     close: 'Close',
-    
-    // === ШАРИНГ (ОБНОВЛЕННО) ===
+
+    // === ШАРИНГ ===
     shareTitle: '📤 Share app',
+    shareFileBtn: '📤 Share as file',
+    shareFileTitle: '📤 Share as file',
+    shareFileDesc: 'Send the HTML file via Telegram, WhatsApp, or other apps.',
+    shareOr: '— or —',
     shareStep1: '1️⃣ Copy app code',
     shareCopyCodeBtn: '📋 Copy code',
     shareStep2: '2️⃣ Host code and get a link',
@@ -96,6 +100,8 @@ const translations = {
     shareUnbindUrl: '✂️ Unbind',
     shareStep4: '4️⃣ Share link in Telegram',
     shareTelegramBtn: '📱 Share in Telegram',
+    fileDownloaded: '✅ File downloaded: {name}',
+    fileShareFailed: '❌ File sharing not supported. Downloading instead...',
     // ============================
 
     themesTitle: '🎨 Manage themes',
@@ -278,8 +284,12 @@ const translations = {
     editCopyPromptCode: '📋 Копировать промпт + код для ИИ',
     close: 'Закрыть',
 
-    // === ШАРИНГ (ОБНОВЛЕННО) ===
+    // === ШАРИНГ ===
     shareTitle: '📤 Поделиться приложением',
+    shareFileBtn: '📤 Поделиться файлом',
+    shareFileTitle: '📤 Поделиться файлом',
+    shareFileDesc: 'Отправьте HTML-файл через Telegram, WhatsApp или другие приложения.',
+    shareOr: '— или —',
     shareStep1: '1️⃣ Скопируйте код приложения',
     shareCopyCodeBtn: '📋 Скопировать код',
     shareStep2: '2️⃣ Разместите код и получите ссылку',
@@ -289,6 +299,8 @@ const translations = {
     shareUnbindUrl: '✂️ Отвязать',
     shareStep4: '4️⃣ Поделитесь ссылкой в Telegram',
     shareTelegramBtn: '📱 Поделиться в Telegram',
+    fileDownloaded: '✅ Файл скачан: {name}',
+    fileShareFailed: '❌ Отправка файлов не поддерживается. Скачиваю файл...',
     // ============================
 
     themesTitle: '🎨 Управление темами',
@@ -493,19 +505,24 @@ function applyLanguage() {
     { selector: '#add-modal .tab-switcher .tab-btn:nth-child(3)', key: 'addTabFolder' },
     { selector: '#add-modal .tab-switcher .tab-btn:nth-child(4)', key: 'addTabCode' },
     { selector: '#confirm-add-btn', key: 'addBtn' },
-    
-    // Обновленные селекторы для модалки шеринга
+
+    // === ШАРИНГ ===
     { selector: '#share-modal .modal-header h2', key: 'shareTitle' },
-    { selector: '#share-modal .step-box:nth-child(2) > h3', key: 'shareStep1' },
+    { selector: '#share-file-block > h3', key: 'shareFileTitle' },
+    { selector: '#share-file-block > p', key: 'shareFileDesc' },
+    { selector: '#share-file-btn', key: 'shareFileBtn' },
+    { selector: '#share-or-divider', key: 'shareOr' },
+    { selector: '#share-modal .step-box:nth-child(4) > h3', key: 'shareStep1' },
     { selector: '#copy-app-code-btn', key: 'shareCopyCodeBtn' },
-    { selector: '#share-modal .step-box:nth-child(3) > h3', key: 'shareStep2' },
-    { selector: '#share-modal .step-box:nth-child(3) > p', key: 'shareStep2Desc' },
-    { selector: '#share-modal .step-box:nth-child(4) > h3', key: 'shareStep3' },
+    { selector: '#share-modal .step-box:nth-child(5) > h3', key: 'shareStep2' },
+    { selector: '#share-modal .step-box:nth-child(5) > p', key: 'shareStep2Desc' },
+    { selector: '#share-modal .step-box:nth-child(6) > h3', key: 'shareStep3' },
     { selector: '#bind-url-btn', key: 'shareBindUrl' },
     { selector: '#unbind-url-btn', key: 'shareUnbindUrl' },
     { selector: '#share-telegram-block > h3', key: 'shareStep4' },
     { selector: '#share-telegram-btn', key: 'shareTelegramBtn' },
-    
+    // ============================
+
     { selector: '#export-urls-modal .modal-header h2', key: 'exportUrlsTitle' },
     { selector: '#export-urls-modal .modal-body > p', key: 'exportDesc' },
     { selector: '#export-urls-empty > p:first-child', key: 'noLinkedApps' },

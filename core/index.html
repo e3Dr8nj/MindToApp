@@ -239,7 +239,7 @@
     </div>
   </div>
 
-  <!-- ОБНОВЛЕННАЯ МОДАЛКА ШАРИНГА (4 ШАГА) -->
+  <!-- МОДАЛКА ШАРИНГА -->
   <div id="share-modal" class="modal">
     <div class="modal-content modal-share">
       <div class="modal-header">
@@ -255,12 +255,24 @@
           </div>
         </div>
 
+        <!-- Блок "Поделиться файлом" -->
+        <div class="step-box" id="share-file-block">
+          <h3>📤 Поделиться файлом</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Отправьте HTML-файл через Telegram, WhatsApp или другие приложения.</p>
+          <button id="share-file-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📤 Поделиться файлом</button>
+        </div>
+
+        <!-- Разделитель "или" -->
+        <div id="share-or-divider" style="text-align: center; color: var(--description-color); font-size: 14px; margin: 15px 0; font-weight: 500;">— или —</div>
+
+        <!-- Шаг 1 -->
         <div class="step-box">
           <h3>1️⃣ Скопируйте код приложения</h3>
           <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать код</button>
           <div id="copy-code-status" class="modal-status"></div>
         </div>
 
+        <!-- Шаг 2 -->
         <div class="step-box">
           <h3>2️⃣ Разместите код и получите ссылку</h3>
           <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Выберите сервис, вставьте код и сохраните:</p>
@@ -271,6 +283,7 @@
           </div>
         </div>
 
+        <!-- Шаг 3 -->
         <div class="step-box">
           <h3>3️⃣ Привяжите ссылку к приложению</h3>
           <input type="url" id="share-url-input" class="url-input" placeholder="https://..." style="margin-bottom: 10px;">
@@ -281,6 +294,7 @@
           </div>
         </div>
 
+        <!-- Шаг 4 -->
         <div class="step-box" id="share-telegram-block" style="display: none;">
           <h3>4️⃣ Поделитесь ссылкой в Telegram</h3>
           <button id="share-telegram-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📱 Поделиться в Telegram</button>
@@ -291,7 +305,6 @@
       </div>
     </div>
   </div>
-  <!-- КОНЕЦ ОБНОВЛЕННОЙ МОДАЛКИ ШАРИНГА -->
 
   <div id="themes-modal" class="modal">
     <div class="modal-content">

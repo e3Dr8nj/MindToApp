@@ -122,9 +122,10 @@ function setupEventListeners() {
   if (selectFileBtn) selectFileBtn.addEventListener('click', () => { if (localFileInput) localFileInput.click(); });
   if (selectFolderBtn) selectFolderBtn.addEventListener('click', () => { if (folderInput) folderInput.click(); });
 
-  // ШАРИНГ И ПРИВЯЗКА ССЫЛОК (ОБНОВЛЕНО)
+  // ШАРИНГ И ПРИВЯЗКА ССЫЛОК
   const closeShareBtn = document.getElementById('close-share-btn');
   const closeShareFooterBtn = document.getElementById('close-share-footer-btn');
+  const shareFileBtn = document.getElementById('share-file-btn');
   const copyAppCodeBtn = document.getElementById('copy-app-code-btn');
   const shareModal = document.getElementById('share-modal');
   const bindUrlBtn = document.getElementById('bind-url-btn');
@@ -133,6 +134,7 @@ function setupEventListeners() {
 
   if (closeShareBtn) closeShareBtn.addEventListener('click', closeShareModal);
   if (closeShareFooterBtn) closeShareFooterBtn.addEventListener('click', closeShareModal);
+  if (shareFileBtn) shareFileBtn.addEventListener('click', shareHtmlFile);
   if (copyAppCodeBtn) copyAppCodeBtn.addEventListener('click', copyAppCode);
   if (shareModal) shareModal.addEventListener('click', (e) => { if (e.target === shareModal) closeShareModal(); });
   if (bindUrlBtn) bindUrlBtn.addEventListener('click', bindUrlToApp);

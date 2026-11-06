@@ -5,6 +5,10 @@
 let currentShareModule = null;
 let appUrlBindings = {};
 
+// ==========================================
+// ХРАНЕНИЕ ПРИВЯЗАННЫХ ССЫЛОК
+// ==========================================
+
 function loadAppUrls() {
   try {
     const stored = localStorage.getItem('appUrls');
@@ -37,6 +41,10 @@ function removeAppUrl(moduleId) {
   delete appUrlBindings[moduleId];
   saveAppUrls();
 }
+
+// ==========================================
+// МОДАЛКА "ПОДЕЛИТЬСЯ"
+// ==========================================
 
 function openShareModal(module) {
   currentShareModule = module;
@@ -125,6 +133,10 @@ function openGistWithCode() {
   window.open('https://gist.github.com', '_blank', 'noopener,noreferrer');
 }
 
+// ==========================================
+// ПРИВЯЗКА / ОТВЯЗКА ССЫЛКИ
+// ==========================================
+
 function bindUrlToApp() {
   if (!currentShareModule) return;
 
@@ -180,6 +192,10 @@ function unbindUrlFromApp() {
   renderAllApps();
 }
 
+// ==========================================
+// ШАРИНГ В TELEGRAM (ССЫЛКА)
+// ==========================================
+
 function shareToTelegram() {
   if (!currentShareModule) return;
 
@@ -207,6 +223,79 @@ function updateTelegramShareBlock() {
   const linkedUrl = getAppUrl(currentShareModule.id);
   block.style.display = linkedUrl ? 'block' : 'none';
 }
+
+// ==========================================
+// ШАРИНГ HTML-ФАЙЛА
+// ==========================================
+
+function sanitizeFileName(name) {
+  return name
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+    .replace(/\s+/g, '_')
+    .trim()
+    .substring(0, 100) || 'app';
+}
+
+function shareHtmlFile() {
+  if (!currentShareModule || !currentShareModule.content) {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
+  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
+  const file = new File([blob], fileName, { type: 'text/html' });
+
+  // Проверяем поддержку Web Share API с файлами
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    const shareData = {
+      files: [file],
+      title: currentShareModule.name,
+      text: currentShareModule.description || ''
+    };
+
+    navigator.share(shareData)
+      .then(() => {
+        console.log('✅ File shared successfully');
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          console.error('Share error:', err);
+          showToast(t('fileShareFailed'), 'error', 4000);
+          setTimeout(() => downloadHtmlFile(), 500);
+        }
+      });
+  } else {
+    // Fallback: скачиваем файл
+    showToast(t('fileShareFailed'), 'error', 4000);
+    setTimeout(() => downloadHtmlFile(), 500);
+  }
+}
+
+function downloadHtmlFile() {
+  if (!currentShareModule || !currentShareModule.content) {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
+  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(t('fileDownloaded', { name: fileName }), 'success');
+}
+
+// ==========================================
+// ЭКСПОРТ ССЫЛОК
+// ==========================================
 
 function getExportableApps() {
   return installedModules
