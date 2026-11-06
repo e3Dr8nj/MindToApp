@@ -141,6 +141,44 @@ function setupEventListeners() {
   if (unbindUrlBtn) unbindUrlBtn.addEventListener('click', unbindUrlFromApp);
   if (shareTelegramBtn) shareTelegramBtn.addEventListener('click', shareToTelegram);
 
+  // ==========================================
+  // ЭКСПОРТ / ИМПОРТ (ОБНОВЛЕНО)
+  // ==========================================
+  const sidebarExportBtn = document.getElementById('sidebar-export-btn');
+  const exportModal = document.getElementById('export-modal');
+  const closeExportBtn = document.getElementById('close-export-btn');
+  const closeExportFooterBtn = document.getElementById('close-export-footer-btn');
+  const exportSelectBtn = document.getElementById('export-select-folder-btn');
+  const exportClearBtn = document.getElementById('export-clear-btn');
+  const exportRunBtn = document.getElementById('export-run-btn');
+
+  if (sidebarExportBtn) sidebarExportBtn.addEventListener('click', () => { if (typeof openExportModal === 'function') openExportModal(); });
+  if (closeExportBtn) closeExportBtn.addEventListener('click', closeExportModal);
+  if (closeExportFooterBtn) closeExportFooterBtn.addEventListener('click', closeExportModal);
+  if (exportSelectBtn) exportSelectBtn.addEventListener('click', () => { if (typeof selectExportFolder === 'function') selectExportFolder(); });
+  if (exportClearBtn) exportClearBtn.addEventListener('click', () => { if (typeof clearExportFolder === 'function') clearExportFolder(); });
+  if (exportRunBtn) exportRunBtn.addEventListener('click', () => { if (typeof runExport === 'function') runExport(); });
+  if (exportModal) exportModal.addEventListener('click', (e) => { if (e.target === exportModal) closeExportModal(); });
+
+  const sidebarImportBtn = document.getElementById('sidebar-import-btn');
+  const importModal = document.getElementById('import-modal');
+  const closeImportBtn = document.getElementById('close-import-btn');
+  const closeImportFooterBtn = document.getElementById('close-import-footer-btn');
+  const importSelectBtn = document.getElementById('import-select-folder-btn');
+  const importClearBtn = document.getElementById('import-clear-btn');
+  const importRunBtn = document.getElementById('import-run-btn');
+  const importFolderInput = document.getElementById('import-folder-input');
+
+  if (sidebarImportBtn) sidebarImportBtn.addEventListener('click', () => { if (typeof openImportModal === 'function') openImportModal(); });
+  if (closeImportBtn) closeImportBtn.addEventListener('click', closeImportModal);
+  if (closeImportFooterBtn) closeImportFooterBtn.addEventListener('click', closeImportModal);
+  if (importSelectBtn) importSelectBtn.addEventListener('click', () => { if (typeof selectImportFolder === 'function') selectImportFolder(); });
+  if (importClearBtn) importClearBtn.addEventListener('click', () => { if (typeof clearImportFolder === 'function') clearImportFolder(); });
+  if (importRunBtn) importRunBtn.addEventListener('click', () => { if (typeof runImport === 'function') runImport(); });
+  if (importFolderInput) importFolderInput.addEventListener('change', (e) => { if (typeof handleFallbackFolderSelect === 'function') handleFallbackFolderSelect(e); });
+  if (importModal) importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImportModal(); });
+  // ==========================================
+
   const exportUrlsBtn = document.getElementById('export-urls-btn');
   const closeExportUrlsBtn = document.getElementById('close-export-urls-btn');
   const closeExportUrlsFooterBtn = document.getElementById('close-export-urls-footer-btn');
@@ -187,25 +225,6 @@ function setupEventListeners() {
 
   const sidebarUrlBtn = document.getElementById('sidebar-url-btn');
   if (sidebarUrlBtn) sidebarUrlBtn.addEventListener('click', handleUrlFromClipboard);
-
-  // ИМПОРТ ИЗ ПАПКИ
-  const sidebarImportBtn = document.getElementById('sidebar-import-btn');
-  const importModal = document.getElementById('import-modal');
-  const closeImportBtn = document.getElementById('close-import-btn');
-  const closeImportFooterBtn = document.getElementById('close-import-footer-btn');
-  const importSelectBtn = document.getElementById('import-select-folder-btn');
-  const importClearBtn = document.getElementById('import-clear-btn');
-  const importRunBtn = document.getElementById('import-run-btn');
-  const importFolderInput = document.getElementById('import-folder-input');
-
-  if (sidebarImportBtn) sidebarImportBtn.addEventListener('click', () => { if (typeof openImportModal === 'function') openImportModal(); });
-  if (closeImportBtn) closeImportBtn.addEventListener('click', closeImportModal);
-  if (closeImportFooterBtn) closeImportFooterBtn.addEventListener('click', closeImportModal);
-  if (importSelectBtn) importSelectBtn.addEventListener('click', () => { if (typeof selectImportFolder === 'function') selectImportFolder(); });
-  if (importClearBtn) importClearBtn.addEventListener('click', () => { if (typeof clearImportFolder === 'function') clearImportFolder(); });
-  if (importRunBtn) importRunBtn.addEventListener('click', () => { if (typeof runImport === 'function') runImport(); });
-  if (importFolderInput) importFolderInput.addEventListener('change', (e) => { if (typeof handleFallbackFolderSelect === 'function') handleFallbackFolderSelect(e); });
-  if (importModal) importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImportModal(); });
 
   const closeClipboardScreenBtn = document.getElementById('close-clipboard-screen-btn');
   if (closeClipboardScreenBtn) closeClipboardScreenBtn.addEventListener('click', closeClipboardScreen);
@@ -282,7 +301,7 @@ function setupEventListeners() {
     if (e.key === 'Escape') {
       closeCreateModal(); closeAddModal(); closeShareModal(); closeBuilder(); closeAIPanel();
       closeAddThemeModal(); closePromptsModal(); closeAIManagerModal(); closeAppInfoModal();
-      closeClipboardScreen(); closeExportUrlsModal(); closeImportModal(); hideCardContextMenu();
+      closeClipboardScreen(); closeExportUrlsModal(); closeExportModal(); closeImportModal(); hideCardContextMenu();
       const tModal = document.getElementById('themes-modal'); if (tModal) tModal.classList.remove('active');
       if (headerMenu) headerMenu.classList.remove('active');
     }
@@ -335,4 +354,7 @@ function resetAIList() {
   if (typeof initAINetworksInUI === 'function') initAINetworksInUI();
 }
 
+// ==========================================
+// ЗАПУСК ПЛАТФОРМЫ
+// ==========================================
 init();
