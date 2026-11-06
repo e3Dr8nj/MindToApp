@@ -5,10 +5,6 @@
 let currentShareModule = null;
 let appUrlBindings = {};
 
-// ==========================================
-// ХРАНЕНИЕ ПРИВЯЗАННЫХ ССЫЛОК
-// ==========================================
-
 function loadAppUrls() {
   try {
     const stored = localStorage.getItem('appUrls');
@@ -42,10 +38,6 @@ function removeAppUrl(moduleId) {
   saveAppUrls();
 }
 
-// ==========================================
-// МОДАЛКА "ПОДЕЛИТЬСЯ"
-// ==========================================
-
 function openShareModal(module) {
   currentShareModule = module;
   const modal = document.getElementById('share-modal');
@@ -71,12 +63,12 @@ function openShareModal(module) {
 
     if (existingUrl) {
       urlInput.value = existingUrl;
-      bindBtn.textContent = t('edit');
+      bindBtn.textContent = t('shareBindUrl');
       unbindBtn.style.display = 'inline-block';
-      unbindBtn.textContent = t('unbindUrl');
+      unbindBtn.textContent = t('shareUnbindUrl');
     } else {
       urlInput.value = '';
-      bindBtn.textContent = t('bindUrl');
+      bindBtn.textContent = t('shareBindUrl');
       unbindBtn.style.display = 'none';
     }
 
@@ -84,7 +76,6 @@ function openShareModal(module) {
   }
 
   updateTelegramShareBlock();
-
   modal.classList.add('active');
 }
 
@@ -134,10 +125,6 @@ function openGistWithCode() {
   window.open('https://gist.github.com', '_blank', 'noopener,noreferrer');
 }
 
-// ==========================================
-// ПРИВЯЗКА / ОТВЯЗКА ССЫЛКИ
-// ==========================================
-
 function bindUrlToApp() {
   if (!currentShareModule) return;
 
@@ -147,14 +134,12 @@ function bindUrlToApp() {
   const status = document.getElementById('share-url-status');
 
   if (!urlInput) return;
-
   const url = urlInput.value.trim();
 
   if (!url) {
     if (status) { status.textContent = t('enterUrl'); status.className = 'modal-status error'; }
     return;
   }
-
   if (!/^https?:\/\//i.test(url)) {
     if (status) { status.textContent = t('invalidUrl'); status.className = 'modal-status error'; }
     return;
@@ -163,22 +148,20 @@ function bindUrlToApp() {
   setAppUrl(currentShareModule.id, url);
 
   if (status) { status.textContent = t('urlBound'); status.className = 'modal-status success'; }
-  if (bindBtn) bindBtn.textContent = t('edit');
+  if (bindBtn) bindBtn.textContent = t('shareBindUrl');
   if (unbindBtn) {
     unbindBtn.style.display = 'inline-block';
-    unbindBtn.textContent = t('unbindUrl');
+    unbindBtn.textContent = t('shareUnbindUrl');
   }
 
   updateTelegramShareBlock();
-
   renderInstalledApps();
   renderAllApps();
 }
 
 function unbindUrlFromApp() {
   if (!currentShareModule) return;
-
-  if (!confirm(t('unbindUrl') + '?')) return;
+  if (!confirm(t('shareUnbindUrl') + '?')) return;
 
   removeAppUrl(currentShareModule.id);
 
@@ -188,19 +171,14 @@ function unbindUrlFromApp() {
   const status = document.getElementById('share-url-status');
 
   if (urlInput) urlInput.value = '';
-  if (bindBtn) bindBtn.textContent = t('bindUrl');
+  if (bindBtn) bindBtn.textContent = t('shareBindUrl');
   if (unbindBtn) unbindBtn.style.display = 'none';
   if (status) { status.textContent = t('urlUnbound'); status.className = 'modal-status success'; }
 
   updateTelegramShareBlock();
-
   renderInstalledApps();
   renderAllApps();
 }
-
-// ==========================================
-// ШАРИНГ В TELEGRAM (ССЫЛКА)
-// ==========================================
 
 function shareToTelegram() {
   if (!currentShareModule) return;
@@ -230,79 +208,6 @@ function updateTelegramShareBlock() {
   block.style.display = linkedUrl ? 'block' : 'none';
 }
 
-// ==========================================
-// ШАРИНГ HTML-ФАЙЛА
-// ==========================================
-
-function sanitizeFileName(name) {
-  return name
-    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
-    .replace(/\s+/g, '_')
-    .trim()
-    .substring(0, 100) || 'app';
-}
-
-function shareHtmlFile() {
-  if (!currentShareModule || !currentShareModule.content) {
-    showToast(t('noCode'), 'error');
-    return;
-  }
-
-  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
-  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
-  const file = new File([blob], fileName, { type: 'text/html' });
-
-  // Проверяем поддержку Web Share API с файлами
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    const shareData = {
-      files: [file],
-      title: currentShareModule.name,
-      text: currentShareModule.description || ''
-    };
-
-    navigator.share(shareData)
-      .then(() => {
-        console.log('✅ File shared successfully');
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') {
-          console.error('Share error:', err);
-          showToast(t('fileShareFailed'), 'error', 4000);
-          setTimeout(() => downloadHtmlFile(), 500);
-        }
-      });
-  } else {
-    // Fallback: скачиваем файл
-    showToast(t('fileShareFailed'), 'error', 4000);
-    setTimeout(() => downloadHtmlFile(), 500);
-  }
-}
-
-function downloadHtmlFile() {
-  if (!currentShareModule || !currentShareModule.content) {
-    showToast(t('noCode'), 'error');
-    return;
-  }
-
-  const fileName = sanitizeFileName(currentShareModule.name) + '.html';
-  const blob = new Blob([currentShareModule.content], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  showToast(t('fileDownloaded', { name: fileName }), 'success');
-}
-
-// ==========================================
-// ЭКСПОРТ ССЫЛОК
-// ==========================================
-
 function getExportableApps() {
   return installedModules
     .map(id => allModules.find(m => m.id === id))
@@ -331,11 +236,7 @@ function openExportUrlsModal() {
   const emptyMsg = document.getElementById('export-urls-empty');
   const status = document.getElementById('export-urls-status');
 
-  if (!modal) {
-    console.error('❌ export-urls-modal not found');
-    return;
-  }
-
+  if (!modal) return;
   if (status) { status.textContent = ''; status.className = 'modal-status'; }
 
   const apps = getExportableApps();
