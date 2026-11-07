@@ -119,6 +119,7 @@ async function runExport() {
   if (statusEl) { statusEl.textContent = t('exportRunning'); statusEl.className = 'modal-status loading'; }
 
   let successCount = 0;
+  let skipCount = 0;    // <-- НОВОЕ: счетчик пропущенных
   let errorCount = 0;
 
   try {
@@ -128,26 +129,43 @@ async function runExport() {
       const filename = `${safeName}_${app.id}.html`;
 
       try {
-        const fileHandle = await exportFolderHandle.getFileHandle(filename, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(app.content);
-        await writable.close();
+        // 1. Пытаемся получить файл БЕЗ создания нового
+        await exportFolderHandle.getFileHandle(filename, { create: false });
         
-        successCount++;
-        appendExportLog(logEl, `✅ ${t('exportFileSaved')}: ${filename}`, 'success');
+        // 2. Если ошибки не было, значит файл уже существует -> пропускаем
+        skipCount++;
+        appendExportLog(logEl, `⏭️ Пропущено (уже существует): ${filename}`, 'warning');
+        
       } catch (e) {
-        errorCount++;
-        appendExportLog(logEl, `❌ ${t('exportFileError')}: ${filename} - ${e.message}`, 'error');
+        if (e.name === 'NotFoundError') {
+          // 3. Файл не найден, значит можно безопасно создавать и записывать
+          const fileHandle = await exportFolderHandle.getFileHandle(filename, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(app.content);
+          await writable.close();
+
+          successCount++;
+          appendExportLog(logEl, `✅ ${t('exportFileSaved')}: ${filename}`, 'success');
+        } else {
+          // 4. Другая ошибка (например, нет прав доступа)
+          errorCount++;
+          appendExportLog(logEl, `❌ ${t('exportFileError')}: ${filename} - ${e.message}`, 'error');
+        }
       }
     }
 
+    // Формируем итоговое сообщение
+    let summaryText = `✅ Успешно: ${successCount}`;
+    if (skipCount > 0) summaryText += ` | ⏭️ Пропущено: ${skipCount}`;
+    if (errorCount > 0) summaryText += ` | ❌ Ошибок: ${errorCount}`;
+
     if (statusEl) {
-      statusEl.textContent = t('exportSuccess', { count: successCount });
-      statusEl.className = successCount > 0 ? 'modal-status success' : 'modal-status error';
+      statusEl.textContent = summaryText;
+      statusEl.className = successCount > 0 || skipCount > 0 ? 'modal-status success' : 'modal-status error';
     }
 
-    if (successCount > 0) {
-      showToast(t('exportSuccess', { count: successCount }), 'success', 4000);
+    if (successCount > 0 || skipCount > 0) {
+      showToast(summaryText, 'success', 4000);
     }
 
   } catch (e) {

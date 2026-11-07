@@ -203,7 +203,7 @@ const translations = {
 
     // === ЭКСПОРТ ===
     exportModalTitle: '📤 Export apps to folder',
-    exportDesc: 'Select a folder to save all your installed applications as individual HTML files. Filenames will be formatted as Name_ID.html.',
+    exportDesc: 'Select a folder to save all your installed applications as individual HTML files. Filenames will be formatted as Name_ID.html. Existing files will be skipped.',
     exportNoApps: '❌ No installed apps with local content to export.',
     exportSelectedFolder: 'Selected folder:',
     exportNoFolderSelected: 'Folder not selected',
@@ -214,6 +214,7 @@ const translations = {
     exportFailed: '❌ Export failed: {error}',
     exportFileSaved: 'Saved',
     exportFileError: 'Error',
+    exportFileSkipped: 'Skipped (already exists)',
     exportFolderSelected: '✅ Folder selected',
     exportFolderCleared: 'Folder cleared',
     // ============================
@@ -443,7 +444,7 @@ const translations = {
 
     // === ЭКСПОРТ ===
     exportModalTitle: '📤 Экспорт приложений в папку',
-    exportDesc: 'Выберите папку для сохранения всех установленных приложений в виде отдельных HTML-файлов. Имена файлов будут в формате Название_ID.html.',
+    exportDesc: 'Выберите папку для сохранения всех установленных приложений в виде отдельных HTML-файлов. Имена файлов будут в формате Название_ID.html. Существующие файлы будут пропущены.',
     exportNoApps: '❌ Нет установленных приложений с локальным контентом для экспорта.',
     exportSelectedFolder: 'Выбранная папка:',
     exportNoFolderSelected: 'Папка не выбрана',
@@ -454,6 +455,7 @@ const translations = {
     exportFailed: '❌ Ошибка экспорта: {error}',
     exportFileSaved: 'Сохранено',
     exportFileError: 'Ошибка',
+    exportFileSkipped: 'Пропущено (уже существует)',
     exportFolderSelected: '✅ Папка выбрана',
     exportFolderCleared: 'Папка очищена',
     // ============================
