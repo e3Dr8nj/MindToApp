@@ -109,61 +109,6 @@ async function readHtmlFile(fileHandle) {
 }
 
 // ==========================================
-// ИЗВЛЕЧЕНИЕ MANIFEST.ID ИЗ HTML
-// ==========================================
-
-function extractManifestIdFromHtml(html) {
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) return null;
-    
-    const manifest = JSON.parse(manifestScript.textContent);
-    return manifest.id || null;
-  } catch (e) {
-    return null;
-  }
-}
-
-// ==========================================
-// ПОСТРОЕНИЕ КАРТЫ ID → FILENAME
-// Сканирует все .html файлы в папке и строит
-// карту: manifest.id → имя файла
-// ==========================================
-
-async function buildImportIdsMap(folderHandle) {
-  const idMap = new Map(); // Map<manifestId, filename>
-  
-  try {
-    for await (const entry of walkDirectory(folderHandle)) {
-      if (!entry.name.toLowerCase().endsWith('.html') && !entry.name.toLowerCase().endsWith('.htm')) {
-        continue;
-      }
-      
-      try {
-        const file = await entry.handle.getFile();
-        const html = await file.text();
-        const manifestId = extractManifestIdFromHtml(html);
-        
-        if (manifestId) {
-          // Если ID уже есть в карте — это дубликат в папке
-          if (!idMap.has(manifestId)) {
-            idMap.set(manifestId, entry.name);
-          }
-        }
-      } catch (e) {
-        console.warn(`Failed to read file ${entry.name}:`, e);
-      }
-    }
-  } catch (e) {
-    console.error('Failed to scan folder for existing IDs:', e);
-  }
-  
-  return idMap;
-}
-
-// ==========================================
 // ОСНОВНАЯ ФУНКЦИЯ ИМПОРТА
 // ==========================================
 
@@ -185,13 +130,7 @@ async function runImport() {
 
   if (importBtn) { importBtn.disabled = true; importBtn.textContent = '⏳ ' + t('importRunning'); }
   if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'block'; }
-  
-  // Считаем существующие ID в папке
-  if (statusEl) { statusEl.textContent = '⏳ Сканирование папки...'; statusEl.className = 'modal-status loading'; }
-  appendImportLog(logEl, '🔍 Сканирование папки для поиска существующих ID...', 'info');
-  
-  const existingIdsMap = await buildImportIdsMap(importFolderHandle);
-  appendImportLog(logEl, `✅ Найдено уникальных ID в папке: ${existingIdsMap.size}`, 'success');
+  if (statusEl) { statusEl.textContent = t('importScanning'); statusEl.className = 'modal-status loading'; }
 
   let found = 0;
   let imported = 0;
@@ -209,22 +148,6 @@ async function runImport() {
 
       try {
         const html = await readHtmlFile(entry.handle);
-        const manifestId = extractManifestIdFromHtml(html);
-        
-        // Проверяем уникальность по manifest.id
-        if (manifestId) {
-          // Проверяем, есть ли этот ID уже в карте (дубликат в папке)
-          const existingFilename = existingIdsMap.get(manifestId);
-          if (existingFilename && existingFilename !== entry.name) {
-            // Этот ID уже встречался в другом файле — пропускаем
-            skipped++;
-            appendImportLog(logEl, `  ⏭️ Пропущено (дубликат ID из ${existingFilename})`, 'warning');
-            continue;
-          }
-          
-          // Помечаем этот ID как обработанный
-          existingIdsMap.set(manifestId, entry.name);
-        }
         
         // Используем универсальную функцию создания приложения
         // skipRender: true — чтобы не перерисовывать UI после каждого файла
@@ -234,13 +157,18 @@ async function runImport() {
         });
 
         if (result.success) {
-          appendImportLog(logEl, `  ✅ ${t('importCreated')}: ${result.manifest.icon} ${result.manifest.name}`, 'success');
+          // Если manifest был сгенерирован автоматически — показываем это в логе
+          if (result.manifestGenerated) {
+            appendImportLog(logEl, `  ✅ ${t('importCreated')} (manifest сгенерирован): ${result.manifest.icon} ${result.manifest.name} [${result.manifest.id}]`, 'success');
+          } else {
+            appendImportLog(logEl, `  ✅ ${t('importCreated')}: ${result.manifest.icon} ${result.manifest.name}`, 'success');
+          }
           imported++;
         } else if (result.error === 'appExists') {
           appendImportLog(logEl, `  ⏭️ ${t('importAlreadyExists')}: ${result.manifest?.name || entry.name}`, 'warning');
           skipped++;
-        } else if (result.error === 'noManifest' || result.error === 'invalidManifest' || result.error === 'missingFields') {
-          appendImportLog(logEl, `  ⚠️ ${t('importNoManifest')}`, 'warning');
+        } else if (result.error === 'notHtml' || result.error === 'noHtml') {
+          appendImportLog(logEl, `  ⚠️ Не является HTML-файлом`, 'warning');
           errors++;
         } else {
           appendImportLog(logEl, `  ❌ ${t('importError')}: ${getCreateAppErrorMessage(result.error)}`, 'error');
