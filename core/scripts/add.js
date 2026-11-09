@@ -1,247 +1,328 @@
+// ==========================================
+// ДОБАВЛЕНИЕ МОДУЛЯ (URL / ФАЙЛ / ПАПКА / КОД)
+// ==========================================
+
+let selectedLocalFile = null;
+let selectedFolderFiles = null;
+let currentAddTab = 'url';
+
 function openAddModal() {
-  if (!addModal) return;
-  addModal.classList.add('active');
-  if (moduleUrlInput) moduleUrlInput.value = '';
+  const modal = document.getElementById('add-modal');
+  const urlInput = document.getElementById('module-url-input');
+  const codeInput = document.getElementById('code-input-textarea');
+  const status = document.getElementById('modal-status');
+  const fileNameDisplay = document.getElementById('selected-file-name');
+  const folderInfoDisplay = document.getElementById('selected-folder-info');
+
+  if (urlInput) urlInput.value = '';
+  if (codeInput) codeInput.value = '';
+  if (status) { status.textContent = ''; status.className = 'modal-status'; }
+  if (fileNameDisplay) fileNameDisplay.textContent = '';
+  if (folderInfoDisplay) folderInfoDisplay.textContent = '';
+
   selectedLocalFile = null;
-  if (selectedFileName) selectedFileName.textContent = '';
-  if (localFileInput) localFileInput.value = '';
   selectedFolderFiles = null;
-  if (selectedFolderInfo) selectedFolderInfo.textContent = '';
-  if (folderInput) folderInput.value = '';
-  // Очищаем textarea для кода
-  const codeTextarea = $('code-input-textarea');
-  if (codeTextarea) codeTextarea.value = '';
-  showStatus(modalStatus, '');
-  switchTab('url');
+  currentAddTab = 'url';
+
+  // Активируем вкладку URL по умолчанию
+  document.querySelectorAll('#add-modal .tab').forEach(tab => {
+    tab.style.display = tab.dataset.tab === 'url' ? 'block' : 'none';
+  });
+  document.querySelectorAll('#add-modal .tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.target === 'url');
+  });
+
+  if (modal) modal.classList.add('active');
 }
 
-function closeAddModal() { 
-  if (addModal) addModal.classList.remove('active'); 
+function closeAddModal() {
+  const modal = document.getElementById('add-modal');
+  if (modal) modal.classList.remove('active');
 }
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-  const activeTab = document.querySelector(`.tab[data-tab="${tab}"]`);
-  if (activeTab) activeTab.style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  const activeBtn = document.querySelector(`.tab-btn[data-target="${tab}"]`);
-  if (activeBtn) activeBtn.classList.add('active');
-  showStatus(modalStatus, '');
+function switchTab(targetTab) {
+  currentAddTab = targetTab;
+  document.querySelectorAll('#add-modal .tab').forEach(tab => {
+    tab.style.display = tab.dataset.tab === targetTab ? 'block' : 'none';
+  });
+  document.querySelectorAll('#add-modal .tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.target === targetTab);
+  });
+
+  const status = document.getElementById('modal-status');
+  if (status) { status.textContent = ''; status.className = 'modal-status'; }
 }
+
+// ==========================================
+// ОБРАБОТКА ЛОКАЛЬНОГО ФАЙЛА
+// ==========================================
+
+function handleLocalFileSelect(event) {
+  const file = event.target.files[0];
+  const fileNameDisplay = document.getElementById('selected-file-name');
+
+  if (!file) {
+    selectedLocalFile = null;
+    if (fileNameDisplay) fileNameDisplay.textContent = '';
+    return;
+  }
+
+  if (!file.name.toLowerCase().endsWith('.html')) {
+    const status = document.getElementById('modal-status');
+    if (status) { status.textContent = '❌ Please select an .html file'; status.className = 'modal-status error'; }
+    selectedLocalFile = null;
+    event.target.value = '';
+    return;
+  }
+
+  selectedLocalFile = file;
+  if (fileNameDisplay) fileNameDisplay.textContent = `✅ ${file.name}`;
+}
+
+// ==========================================
+// ОБРАБОТКА ВЫБОРА ПАПКИ
+// ==========================================
+
+function handleFolderSelect(event) {
+  const files = Array.from(event.target.files);
+  const folderInfoDisplay = document.getElementById('selected-folder-info');
+
+  if (files.length === 0) {
+    selectedFolderFiles = null;
+    if (folderInfoDisplay) folderInfoDisplay.textContent = '';
+    return;
+  }
+
+  const hasIndex = files.some(f => f.name.toLowerCase() === 'index.html');
+  if (!hasIndex) {
+    const status = document.getElementById('modal-status');
+    if (status) { status.textContent = '❌ Folder must contain index.html'; status.className = 'modal-status error'; }
+    selectedFolderFiles = null;
+    event.target.value = '';
+    return;
+  }
+
+  selectedFolderFiles = files;
+  const folderName = files[0].webkitRelativePath.split('/')[0];
+  if (folderInfoDisplay) folderInfoDisplay.textContent = `✅ ${folderName} (${files.length} files)`;
+}
+
+// ==========================================
+// ГЛАВНАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ МОДУЛЯ
+// ==========================================
 
 async function addModule() {
-  if (currentTab === 'folder') await addFolderModule();
-  else if (currentTab === 'local') await addLocalFileModule();
-  else if (currentTab === 'code') await addCodeModule();
-  else await addUrlModule();
-}
+  const status = document.getElementById('modal-status');
 
-async function addLocalFileModule() {
-  if (!selectedLocalFile) return showStatus(modalStatus, '❌ Выберите файл', 'error');
-  showStatus(modalStatus, '⏳ Чтение файла...', 'loading');
-  try {
-    const fileText = await selectedLocalFile.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(fileText, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) throw new Error('Manifest не найден');
-    const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    
-    const newModule = { id: manifest.id, name: manifest.name, icon: manifest.icon, description: manifest.description || 'Локальный модуль', content: fileText, isCustom: true, isLocal: true, isFolder: false };
-    customModules.push(newModule);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
-    allModules.push({ ...manifest, content: fileText, url: URL.createObjectURL(new Blob([fileText], { type: 'text/html' })), isCustom: true, isLocal: true, isFolder: false });
-    
-    showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
-    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
-}
-
-async function addFolderModule() {
-  if (!selectedFolderFiles?.length) return showStatus(modalStatus, '❌ Выберите папку', 'error');
-  showStatus(modalStatus, '⏳ Чтение файлов...', 'loading');
-  try {
-    const indexFile = selectedFolderFiles.find(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html');
-    if (!indexFile) throw new Error('index.html не найден');
-    const mainHtml = await indexFile.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(mainHtml, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) throw new Error('Manifest не найден');
-    const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    
-    showStatus(modalStatus, `⏳ Загрузка ${selectedFolderFiles.length} файлов...`, 'loading');
-    const files = [];
-    for (const file of selectedFolderFiles) {
-      const parts = file.webkitRelativePath.split('/');
-      const rel = parts.slice(1).join('/');
-      if (parts[parts.length - 1].toLowerCase() === 'index.html' || !rel) continue;
-      files.push({ path: rel, blob: file });
-    }
-    
-    await saveFolderModule(manifest.id, manifest, files, mainHtml);
-    const customEntry = { id: manifest.id, name: manifest.name, icon: manifest.icon, description: manifest.description || 'Папка модуля', isCustom: true, isLocal: true, isFolder: true };
-    customModules.push(customEntry);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
-    
-    const vfs = createVirtualFS({ id: manifest.id, manifest, files, mainHtml });
-    activeVirtualFS.set(manifest.id, vfs);
-    allModules.push({ ...manifest, content: mainHtml, url: vfs.url, isCustom: true, isLocal: true, isFolder: true });
-    
-    showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
-    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
-}
-
-async function addUrlModule() {
-  let url = moduleUrlInput?.value.trim();
-  if (!url) return showStatus(modalStatus, '❌ Введите URL', 'error');
-  if (!url.startsWith('http')) url = 'https://' + url;
-  if (!url.endsWith('/') && !url.endsWith('.html')) url += '/';
-  showStatus(modalStatus, '⏳ Загрузка модуля...', 'loading');
-  try {
-    const code = await loadContentFromUrl(url);
-    if (!code) throw new Error('Не удалось загрузить');
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(code, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) throw new Error('Manifest не найден');
-    const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) throw new Error('Не все обязательные поля');
-    if (allModules.some(m => m.id === manifest.id)) throw new Error('Модуль уже добавлен');
-    
-    const newModule = { ...manifest, description: manifest.description || 'Пользовательский модуль', content: code, url, isCustom: true, isLocal: false, isFolder: false };
-    customModules.push(newModule);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-    if (!installedModules.includes(manifest.id)) { installedModules.push(manifest.id); localStorage.setItem('installedModules', JSON.stringify(installedModules)); }
-    allModules.push(newModule);
-    
-    showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
-    setTimeout(() => { closeAddModal(); renderInstalledApps(); renderAllApps(); }, 1000);
-  } catch (error) { showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error'); }
-}
-
-// НОВАЯ ФУНКЦИЯ: Добавление по прямому коду
-async function addCodeModule() {
-  const codeTextarea = $('code-input-textarea');
-  if (!codeTextarea) return showStatus(modalStatus, '❌ Поле кода не найдено', 'error');
-  
-  const code = codeTextarea.value.trim();
-  if (!code) return showStatus(modalStatus, '❌ Вставьте HTML-код', 'error');
-  
-  // Проверка что это похоже на HTML
-  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
-    return showStatus(modalStatus, '❌ Это не похоже на HTML-код', 'error');
+  if (currentAddTab === 'url') {
+    await addFromUrl();
+  } else if (currentAddTab === 'local') {
+    await addFromLocalFile();
+  } else if (currentAddTab === 'folder') {
+    await addFromFolder();
+  } else if (currentAddTab === 'code') {
+    addFromCode();
   }
-  
-  showStatus(modalStatus, '⏳ Анализ кода...', 'loading');
-  
+}
+
+// ==========================================
+// ДОБАВЛЕНИЕ ИЗ URL
+// ==========================================
+
+async function addFromUrl() {
+  const urlInput = document.getElementById('module-url-input');
+  const status = document.getElementById('modal-status');
+
+  if (!urlInput) return;
+  const url = urlInput.value.trim();
+
+  if (!url) {
+    if (status) { status.textContent = t('enterUrl'); status.className = 'modal-status error'; }
+    return;
+  }
+
+  if (!/^https?:\/\//i.test(url)) {
+    if (status) { status.textContent = t('invalidUrl'); status.className = 'modal-status error'; }
+    return;
+  }
+
+  if (status) { status.textContent = t('loadingByUrl'); status.className = 'modal-status loading'; }
+
   try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(code, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    
-    if (!manifestScript) {
-      throw new Error('Не найден тег <script id="manifest"> в <head>. Код должен содержать manifest.');
+    let html;
+
+    // Определяем тип URL
+    if (url.includes('gist.github.com') || url.includes('gist.githubusercontent.com')) {
+      // GitHub Gist
+      const rawUrl = convertGistToRaw(url);
+      const response = await fetch(rawUrl);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      html = await response.text();
+    } else {
+      // Обычный URL
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      html = await response.text();
     }
-    
-    const manifest = JSON.parse(manifestScript.textContent);
-    
-    if (!manifest.id || !manifest.name || !manifest.icon) {
-      throw new Error('В manifest не хватает обязательных полей: id, name или icon');
+
+    // Проверяем, что это HTML
+    if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<HTML')) {
+      throw new Error(t('noHtmlAtUrl'));
     }
-    
-    if (allModules.some(m => m.id === manifest.id)) {
-      throw new Error(`Модуль с ID "${manifest.id}" уже существует. Измените ID в manifest.`);
+
+    // Используем универсальную функцию создания приложения
+    const result = createAppFromHtml(html, { defaultDescription: 'Added from URL' });
+
+    if (result.success) {
+      if (status) { status.textContent = t('appCreated', { name: result.manifest.name }); status.className = 'modal-status success'; }
+      setTimeout(() => {
+        closeAddModal();
+        showToast(t('appCreated', { name: result.manifest.name }), 'success', 3000);
+      }, 1000);
+    } else {
+      if (status) { status.textContent = getCreateAppErrorMessage(result.error); status.className = 'modal-status error'; }
     }
-    
-    // Создаём новый модуль
-    const newModule = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
-      description: manifest.description || 'Добавлено из кода',
-      content: code,
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    };
-    
-    customModules.push(newModule);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-    
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
+
+  } catch (error) {
+    console.error('URL add error:', error);
+    if (status) { status.textContent = t('loadFailed', { message: error.message }); status.className = 'modal-status error'; }
+  }
+}
+
+// ==========================================
+// ДОБАВЛЕНИЕ ИЗ ЛОКАЛЬНОГО ФАЙЛА
+// ==========================================
+
+async function addFromLocalFile() {
+  const status = document.getElementById('modal-status');
+
+  if (!selectedLocalFile) {
+    if (status) { status.textContent = '❌ Please select a file first'; status.className = 'modal-status error'; }
+    return;
+  }
+
+  try {
+    const html = await selectedLocalFile.text();
+
+    // Используем универсальную функцию создания приложения
+    const result = createAppFromHtml(html, { defaultDescription: 'Added from local file' });
+
+    if (result.success) {
+      if (status) { status.textContent = t('appCreated', { name: result.manifest.name }); status.className = 'modal-status success'; }
+      setTimeout(() => {
+        closeAddModal();
+        showToast(t('appCreated', { name: result.manifest.name }), 'success', 3000);
+      }, 1000);
+    } else {
+      if (status) { status.textContent = getCreateAppErrorMessage(result.error); status.className = 'modal-status error'; }
     }
-    
-    const blob = new Blob([code], { type: 'text/html' });
-    allModules.push({
-      ...manifest,
-      description: manifest.description || 'Добавлено из кода',
-      content: code,
-      url: URL.createObjectURL(blob),
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    });
-    
-    showStatus(modalStatus, `✅ Модуль "${manifest.name}" добавлен!`, 'success');
+
+  } catch (error) {
+    console.error('Local file add error:', error);
+    if (status) { status.textContent = `❌ ${error.message}`; status.className = 'modal-status error'; }
+  }
+}
+
+// ==========================================
+// ДОБАВЛЕНИЕ ИЗ ПАПКИ
+// ==========================================
+
+async function addFromFolder() {
+  const status = document.getElementById('modal-status');
+
+  if (!selectedFolderFiles || selectedFolderFiles.length === 0) {
+    if (status) { status.textContent = '❌ Please select a folder first'; status.className = 'modal-status error'; }
+    return;
+  }
+
+  try {
+    // Находим index.html
+    const indexFile = selectedFolderFiles.find(f => f.name.toLowerCase() === 'index.html');
+    if (!indexFile) {
+      if (status) { status.textContent = '❌ Folder must contain index.html'; status.className = 'modal-status error'; }
+      return;
+    }
+
+    const html = await indexFile.text();
+
+    // Используем универсальную функцию создания приложения
+    const result = createAppFromHtml(html, { defaultDescription: 'Added from folder' });
+
+    if (result.success) {
+      if (status) { status.textContent = t('appCreated', { name: result.manifest.name }); status.className = 'modal-status success'; }
+      setTimeout(() => {
+        closeAddModal();
+        showToast(t('appCreated', { name: result.manifest.name }), 'success', 3000);
+      }, 1000);
+    } else {
+      if (status) { status.textContent = getCreateAppErrorMessage(result.error); status.className = 'modal-status error'; }
+    }
+
+  } catch (error) {
+    console.error('Folder add error:', error);
+    if (status) { status.textContent = `❌ ${error.message}`; status.className = 'modal-status error'; }
+  }
+}
+
+// ==========================================
+// ДОБАВЛЕНИЕ ИЗ КОДА
+// ==========================================
+
+function addFromCode() {
+  const codeInput = document.getElementById('code-input-textarea');
+  const status = document.getElementById('modal-status');
+
+  if (!codeInput) return;
+  const code = codeInput.value.trim();
+
+  if (!code) {
+    if (status) { status.textContent = t('enterCode'); status.className = 'modal-status error'; }
+    return;
+  }
+
+  if (status) { status.textContent = t('analyzing'); status.className = 'modal-status loading'; }
+
+  // Используем универсальную функцию создания приложения
+  const result = createAppFromHtml(code, { defaultDescription: 'Added from code' });
+
+  if (result.success) {
+    if (result.manifestGenerated) {
+      if (status) { 
+        status.textContent = `✅ ${t('appCreated', { name: result.manifest.name })} (manifest сгенерирован)`; 
+        status.className = 'modal-status success'; 
+      }
+    } else {
+      if (status) { status.textContent = t('appCreated', { name: result.manifest.name }); status.className = 'modal-status success'; }
+    }
     setTimeout(() => {
       closeAddModal();
-      renderInstalledApps();
-      renderAllApps();
+      showToast(t('appCreated', { name: result.manifest.name }), 'success', 3000);
     }, 1000);
-    
-  } catch (error) {
-    showStatus(modalStatus, `❌ Ошибка: ${error.message}`, 'error');
+  } else {
+    if (status) { status.textContent = getCreateAppErrorMessage(result.error); status.className = 'modal-status error'; }
   }
 }
 
-// Обработчики input для файлов
-if (localFileInput) {
-  localFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.name.toLowerCase().endsWith('.html')) {
-      showStatus(modalStatus, '❌ Выберите файл .html', 'error');
-      selectedLocalFile = null;
-      if (selectedFileName) selectedFileName.textContent = '';
-      return;
-    }
-    selectedLocalFile = file;
-    if (selectedFileName) selectedFileName.textContent = `✅ Выбран: ${file.name}`;
-    showStatus(modalStatus, '');
-  });
+// ==========================================
+// ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ ФАЙЛОВ
+// ==========================================
+
+function setupAddModuleListeners() {
+  const localFileInput = document.getElementById('local-file-input');
+  const folderInput = document.getElementById('folder-input');
+
+  if (localFileInput) {
+    localFileInput.addEventListener('change', handleLocalFileSelect);
+  }
+
+  if (folderInput) {
+    folderInput.addEventListener('change', handleFolderSelect);
+  }
 }
 
-if (folderInput) {
-  folderInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-    if (!files.some(f => f.webkitRelativePath.split('/').pop().toLowerCase() === 'index.html')) {
-      showStatus(modalStatus, '❌ В папке должен быть index.html', 'error');
-      selectedFolderFiles = null;
-      if (selectedFolderInfo) selectedFolderInfo.textContent = '';
-      return;
-    }
-    selectedFolderFiles = files;
-    const root = files[0].webkitRelativePath.split('/')[0];
-    const size = (files.reduce((s, f) => s + f.size, 0) / 1048576).toFixed(2);
-    if (selectedFolderInfo) selectedFolderInfo.textContent = `✅ Папка: ${root} (${files.length} файлов, ${size} МБ)`;
-    showStatus(modalStatus, '');
-  });
-}
-
-function showStatus(element, message, type = '') {
-  if (!element) return;
-  element.textContent = message;
-  element.className = `modal-status ${type}`.trim();
+// Инициализация при загрузке
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupAddModuleListeners);
+} else {
+  setupAddModuleListeners();
 }
