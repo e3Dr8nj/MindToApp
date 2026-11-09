@@ -1,7 +1,5 @@
 // ==========================================
 // ИМПОРТ ПРИЛОЖЕНИЙ ИЗ ПАПКИ
-// Рекурсивное сканирование папки и создание
-// приложений из HTML-файлов
 // ==========================================
 
 const IMPORT_DB_NAME = 'MindToAppImportDB';
@@ -102,62 +100,12 @@ async function* walkDirectory(dirHandle, path = '') {
 }
 
 // ==========================================
-// ЧТЕНИЕ HTML-ФАЙЛА И ПАРСИНГ MANIFEST
+// ЧТЕНИЕ HTML-ФАЙЛА
 // ==========================================
 
 async function readHtmlFile(fileHandle) {
   const file = await fileHandle.getFile();
   return await file.text();
-}
-
-function parseManifestFromHtml(html) {
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) return null;
-
-    const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) return null;
-    return manifest;
-  } catch (e) {
-    console.error('Failed to parse manifest:', e);
-    return null;
-  }
-}
-
-// ==========================================
-// СОЗДАНИЕ ПРИЛОЖЕНИЯ ИЗ ФАЙЛА
-// ==========================================
-
-function createAppFromHtml(html, manifest) {
-  const newModule = {
-    id: manifest.id,
-    name: manifest.name,
-    icon: manifest.icon,
-    description: manifest.description || 'Imported from file',
-    content: html,
-    isCustom: true,
-    isLocal: true,
-    isFolder: false
-  };
-
-  customModules.push(newModule);
-  localStorage.setItem('customModules', JSON.stringify(customModules));
-
-  if (!installedModules.includes(manifest.id)) {
-    installedModules.push(manifest.id);
-    localStorage.setItem('installedModules', JSON.stringify(installedModules));
-  }
-
-  allModules.push({
-    ...manifest,
-    content: html,
-    url: URL.createObjectURL(new Blob([html], { type: 'text/html' })),
-    isCustom: true,
-    isLocal: true,
-    isFolder: false
-  });
 }
 
 // ==========================================
@@ -200,27 +148,37 @@ async function runImport() {
 
       try {
         const html = await readHtmlFile(entry.handle);
-        const manifest = parseManifestFromHtml(html);
+        
+        // Используем универсальную функцию создания приложения
+        // skipRender: true — чтобы не перерисовывать UI после каждого файла
+        const result = createAppFromHtml(html, { 
+          skipRender: true, 
+          defaultDescription: 'Imported from file' 
+        });
 
-        if (!manifest) {
+        if (result.success) {
+          appendImportLog(logEl, `  ✅ ${t('importCreated')}: ${result.manifest.icon} ${result.manifest.name}`, 'success');
+          imported++;
+        } else if (result.error === 'appExists') {
+          appendImportLog(logEl, `  ⏭️ ${t('importAlreadyExists')}: ${result.manifest?.name || entry.name}`, 'warning');
+          skipped++;
+        } else if (result.error === 'noManifest' || result.error === 'invalidManifest' || result.error === 'missingFields') {
           appendImportLog(logEl, `  ⚠️ ${t('importNoManifest')}`, 'warning');
           errors++;
-          continue;
+        } else {
+          appendImportLog(logEl, `  ❌ ${t('importError')}: ${getCreateAppErrorMessage(result.error)}`, 'error');
+          errors++;
         }
-
-        if (allModules.some(m => m.id === manifest.id)) {
-          appendImportLog(logEl, `  ⏭️ ${t('importAlreadyExists')}: ${manifest.name}`, 'warning');
-          skipped++;
-          continue;
-        }
-
-        createAppFromHtml(html, manifest);
-        appendImportLog(logEl, `  ✅ ${t('importCreated')}: ${manifest.icon} ${manifest.name}`, 'success');
-        imported++;
       } catch (e) {
         appendImportLog(logEl, `  ❌ ${t('importError')}: ${e.message}`, 'error');
         errors++;
       }
+    }
+
+    // Перерисовываем UI один раз после всего импорта
+    if (imported > 0) {
+      if (typeof renderInstalledApps === 'function') renderInstalledApps();
+      if (typeof renderAllApps === 'function') renderAllApps();
     }
 
     const summary = t('importSummary', {
@@ -236,8 +194,6 @@ async function runImport() {
     }
 
     if (imported > 0) {
-      renderInstalledApps();
-      renderAllApps();
       showToast(t('importSuccess', { count: imported }), 'success', 4000);
     } else if (found === 0) {
       showToast(t('importNoFiles'), 'error', 3000);
@@ -268,7 +224,6 @@ async function selectImportFolder() {
   const pathDisplay = document.getElementById('import-folder-path');
   const statusEl = document.getElementById('import-status');
 
-  // File System Access API (Chrome, Edge)
   if (window.showDirectoryPicker) {
     try {
       const handle = await window.showDirectoryPicker({ mode: 'read' });
@@ -301,7 +256,6 @@ async function handleFallbackFolderSelect(event) {
     return;
   }
 
-  // Создаём виртуальный handle из файлов
   importFolderHandle = createVirtualFolderHandle(files);
   if (pathDisplay) {
     const firstName = files[0].webkitRelativePath.split('/')[0];
@@ -312,7 +266,6 @@ async function handleFallbackFolderSelect(event) {
   event.target.value = '';
 }
 
-// Виртуальный handle для fallback (когда File System Access API недоступен)
 function createVirtualFolderHandle(files) {
   const tree = {};
 
@@ -366,11 +319,9 @@ async function openImportModal() {
 
   if (!modal) return;
 
-  // Очищаем предыдущий статус и лог
   if (statusEl) { statusEl.textContent = ''; statusEl.className = 'modal-status'; }
   if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'none'; }
 
-  // Пытаемся восстановить сохранённую папку
   if (!importFolderHandle) {
     const savedHandle = await loadFolderHandle();
     if (savedHandle) {

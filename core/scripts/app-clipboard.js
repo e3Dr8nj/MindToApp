@@ -1,7 +1,5 @@
 // ==========================================
 // РАБОТА С БУФЕРОМ ОБМЕНА И URL
-// Загрузка по ссылке, gist, создание из буфера,
-// обработка URL, экран буфера обмена
 // ==========================================
 
 function convertGistToRaw(url) {
@@ -51,6 +49,7 @@ async function createFromClipboard() {
     let trimmedContent = clipboardContent.trim();
     let trimmedCode = trimmedContent;
 
+    // Если в буфере URL — загружаем HTML по ссылке
     if (trimmedContent.startsWith('http://') || trimmedContent.startsWith('https://')) {
       showToast(t('loadingByUrl'), 'info', 2000);
       try {
@@ -63,63 +62,14 @@ async function createFromClipboard() {
       }
     }
 
-    if (!trimmedCode.includes('<html') && !trimmedCode.includes('<!DOCTYPE')) {
-      showToast(t('noHtml'), 'error');
-      return;
+    // Используем универсальную функцию создания приложения
+    const result = createAppFromHtml(trimmedCode, { defaultDescription: 'Created from clipboard' });
+
+    if (result.success) {
+      showToast(t('appCreated', { name: result.manifest.name }), 'success', 3000);
+    } else {
+      showToast(getCreateAppErrorMessage(result.error), 'error');
     }
-
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(trimmedCode, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-
-    if (!manifestScript) {
-      showToast(t('noManifest'), 'error');
-      return;
-    }
-
-    const manifest = JSON.parse(manifestScript.textContent);
-
-    if (!manifest.id || !manifest.name || !manifest.icon) {
-      showToast(t('missingFields'), 'error');
-      return;
-    }
-
-    if (allModules.some(m => m.id === manifest.id)) {
-      showToast(t('appExists'), 'error');
-      return;
-    }
-
-    const newModule = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
-      description: manifest.description || 'Created from clipboard',
-      content: trimmedCode,
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    };
-
-    customModules.push(newModule);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
-    }
-
-    allModules.push({
-      ...manifest,
-      content: trimmedCode,
-      url: URL.createObjectURL(new Blob([trimmedCode], { type: 'text/html' })),
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    });
-
-    showToast(t('appCreated', { name: manifest.name }), 'success', 3000);
-    renderInstalledApps();
-    renderAllApps();
 
   } catch (error) {
     console.error('Clipboard creation error:', error);

@@ -1,7 +1,5 @@
 // ==========================================
 // КОНСТРУКТОР ПРИЛОЖЕНИЙ
-// Панель конструктора, копирование промпта,
-// создание приложения из кода
 // ==========================================
 
 function openAIPanel() {
@@ -103,66 +101,23 @@ function createFromBuilder() {
     showStatus(statusEl, t('enterCode'), 'error');
     return;
   }
-  if (!code.includes('<html') && !code.includes('<!DOCTYPE')) {
-    showStatus(statusEl, t('notHtml'), 'error');
-    return;
-  }
 
   showStatus(statusEl, t('analyzing'), 'loading');
 
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(code, 'text/html');
-    const manifestScript = doc.getElementById('manifest');
-    if (!manifestScript) throw new Error('No <script id="manifest"> in <head>');
+  // Используем универсальную функцию создания приложения
+  const result = createAppFromHtml(code, { defaultDescription: 'Created via builder' });
 
-    const manifest = JSON.parse(manifestScript.textContent);
-    if (!manifest.id || !manifest.name || !manifest.icon) {
-      throw new Error(t('missingFields'));
-    }
-    if (allModules.some(m => m.id === manifest.id)) {
-      throw new Error(t('appExists'));
-    }
-
-    const newModule = {
-      id: manifest.id,
-      name: manifest.name,
-      icon: manifest.icon,
-      description: manifest.description || 'Created via builder',
-      content: code,
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    };
-
-    customModules.push(newModule);
-    localStorage.setItem('customModules', JSON.stringify(customModules));
-    if (!installedModules.includes(manifest.id)) {
-      installedModules.push(manifest.id);
-      localStorage.setItem('installedModules', JSON.stringify(installedModules));
-    }
-
-    allModules.push({
-      ...manifest,
-      content: code,
-      url: URL.createObjectURL(new Blob([code], { type: 'text/html' })),
-      isCustom: true,
-      isLocal: true,
-      isFolder: false
-    });
-
+  if (result.success) {
     showStatus(statusEl, '✅', 'success');
     if (createBtn) {
       createBtn.textContent = t('created');
       setTimeout(() => {
         createBtn.textContent = t('createApp');
         closeBuilder();
-        renderInstalledApps();
-        renderAllApps();
       }, 1000);
     }
-  } catch (error) {
-    showStatus(statusEl, `❌ ${error.message}`, 'error');
+  } else {
+    showStatus(statusEl, getCreateAppErrorMessage(result.error), 'error');
   }
 }
 
