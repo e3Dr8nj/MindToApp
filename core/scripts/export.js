@@ -85,6 +85,74 @@ async function verifyExportPermission(handle, readWrite = false) {
 }
 
 // ==========================================
+// РЕКУРСИВНЫЙ ОБХОД ПАПКИ
+// ==========================================
+
+async function* walkExportDirectory(dirHandle, path = '') {
+  for await (const entry of dirHandle.values()) {
+    const entryPath = path ? `${path}/${entry.name}` : entry.name;
+    if (entry.kind === 'file') {
+      yield { handle: entry, path: entryPath, name: entry.name };
+    } else if (entry.kind === 'directory') {
+      yield* walkExportDirectory(entry, entryPath);
+    }
+  }
+}
+
+// ==========================================
+// ИЗВЛЕЧЕНИЕ MANIFEST.ID ИЗ HTML
+// ==========================================
+
+function extractManifestIdFromHtml(html) {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const manifestScript = doc.getElementById('manifest');
+    if (!manifestScript) return null;
+    
+    const manifest = JSON.parse(manifestScript.textContent);
+    return manifest.id || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ==========================================
+// ПОСТРОЕНИЕ КАРТЫ ID → FILENAME
+// Сканирует все .html файлы в папке и строит
+// карту: manifest.id → имя файла
+// ==========================================
+
+async function buildExistingIdsMap(folderHandle) {
+  const idMap = new Map(); // Map<manifestId, filename>
+  
+  try {
+    for await (const entry of walkExportDirectory(folderHandle)) {
+      if (!entry.name.toLowerCase().endsWith('.html') && !entry.name.toLowerCase().endsWith('.htm')) {
+        continue;
+      }
+      
+      try {
+        const file = await entry.handle.getFile();
+        const html = await file.text();
+        const manifestId = extractManifestIdFromHtml(html);
+        
+        if (manifestId) {
+          idMap.set(manifestId, entry.name);
+        }
+      } catch (e) {
+        // Если не удалось прочитать файл — пропускаем
+        console.warn(`Failed to read file ${entry.name}:`, e);
+      }
+    }
+  } catch (e) {
+    console.error('Failed to scan folder for existing IDs:', e);
+  }
+  
+  return idMap;
+}
+
+// ==========================================
 // ОСНОВНАЯ ФУНКЦИЯ ЭКСПОРТА
 // ==========================================
 
@@ -116,10 +184,16 @@ async function runExport() {
 
   if (exportBtn) { exportBtn.disabled = true; exportBtn.textContent = '⏳ ' + t('exportRunning'); }
   if (logEl) { logEl.innerHTML = ''; logEl.style.display = 'block'; }
-  if (statusEl) { statusEl.textContent = t('exportRunning'); statusEl.className = 'modal-status loading'; }
+  
+  // Считаем существующие ID в папке
+  if (statusEl) { statusEl.textContent = '⏳ Сканирование папки...'; statusEl.className = 'modal-status loading'; }
+  appendExportLog(logEl, '🔍 Сканирование папки для поиска существующих ID...', 'info');
+  
+  const existingIdsMap = await buildExistingIdsMap(exportFolderHandle);
+  appendExportLog(logEl, `✅ Найдено существующих ID: ${existingIdsMap.size}`, 'success');
 
   let successCount = 0;
-  let skipCount = 0;    // <-- НОВОЕ: счетчик пропущенных
+  let skipCount = 0;
   let errorCount = 0;
 
   try {
@@ -128,29 +202,44 @@ async function runExport() {
       const safeName = app.name.replace(/[^a-zA-Z0-9а-яА-ЯёЁ\s_-]/g, '').trim().replace(/\s+/g, '_').substring(0, 50);
       const filename = `${safeName}_${app.id}.html`;
 
-      try {
-        // 1. Пытаемся получить файл БЕЗ создания нового
-        await exportFolderHandle.getFileHandle(filename, { create: false });
-        
-        // 2. Если ошибки не было, значит файл уже существует -> пропускаем
+      // Проверяем уникальность по manifest.id
+      if (existingIdsMap.has(app.id)) {
+        // ID уже существует в папке — пропускаем
+        const existingFilename = existingIdsMap.get(app.id);
         skipCount++;
-        appendExportLog(logEl, `⏭️ Пропущено (уже существует): ${filename}`, 'warning');
-        
-      } catch (e) {
-        if (e.name === 'NotFoundError') {
-          // 3. Файл не найден, значит можно безопасно создавать и записывать
-          const fileHandle = await exportFolderHandle.getFileHandle(filename, { create: true });
-          const writable = await fileHandle.createWritable();
-          await writable.write(app.content);
-          await writable.close();
+        appendExportLog(logEl, `⏭️ Пропущено (ID уже есть в ${existingFilename}): ${app.name}`, 'warning');
+        continue;
+      }
 
-          successCount++;
-          appendExportLog(logEl, `✅ ${t('exportFileSaved')}: ${filename}`, 'success');
-        } else {
-          // 4. Другая ошибка (например, нет прав доступа)
-          errorCount++;
-          appendExportLog(logEl, `❌ ${t('exportFileError')}: ${filename} - ${e.message}`, 'error');
+      try {
+        // Проверяем, существует ли файл с таким именем (на случай коллизии имён)
+        try {
+          await exportFolderHandle.getFileHandle(filename, { create: false });
+          // Файл с таким именем уже есть, но ID другой — это коллизия
+          skipCount++;
+          appendExportLog(logEl, `⏭️ Пропущено (файл с таким именем уже существует): ${filename}`, 'warning');
+          continue;
+        } catch (e) {
+          if (e.name !== 'NotFoundError') {
+            throw e;
+          }
+          // Файл не найден — можно создавать
         }
+
+        // Создаём и записываем файл
+        const fileHandle = await exportFolderHandle.getFileHandle(filename, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(app.content);
+        await writable.close();
+
+        // Добавляем новый ID в карту (на случай, если дальше будут дубликаты)
+        existingIdsMap.set(app.id, filename);
+
+        successCount++;
+        appendExportLog(logEl, `✅ ${t('exportFileSaved')}: ${filename}`, 'success');
+      } catch (e) {
+        errorCount++;
+        appendExportLog(logEl, `❌ ${t('exportFileError')}: ${filename} - ${e.message}`, 'error');
       }
     }
 
