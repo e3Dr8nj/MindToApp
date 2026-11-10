@@ -206,10 +206,7 @@ function showCardContextMenu(event, app) {
   // Info
   const infoBtn = document.createElement('button');
   infoBtn.className = 'app-card-context-menu-item';
-  infoBtn.innerHTML = `
-    <span class="menu-icon">ℹ️</span>
-    <span class="menu-text">${t('info')}</span>
-  `;
+  infoBtn.textContent = t('info');
   infoBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hideCardContextMenu();
@@ -220,10 +217,7 @@ function showCardContextMenu(event, app) {
   // Open
   const openBtn = document.createElement('button');
   openBtn.className = 'app-card-context-menu-item';
-  openBtn.innerHTML = `
-    <span class="menu-icon">🚀</span>
-    <span class="menu-text">${t('open')}</span>
-  `;
+  openBtn.textContent = t('open');
   openBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     hideCardContextMenu();
@@ -235,10 +229,7 @@ function showCardContextMenu(event, app) {
   if (isInstalled && app.content) {
     const editBtn = document.createElement('button');
     editBtn.className = 'app-card-context-menu-item';
-    editBtn.innerHTML = `
-      <span class="menu-icon">✏️</span>
-      <span class="menu-text">${t('edit')}</span>
-    `;
+    editBtn.textContent = t('edit');
     editBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -251,10 +242,7 @@ function showCardContextMenu(event, app) {
   if (isInstalled && app.content) {
     const shareBtn = document.createElement('button');
     shareBtn.className = 'app-card-context-menu-item';
-    shareBtn.innerHTML = `
-      <span class="menu-icon">📤</span>
-      <span class="menu-text">${t('share')}</span>
-    `;
+    shareBtn.textContent = t('share');
     shareBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -267,10 +255,7 @@ function showCardContextMenu(event, app) {
   if (isInstalled && app.content) {
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'app-card-context-menu-item';
-    downloadBtn.innerHTML = `
-      <span class="menu-icon">📥</span>
-      <span class="menu-text">${t('downloadHtml')}</span>
-    `;
+    downloadBtn.textContent = t('downloadHtml');
     downloadBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -283,10 +268,7 @@ function showCardContextMenu(event, app) {
   if (isInstalled) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'app-card-context-menu-item delete';
-    deleteBtn.innerHTML = `
-      <span class="menu-icon">🗑</span>
-      <span class="menu-text">${t('delete')}</span>
-    `;
+    deleteBtn.textContent = t('delete');
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
