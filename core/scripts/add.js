@@ -302,27 +302,3 @@ function addFromCode() {
     if (status) { status.textContent = getCreateAppErrorMessage(result.error); status.className = 'modal-status error'; }
   }
 }
-
-// ==========================================
-// ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ ФАЙЛОВ
-// ==========================================
-
-function setupAddModuleListeners() {
-  const localFileInput = document.getElementById('local-file-input');
-  const folderInput = document.getElementById('folder-input');
-
-  if (localFileInput) {
-    localFileInput.addEventListener('change', handleLocalFileSelect);
-  }
-
-  if (folderInput) {
-    folderInput.addEventListener('change', handleFolderSelect);
-  }
-}
-
-// Инициализация при загрузке
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', setupAddModuleListeners);
-} else {
-  setupAddModuleListeners();
-}
