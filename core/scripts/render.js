@@ -75,7 +75,7 @@ function createAppCard(app, isInstalled) {
   }
 
   // Если есть привязанная ссылка — добавляем значок
-  if (isInstalled && getAppUrl(app.id)) {
+  if (isInstalled && typeof getAppUrl === 'function' && getAppUrl(app.id)) {
     const linkBadge = document.createElement('div');
     linkBadge.className = 'app-card-link-badge';
     linkBadge.textContent = '🔗';
@@ -104,12 +104,12 @@ function createAppCard(app, isInstalled) {
 }
 
 function openApp(app) {
-  const appScreen = document.getElementById('app-screen');
+  const appScreenEl = document.getElementById('app-screen');
   const appName = document.getElementById('current-app-name');
   const appFrame = document.getElementById('app-frame');
   const sidebar = document.getElementById('sidebar');
 
-  if (!appScreen || !appName || !appFrame) return;
+  if (!appScreenEl || !appName || !appFrame) return;
 
   appName.textContent = app.name;
 
@@ -125,7 +125,7 @@ function openApp(app) {
     return;
   }
 
-  showScreen(appScreen);
+  showScreen(appScreenEl);
 
   // Скрываем сайдбар при открытии приложения
   if (sidebar) sidebar.classList.add('sidebar-hidden');
@@ -334,7 +334,7 @@ function showAppInfo(app) {
 
   // Показываем привязанную ссылку, если есть
   if (linkBlock) {
-    const linkedUrl = getAppUrl(app.id);
+    const linkedUrl = typeof getAppUrl === 'function' ? getAppUrl(app.id) : null;
     if (linkedUrl) {
       linkBlock.style.display = 'block';
       linkBlock.innerHTML = `
@@ -436,7 +436,7 @@ function downloadAppHtml(app) {
     .replace(/\s+/g, '_')
     .trim()
     .substring(0, 50);
-  
+
   const filename = `${safeName}_${app.id}.html`;
 
   // Создаём Blob и скачиваем
@@ -479,10 +479,8 @@ function closeApp() {
   const appFrame = document.getElementById('app-frame');
   if (appFrame) appFrame.src = 'about:blank';
 
-  showScreen(homeScreen);
+  // homeScreen — глобальная переменная из state.js
+  if (typeof homeScreen !== 'undefined') {
+    showScreen(homeScreen);
+  }
 }
-
-// Глобальные переменные для экранов
-const homeScreen = document.getElementById('home-screen');
-const storeScreen = document.getElementById('store-screen');
-const appScreen = document.getElementById('app-screen');
