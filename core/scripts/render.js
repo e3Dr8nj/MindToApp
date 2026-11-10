@@ -207,7 +207,7 @@ function showCardContextMenu(event, app) {
   const infoBtn = document.createElement('button');
   infoBtn.className = 'app-card-context-menu-item';
   infoBtn.innerHTML = `
-    <span class="menu-icon">ℹ️</span>
+    
     <span class="menu-text">${t('info')}</span>
   `;
   infoBtn.addEventListener('click', (e) => {
@@ -221,7 +221,7 @@ function showCardContextMenu(event, app) {
   const openBtn = document.createElement('button');
   openBtn.className = 'app-card-context-menu-item';
   openBtn.innerHTML = `
-    <span class="menu-icon">🚀</span>
+    
     <span class="menu-text">${t('open')}</span>
   `;
   openBtn.addEventListener('click', (e) => {
@@ -236,7 +236,7 @@ function showCardContextMenu(event, app) {
     const editBtn = document.createElement('button');
     editBtn.className = 'app-card-context-menu-item';
     editBtn.innerHTML = `
-      <span class="menu-icon">✏️</span>
+     
       <span class="menu-text">${t('edit')}</span>
     `;
     editBtn.addEventListener('click', (e) => {
@@ -252,7 +252,7 @@ function showCardContextMenu(event, app) {
     const shareBtn = document.createElement('button');
     shareBtn.className = 'app-card-context-menu-item';
     shareBtn.innerHTML = `
-      <span class="menu-icon">📤</span>
+     
       <span class="menu-text">${t('share')}</span>
     `;
     shareBtn.addEventListener('click', (e) => {
@@ -268,7 +268,7 @@ function showCardContextMenu(event, app) {
     const downloadBtn = document.createElement('button');
     downloadBtn.className = 'app-card-context-menu-item';
     downloadBtn.innerHTML = `
-      <span class="menu-icon">📥</span>
+      
       <span class="menu-text">${t('downloadHtml')}</span>
     `;
     downloadBtn.addEventListener('click', (e) => {
