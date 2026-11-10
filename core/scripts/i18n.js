@@ -151,6 +151,7 @@ const translations = {
     settings: 'Settings',
     noDescription: 'No description',
     linkedUrl: '🔗 Linked URL:',
+    downloadHtml: '📥 Download HTML',
     promptCopied: '✅ Prompt copied',
     codeCopied: '✅ Code copied to clipboard!',
     listCopied: '✅ List copied to clipboard!',
@@ -217,7 +218,6 @@ const translations = {
     exportFileSkipped: 'Skipped (already exists)',
     exportFolderSelected: '✅ Folder selected',
     exportFolderCleared: 'Folder cleared',
-    // ============================
 
     // === ИМПОРТ ===
     importModalTitle: '📥 Import apps from folder',
@@ -241,7 +241,6 @@ const translations = {
     importNoFiles: '❌ No HTML files found in the folder',
     importFolderSelected: '✅ Folder selected',
     importFolderCleared: 'Folder cleared'
-    // ============================
   },
 
   ru: {
@@ -392,6 +391,7 @@ const translations = {
     settings: 'Настройки',
     noDescription: 'Нет описания',
     linkedUrl: '🔗 Привязанная ссылка:',
+    downloadHtml: '📥 Скачать HTML',
     promptCopied: '✅ Промпт скопирован',
     codeCopied: '✅ Код скопирован в буфер обмена!',
     listCopied: '✅ Список скопирован в буфер обмена!',
@@ -458,7 +458,6 @@ const translations = {
     exportFileSkipped: 'Пропущено (уже существует)',
     exportFolderSelected: '✅ Папка выбрана',
     exportFolderCleared: 'Папка очищена',
-    // ============================
 
     // === ИМПОРТ ===
     importModalTitle: '📥 Импорт приложений из папки',
@@ -482,7 +481,6 @@ const translations = {
     importNoFiles: '❌ В папке не найдено HTML-файлов',
     importFolderSelected: '✅ Папка выбрана',
     importFolderCleared: 'Папка очищена'
-    // ============================
   }
 };
 
@@ -617,21 +615,17 @@ function applyLanguage() {
     { selector: '#copy-code-btn', key: 'editCopyCode' },
     { selector: '#copy-edit-prompt-btn', key: 'editCopyPromptCode' },
 
-    // === ЭКСПОРТ ===
     { selector: '#export-modal .modal-header h2', key: 'exportModalTitle' },
     { selector: '#export-modal-desc', key: 'exportDesc' },
     { selector: '#export-select-folder-btn', key: 'exportSelectFolderBtn' },
     { selector: '#export-run-btn', key: 'exportRunBtn' },
-    // ============================
 
-    // === ИМПОРТ ===
     { selector: '#import-modal .modal-header h2', key: 'importModalTitle' },
     { selector: '#import-modal-desc', key: 'importDesc' },
     { selector: '#import-default-hint', key: 'importDefaultFolder' },
     { selector: '#import-select-folder-btn', key: 'importSelectFolderBtn' },
     { selector: '#import-clear-btn', key: 'importClearFolderBtn' },
     { selector: '#import-run-btn', key: 'importRunBtn' }
-    // ============================
   ];
 
   textUpdates.forEach(function(item) {

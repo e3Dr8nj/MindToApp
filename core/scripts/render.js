@@ -1,288 +1,488 @@
 // ==========================================
-// РЕНДЕРИНГ КАРТОЧЕК ПРИЛОЖЕНИЙ
+// РЕНДЕРИНГ ПРИЛОЖЕНИЙ И КАРТОЧЕК
 // ==========================================
 
 function renderInstalledApps() {
-  installedAppsContainer.innerHTML = '';
+  const container = document.getElementById('installed-apps');
+  const emptyState = document.getElementById('empty-state');
 
-  if (installedModules.length === 0) {
-    emptyState.style.display = 'block';
-    installedAppsContainer.style.display = 'none';
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  const installedApps = installedModules
+    .map(id => allModules.find(m => m.id === id))
+    .filter(m => m);
+
+  if (installedApps.length === 0) {
+    if (emptyState) emptyState.style.display = 'block';
     return;
   }
 
-  emptyState.style.display = 'none';
-  installedAppsContainer.style.display = 'grid';
+  if (emptyState) emptyState.style.display = 'none';
 
-  installedModules.forEach(moduleId => {
-    const module = allModules.find(m => m.id === moduleId);
-    if (module) {
-      installedAppsContainer.appendChild(createAppCard(module, true, false));
-    }
+  installedApps.forEach(app => {
+    const card = createAppCard(app, true);
+    container.appendChild(card);
   });
 }
 
 function renderAllApps() {
-  allAppsContainer.innerHTML = '';
+  const container = document.getElementById('all-apps');
+  if (!container) return;
 
-  const standardModules = allModules.filter(m => !m.isCustom);
+  container.innerHTML = '';
 
-  if (standardModules.length === 0) {
-    allAppsContainer.innerHTML = `<p style="color: white; text-align: center; grid-column: 1/-1;">${t('storeEmpty')}</p>`;
-    return;
-  }
-
-  standardModules.forEach(module => {
-    const isInstalled = installedModules.includes(module.id);
-    allAppsContainer.appendChild(createAppCard(module, isInstalled, true));
+  allModules.forEach(app => {
+    const isInstalled = installedModules.includes(app.id);
+    const card = createAppCard(app, isInstalled);
+    container.appendChild(card);
   });
 }
 
-function createAppCard(module, isInstalled, isOnStore) {
+function createAppCard(app, isInstalled) {
   const card = document.createElement('div');
-  card.className = 'app-card';
+  card.className = `app-card ${isInstalled ? 'app-card-installed' : ''}`;
+  card.dataset.appId = app.id;
 
-  if (isInstalled) {
-    card.classList.add('app-card-installed');
-  }
-
+  // Иконка
   const icon = document.createElement('div');
   icon.className = 'app-card-icon';
-  icon.textContent = module.icon;
-  icon.title = module.name;
+  icon.textContent = app.icon;
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openApp(app);
+  });
+  card.appendChild(icon);
 
+  // Название
   const name = document.createElement('div');
   name.className = 'app-card-name';
-  name.textContent = module.name;
-  name.title = module.name;
-
-  card.appendChild(icon);
+  name.textContent = app.name;
   card.appendChild(name);
 
-  // Значок настроек (⚙️)
-  const settingsBadge = document.createElement('div');
-  settingsBadge.className = 'app-card-settings-badge';
-  settingsBadge.textContent = '⚙️';
-  settingsBadge.title = t('settings');
-  settingsBadge.addEventListener('click', (e) => {
-    e.stopPropagation();
-    showCardContextMenu(e, module, isInstalled, isOnStore, settingsBadge);
-  });
-  card.appendChild(settingsBadge);
+  // Если приложение установлено — добавляем значок настроек
+  if (isInstalled) {
+    const settingsBadge = document.createElement('div');
+    settingsBadge.className = 'app-card-settings-badge';
+    settingsBadge.textContent = '⚙️';
+    settingsBadge.title = t('settings');
+    settingsBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showCardContextMenu(e, app);
+    });
+    card.appendChild(settingsBadge);
+  }
 
-  // Маркер привязанной ссылки (🔗)
-  const linkedUrl = getAppUrl(module.id);
-  if (linkedUrl) {
+  // Если есть привязанная ссылка — добавляем значок
+  if (isInstalled && getAppUrl(app.id)) {
     const linkBadge = document.createElement('div');
     linkBadge.className = 'app-card-link-badge';
     linkBadge.textContent = '🔗';
-    linkBadge.title = `${t('linkedUrl')} ${linkedUrl}`;
+    linkBadge.title = t('linkedUrl');
     card.appendChild(linkBadge);
   }
 
-  const actions = document.createElement('div');
-  actions.className = 'app-card-actions';
-
-  if (isOnStore) {
-    if (!isInstalled) {
-      const installBtn = document.createElement('button');
-      installBtn.className = 'app-card-install-btn';
-      installBtn.textContent = t('install');
-      installBtn.title = t('install');
-      installBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleInstall(module.id);
-      });
-      actions.appendChild(installBtn);
-
-      card.addEventListener('click', () => {
-        hideCardContextMenu();
-        openAppInfoModal(module, isInstalled);
-      });
-    } else {
-      card.addEventListener('click', () => {
-        hideCardContextMenu();
-        openApp(module);
-      });
-    }
-  } else {
-    card.addEventListener('click', () => {
-      hideCardContextMenu();
-      openApp(module);
+  // Если приложение НЕ установлено — показываем кнопку "Установить"
+  if (!isInstalled) {
+    const installBtn = document.createElement('button');
+    installBtn.className = 'app-card-install-btn';
+    installBtn.textContent = t('install');
+    installBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      installApp(app);
     });
+    card.appendChild(installBtn);
   }
 
-  card.appendChild(actions);
+  // Клик по карточке — открыть приложение
+  card.addEventListener('click', () => {
+    openApp(app);
+  });
+
   return card;
+}
+
+function openApp(app) {
+  const appScreen = document.getElementById('app-screen');
+  const appName = document.getElementById('current-app-name');
+  const appFrame = document.getElementById('app-frame');
+  const sidebar = document.getElementById('sidebar');
+
+  if (!appScreen || !appName || !appFrame) return;
+
+  appName.textContent = app.name;
+
+  // Если есть URL — открываем по URL, иначе из content
+  if (app.url) {
+    appFrame.src = app.url;
+  } else if (app.content) {
+    const blob = new Blob([app.content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    appFrame.src = url;
+  } else {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  showScreen(appScreen);
+
+  // Скрываем сайдбар при открытии приложения
+  if (sidebar) sidebar.classList.add('sidebar-hidden');
+}
+
+function installApp(app) {
+  if (installedModules.includes(app.id)) {
+    showToast(t('appExists'), 'error');
+    return;
+  }
+
+  installedModules.push(app.id);
+  localStorage.setItem('installedModules', JSON.stringify(installedModules));
+
+  renderInstalledApps();
+  renderAllApps();
+
+  showToast(t('appCreated', { name: app.name }), 'success', 2000);
+}
+
+function uninstallApp(appId) {
+  if (!confirm(t('deleteModule'))) return;
+
+  const index = installedModules.indexOf(appId);
+  if (index > -1) {
+    installedModules.splice(index, 1);
+    localStorage.setItem('installedModules', JSON.stringify(installedModules));
+
+    renderInstalledApps();
+    renderAllApps();
+
+    showToast('✅ App uninstalled', 'success', 2000);
+  }
+}
+
+function deleteApp(appId) {
+  if (!confirm(t('deleteModule'))) return;
+
+  // Удаляем из installedModules
+  const installedIndex = installedModules.indexOf(appId);
+  if (installedIndex > -1) {
+    installedModules.splice(installedIndex, 1);
+    localStorage.setItem('installedModules', JSON.stringify(installedModules));
+  }
+
+  // Удаляем из customModules
+  const customIndex = customModules.findIndex(m => m.id === appId);
+  if (customIndex > -1) {
+    customModules.splice(customIndex, 1);
+    localStorage.setItem('customModules', JSON.stringify(customModules));
+  }
+
+  // Удаляем из allModules
+  const allIndex = allModules.findIndex(m => m.id === appId);
+  if (allIndex > -1) {
+    allModules.splice(allIndex, 1);
+  }
+
+  renderInstalledApps();
+  renderAllApps();
+
+  showToast('✅ App deleted', 'success', 2000);
 }
 
 // ==========================================
 // КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
 // ==========================================
 
-let currentContextMenu = null;
-
-function showCardContextMenu(event, module, isInstalled, isOnStore, anchorElement) {
+function showCardContextMenu(event, app) {
   hideCardContextMenu();
 
   const menu = document.createElement('div');
   menu.className = 'app-card-context-menu';
-  menu.addEventListener('click', (e) => e.stopPropagation());
+  menu.id = 'card-context-menu';
 
-  if (isOnStore) {
-    const infoItem = createMenuItem('ℹ️', t('info'), () => {
+  const isInstalled = installedModules.includes(app.id);
+
+  // Info
+  const infoBtn = document.createElement('button');
+  infoBtn.className = 'app-card-context-menu-item';
+  infoBtn.innerHTML = `
+    <span class="menu-icon">ℹ️</span>
+    <span class="menu-text">${t('info')}</span>
+  `;
+  infoBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideCardContextMenu();
+    showAppInfo(app);
+  });
+  menu.appendChild(infoBtn);
+
+  // Open
+  const openBtn = document.createElement('button');
+  openBtn.className = 'app-card-context-menu-item';
+  openBtn.innerHTML = `
+    <span class="menu-icon">🚀</span>
+    <span class="menu-text">${t('open')}</span>
+  `;
+  openBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideCardContextMenu();
+    openApp(app);
+  });
+  menu.appendChild(openBtn);
+
+  // Edit
+  if (isInstalled && app.content) {
+    const editBtn = document.createElement('button');
+    editBtn.className = 'app-card-context-menu-item';
+    editBtn.innerHTML = `
+      <span class="menu-icon">✏️</span>
+      <span class="menu-text">${t('edit')}</span>
+    `;
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       hideCardContextMenu();
-      openAppInfoModal(module, isInstalled);
+      if (typeof openEditModal === 'function') openEditModal(app);
     });
-    menu.appendChild(infoItem);
+    menu.appendChild(editBtn);
+  }
 
-    if (isInstalled) {
-      const openItem = createMenuItem('🚀', t('open'), () => {
-        hideCardContextMenu();
-        openApp(module);
-      });
-      menu.appendChild(openItem);
-
-      const deleteItem = createMenuItem('🗑', t('delete'), () => {
-        hideCardContextMenu();
-        toggleInstall(module.id);
-      }, 'delete');
-      menu.appendChild(deleteItem);
-    } else {
-      const installItem = createMenuItem('✅', t('install'), () => {
-        hideCardContextMenu();
-        toggleInstall(module.id);
-      });
-      menu.appendChild(installItem);
-    }
-  } else {
-    const infoItem = createMenuItem('ℹ️', t('info'), () => {
+  // Share
+  if (isInstalled && app.content) {
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'app-card-context-menu-item';
+    shareBtn.innerHTML = `
+      <span class="menu-icon">📤</span>
+      <span class="menu-text">${t('share')}</span>
+    `;
+    shareBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       hideCardContextMenu();
-      openAppInfoModal(module, isInstalled);
+      if (typeof openShareModal === 'function') openShareModal(app);
     });
-    menu.appendChild(infoItem);
+    menu.appendChild(shareBtn);
+  }
 
-    if (isInstalled) {
-      const openItem = createMenuItem('🚀', t('open'), () => {
-        hideCardContextMenu();
-        openApp(module);
-      });
-      menu.appendChild(openItem);
-    }
+  // Download HTML
+  if (isInstalled && app.content) {
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'app-card-context-menu-item';
+    downloadBtn.innerHTML = `
+      <span class="menu-icon">📥</span>
+      <span class="menu-text">${t('downloadHtml')}</span>
+    `;
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideCardContextMenu();
+      downloadAppHtml(app);
+    });
+    menu.appendChild(downloadBtn);
+  }
 
-    if (module.content) {
-      const editItem = createMenuItem('✏️', t('edit'), () => {
-        hideCardContextMenu();
-        copyCodeWithInstruction(module);
-      });
-      menu.appendChild(editItem);
-    }
-
-    if (module.content) {
-      const shareItem = createMenuItem('📤', t('share'), () => {
-        hideCardContextMenu();
-        openShareModal(module);
-      });
-      menu.appendChild(shareItem);
-    }
-
-    if (isInstalled) {
-      const deleteItem = createMenuItem('🗑', t('delete'), () => {
-        hideCardContextMenu();
-        if (module.isCustom) {
-          removeCustomModule(module.id);
-        } else {
-          toggleInstall(module.id);
-        }
-      }, 'delete');
-      menu.appendChild(deleteItem);
-    }
+  // Delete (только для установленных)
+  if (isInstalled) {
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'app-card-context-menu-item delete';
+    deleteBtn.innerHTML = `
+      <span class="menu-icon">🗑</span>
+      <span class="menu-text">${t('delete')}</span>
+    `;
+    deleteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideCardContextMenu();
+      deleteApp(app.id);
+    });
+    menu.appendChild(deleteBtn);
   }
 
   document.body.appendChild(menu);
 
-  const rect = anchorElement.getBoundingClientRect();
-  const menuRect = menu.getBoundingClientRect();
+  // Позиционируем меню рядом с кнопкой
+  const rect = event.target.getBoundingClientRect();
+  menu.style.position = 'fixed';
+  menu.style.top = `${rect.bottom + 5}px`;
+  menu.style.left = `${rect.left}px`;
 
-  let top = rect.bottom + 5;
-  let left = rect.right - menuRect.width;
-
-  if (top + menuRect.height > window.innerHeight) {
-    top = rect.top - menuRect.height - 5;
-  }
-  if (left < 0) {
-    left = rect.left;
-  }
-  if (top < 5) {
-    top = 5;
-  }
-
-  menu.style.top = `${top}px`;
-  menu.style.left = `${left}px`;
-
-  currentContextMenu = menu;
-
+  // Закрываем меню при клике вне его
   setTimeout(() => {
-    document.addEventListener('click', hideCardContextMenuOnClickOutside);
+    document.addEventListener('click', hideCardContextMenu, { once: true });
   }, 0);
 }
 
-function createMenuItem(icon, text, onClick, className = '') {
-  const item = document.createElement('div');
-  item.className = `app-card-context-menu-item ${className}`.trim();
-
-  // Защита от задвоения эмодзи: если текст уже начинается с этой же иконки, убираем её
-  let displayText = String(text || '').trim();
-  const menuIcon = String(icon || '').trim();
-
-  if (menuIcon && displayText.startsWith(menuIcon)) {
-    displayText = displayText.slice(menuIcon.length).trim();
-  }
-
-  const iconSpan = document.createElement('span');
-  iconSpan.className = 'menu-icon';
-  iconSpan.textContent = menuIcon;
-
-  const textSpan = document.createElement('span');
-  textSpan.className = 'menu-text';
-  textSpan.textContent = displayText;
-
-  item.appendChild(iconSpan);
-  item.appendChild(textSpan);
-
-  item.addEventListener('click', (e) => {
-    e.stopPropagation();
-    onClick();
-  });
-
-  return item;
-}
-
 function hideCardContextMenu() {
-  if (currentContextMenu) {
-    currentContextMenu.remove();
-    currentContextMenu = null;
-  }
-  document.removeEventListener('click', hideCardContextMenuOnClickOutside);
+  const menu = document.getElementById('card-context-menu');
+  if (menu) menu.remove();
 }
 
-function hideCardContextMenuOnClickOutside(e) {
-  if (currentContextMenu && !currentContextMenu.contains(e.target)) {
-    hideCardContextMenu();
+// ==========================================
+// МОДАЛКА ИНФОРМАЦИИ О ПРИЛОЖЕНИИ
+// ==========================================
+
+function showAppInfo(app) {
+  const modal = document.getElementById('app-info-modal');
+  const iconEl = document.getElementById('app-info-icon');
+  const nameEl = document.getElementById('app-info-name');
+  const descEl = document.getElementById('app-info-desc');
+  const linkBlock = document.getElementById('app-info-link-block');
+  const actionsEl = document.getElementById('app-info-actions');
+
+  if (!modal) return;
+
+  if (iconEl) iconEl.textContent = app.icon;
+  if (nameEl) nameEl.textContent = app.name;
+  if (descEl) descEl.textContent = app.description || t('noDescription');
+
+  // Показываем привязанную ссылку, если есть
+  if (linkBlock) {
+    const linkedUrl = getAppUrl(app.id);
+    if (linkedUrl) {
+      linkBlock.style.display = 'block';
+      linkBlock.innerHTML = `
+        <div class="app-info-link-label">${t('linkedUrl')}</div>
+        <a href="${linkedUrl}" target="_blank" rel="noopener noreferrer" class="app-info-link-url">${linkedUrl}</a>
+      `;
+    } else {
+      linkBlock.style.display = 'none';
+    }
   }
+
+  // Кнопки действий
+  if (actionsEl) {
+    actionsEl.innerHTML = '';
+
+    const isInstalled = installedModules.includes(app.id);
+
+    // Open
+    const openBtn = document.createElement('button');
+    openBtn.className = 'btn btn-primary';
+    openBtn.textContent = t('open');
+    openBtn.addEventListener('click', () => {
+      closeAppInfoModal();
+      openApp(app);
+    });
+    actionsEl.appendChild(openBtn);
+
+    // Edit
+    if (isInstalled && app.content) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn btn-secondary';
+      editBtn.textContent = t('edit');
+      editBtn.addEventListener('click', () => {
+        closeAppInfoModal();
+        if (typeof openEditModal === 'function') openEditModal(app);
+      });
+      actionsEl.appendChild(editBtn);
+    }
+
+    // Share
+    if (isInstalled && app.content) {
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'btn btn-secondary';
+      shareBtn.textContent = t('share');
+      shareBtn.addEventListener('click', () => {
+        closeAppInfoModal();
+        if (typeof openShareModal === 'function') openShareModal(app);
+      });
+      actionsEl.appendChild(shareBtn);
+    }
+
+    // Download HTML
+    if (isInstalled && app.content) {
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className = 'btn btn-secondary';
+      downloadBtn.textContent = t('downloadHtml');
+      downloadBtn.addEventListener('click', () => {
+        closeAppInfoModal();
+        downloadAppHtml(app);
+      });
+      actionsEl.appendChild(downloadBtn);
+    }
+
+    // Delete
+    if (isInstalled) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn btn-secondary';
+      deleteBtn.style.color = 'var(--delete-btn-bg)';
+      deleteBtn.textContent = t('delete');
+      deleteBtn.addEventListener('click', () => {
+        closeAppInfoModal();
+        deleteApp(app.id);
+      });
+      actionsEl.appendChild(deleteBtn);
+    }
+  }
+
+  modal.classList.add('active');
 }
+
+function closeAppInfoModal() {
+  const modal = document.getElementById('app-info-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+// ==========================================
+// СКАЧИВАНИЕ HTML ПРИЛОЖЕНИЯ
+// ==========================================
+
+function downloadAppHtml(app) {
+  if (!app || !app.content) {
+    showToast(t('noCode'), 'error');
+    return;
+  }
+
+  // Формируем безопасное имя файла
+  const safeName = app.name
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+    .replace(/\s+/g, '_')
+    .trim()
+    .substring(0, 50);
+  
+  const filename = `${safeName}_${app.id}.html`;
+
+  // Создаём Blob и скачиваем
+  const blob = new Blob([app.content], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`✅ ${filename}`, 'success', 3000);
+}
+
+// ==========================================
+// ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
+// ==========================================
 
 function showScreen(screen) {
-  const homeScreenEl = document.getElementById('home-screen');
-  const storeScreenEl = document.getElementById('store-screen');
-  const appScreenEl = document.getElementById('app-screen');
-  const clipboardScreenEl = document.getElementById('clipboard-screen');
-
-  [homeScreenEl, storeScreenEl, appScreenEl, clipboardScreenEl].forEach(s => {
-    if (s) s.classList.remove('active');
-  });
-
-  hideCardContextMenu();
-
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   if (screen) screen.classList.add('active');
+
+  const sidebar = document.getElementById('sidebar');
+  const isAppScreen = screen && screen.id === 'app-screen';
+
+  // Показываем/скрываем сайдбар
+  if (sidebar) {
+    if (isAppScreen) {
+      sidebar.classList.add('sidebar-hidden');
+    } else {
+      sidebar.classList.remove('sidebar-hidden');
+    }
+  }
 }
+
+function closeApp() {
+  const appFrame = document.getElementById('app-frame');
+  if (appFrame) appFrame.src = 'about:blank';
+
+  showScreen(homeScreen);
+}
+
+// Глобальные переменные для экранов
+const homeScreen = document.getElementById('home-screen');
+const storeScreen = document.getElementById('store-screen');
+const appScreen = document.getElementById('app-screen');
