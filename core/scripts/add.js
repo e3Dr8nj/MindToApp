@@ -112,8 +112,6 @@ function handleFolderSelect(event) {
 // ==========================================
 
 async function addModule() {
-  const status = document.getElementById('modal-status');
-
   if (currentAddTab === 'url') {
     await addFromUrl();
   } else if (currentAddTab === 'local') {
@@ -151,21 +149,17 @@ async function addFromUrl() {
   try {
     let html;
 
-    // Определяем тип URL
     if (url.includes('gist.github.com') || url.includes('gist.githubusercontent.com')) {
-      // GitHub Gist
       const rawUrl = convertGistToRaw(url);
       const response = await fetch(rawUrl);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       html = await response.text();
     } else {
-      // Обычный URL
       const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       html = await response.text();
     }
 
-    // Проверяем, что это HTML
     if (!html.includes('<html') && !html.includes('<!DOCTYPE') && !html.includes('<HTML')) {
       throw new Error(t('noHtmlAtUrl'));
     }
@@ -204,7 +198,6 @@ async function addFromLocalFile() {
   try {
     const html = await selectedLocalFile.text();
 
-    // Используем универсальную функцию создания приложения
     const result = createAppFromHtml(html, { defaultDescription: 'Added from local file' });
 
     if (result.success) {
@@ -236,7 +229,6 @@ async function addFromFolder() {
   }
 
   try {
-    // Находим index.html
     const indexFile = selectedFolderFiles.find(f => f.name.toLowerCase() === 'index.html');
     if (!indexFile) {
       if (status) { status.textContent = '❌ Folder must contain index.html'; status.className = 'modal-status error'; }
@@ -245,7 +237,6 @@ async function addFromFolder() {
 
     const html = await indexFile.text();
 
-    // Используем универсальную функцию создания приложения
     const result = createAppFromHtml(html, { defaultDescription: 'Added from folder' });
 
     if (result.success) {
