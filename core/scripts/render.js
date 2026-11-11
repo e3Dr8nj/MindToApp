@@ -190,7 +190,6 @@ function deleteApp(appId) {
 // Стиль как у выпадающего меню AI в сайдбаре
 // ==========================================
 
-// Маппинг: ключ перевода → эмодзи и текст БЕЗ эмодзи
 const menuItemIcons = {
   info:         { icon: 'ℹ️', text: 'Info' },
   open:         { icon: '🚀', text: 'Open' },
@@ -215,23 +214,21 @@ function getMenuItemData(key) {
   return map[key] || { icon: '', text: t(key) };
 }
 
-// Переключение меню (открыть/закрыть)
 function toggleCardContextMenu(event, app) {
   event.stopPropagation();
   const existingMenu = document.getElementById('card-context-menu');
-
+  
   if (existingMenu && existingMenu.dataset.appId === app.id) {
     hideCardContextMenu();
     return;
   }
-
+  
   hideCardContextMenu();
   showCardContextMenu(event, app);
 }
 
 function showCardContextMenu(event, app) {
   const menu = document.createElement('div');
-  // Тот же стиль, что и у AI-меню в сайдбаре
   menu.className = 'sidebar-ai-dropdown';
   menu.id = 'card-context-menu';
   menu.dataset.appId = app.id;
@@ -243,7 +240,6 @@ function showCardContextMenu(event, app) {
 
   const isInstalled = installedModules.includes(app.id);
 
-  // Пункт меню в стиле AI-ссылок
   const createMenuItem = (key, action) => {
     const data = getMenuItemData(key);
     const link = document.createElement('a');
@@ -293,14 +289,12 @@ function showCardContextMenu(event, app) {
 
   document.body.appendChild(menu);
 
-  // Позиционирование: привязываем к кнопке ⚙️
   const rect = event.target.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const margin = 8;
 
-  // Меню появляется СПРАВА от кнопки ⚙️ (как AI-меню)
   let left = rect.right + 8;
   let top = rect.top;
 
@@ -312,13 +306,11 @@ function showCardContextMenu(event, app) {
     top = viewportHeight - menuRect.height - margin;
   }
   if (top < margin) top = margin;
-  if (left < margin) left = margin;
 
   menu.style.position = 'fixed';
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
 
-  // Закрываем меню при клике вне его
   setTimeout(() => {
     document.addEventListener('click', hideCardContextMenu, { once: true });
   }, 0);
