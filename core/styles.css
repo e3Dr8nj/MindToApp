@@ -1206,7 +1206,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px 0 50px 0;
   z-index: 500;
   gap: 12px;
   transition: transform 0.3s ease, opacity 0.3s ease;
