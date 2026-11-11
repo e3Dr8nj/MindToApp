@@ -33,7 +33,6 @@ function renderAllApps() {
 
   container.innerHTML = '';
 
-  // В складе показываем ТОЛЬКО те приложения, которые еще НЕ установлены
   const storeApps = allModules.filter(app => !installedModules.includes(app.id));
 
   if (storeApps.length === 0) {
@@ -52,7 +51,6 @@ function createAppCard(app, isInstalled) {
   card.className = `app-card ${isInstalled ? 'app-card-installed' : ''}`;
   card.dataset.appId = app.id;
 
-  // Иконка
   const icon = document.createElement('div');
   icon.className = 'app-card-icon';
   icon.textContent = app.icon;
@@ -62,13 +60,11 @@ function createAppCard(app, isInstalled) {
   });
   card.appendChild(icon);
 
-  // Название
   const name = document.createElement('div');
   name.className = 'app-card-name';
   name.textContent = app.name;
   card.appendChild(name);
 
-  // Если приложение установлено — добавляем значок настроек
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
     settingsBadge.className = 'app-card-settings-badge';
@@ -81,7 +77,6 @@ function createAppCard(app, isInstalled) {
     card.appendChild(settingsBadge);
   }
 
-  // Если есть привязанная ссылка — добавляем значок
   if (isInstalled && typeof getAppUrl === 'function' && getAppUrl(app.id)) {
     const linkBadge = document.createElement('div');
     linkBadge.className = 'app-card-link-badge';
@@ -90,7 +85,6 @@ function createAppCard(app, isInstalled) {
     card.appendChild(linkBadge);
   }
 
-  // Если приложение НЕ установлено — показываем кнопку "Установить"
   if (!isInstalled) {
     const installBtn = document.createElement('button');
     installBtn.className = 'app-card-install-btn';
@@ -102,7 +96,6 @@ function createAppCard(app, isInstalled) {
     card.appendChild(installBtn);
   }
 
-  // Клик по карточке — открыть приложение
   card.addEventListener('click', () => {
     openApp(app);
   });
@@ -120,7 +113,6 @@ function openApp(app) {
 
   appName.textContent = app.name;
 
-  // Если есть URL — открываем по URL, иначе из content
   if (app.url) {
     appFrame.src = app.url;
   } else if (app.content) {
@@ -134,7 +126,6 @@ function openApp(app) {
 
   showScreen(appScreenEl);
 
-  // Скрываем сайдбар при открытии приложения
   if (sidebar) sidebar.classList.add('sidebar-hidden');
 }
 
@@ -171,21 +162,18 @@ function uninstallApp(appId) {
 function deleteApp(appId) {
   if (!confirm(t('deleteModule'))) return;
 
-  // Удаляем из installedModules
   const installedIndex = installedModules.indexOf(appId);
   if (installedIndex > -1) {
     installedModules.splice(installedIndex, 1);
     localStorage.setItem('installedModules', JSON.stringify(installedModules));
   }
 
-  // Удаляем из customModules
   const customIndex = customModules.findIndex(m => m.id === appId);
   if (customIndex > -1) {
     customModules.splice(customIndex, 1);
     localStorage.setItem('customModules', JSON.stringify(customModules));
   }
 
-  // Удаляем из allModules
   const allIndex = allModules.findIndex(m => m.id === appId);
   if (allIndex > -1) {
     allModules.splice(allIndex, 1);
@@ -201,6 +189,32 @@ function deleteApp(appId) {
 // КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
 // ==========================================
 
+// Маппинг: ключ перевода → эмодзи и текст БЕЗ эмодзи
+// Чтобы не было задвоения (в переводах уже есть эмодзи)
+const menuItemIcons = {
+  info:         { icon: 'ℹ️', text: 'Info' },
+  open:         { icon: '🚀', text: 'Open' },
+  edit:         { icon: '✏️', text: 'Edit' },
+  share:        { icon: '📤', text: 'Share' },
+  downloadHtml: { icon: '📥', text: 'Download HTML' },
+  delete:       { icon: '🗑', text: 'Delete' }
+};
+
+const menuItemIconsRu = {
+  info:         { icon: 'ℹ️', text: 'Информация' },
+  open:         { icon: '🚀', text: 'Открыть' },
+  edit:         { icon: '✏️', text: 'Редактировать' },
+  share:        { icon: '📤', text: 'Поделиться' },
+  downloadHtml: { icon: '📥', text: 'Скачать HTML' },
+  delete:       { icon: '🗑', text: 'Удалить' }
+};
+
+function getMenuItemData(key) {
+  const lang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'en';
+  const map = lang === 'ru' ? menuItemIconsRu : menuItemIcons;
+  return map[key] || { icon: '', text: t(key) };
+}
+
 function showCardContextMenu(event, app) {
   hideCardContextMenu();
 
@@ -210,20 +224,18 @@ function showCardContextMenu(event, app) {
 
   const isInstalled = installedModules.includes(app.id);
 
-  // Заголовок меню с названием приложения (чтобы было понятно, к чему относится)
+  // Заголовок меню — иконка + название приложения
   const header = document.createElement('div');
-  header.style.cssText = 'padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--description-color); border-bottom: 1px solid var(--input-border); display: flex; align-items: center; gap: 8px;';
-  header.innerHTML = `<span style="font-size: 18px;">${app.icon}</span><span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${app.name}</span>`;
+  header.style.cssText = 'padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--heading-color); border-bottom: 1px solid var(--input-border); display: flex; align-items: center; gap: 10px;';
+  header.innerHTML = `<span style="font-size: 20px;">${app.icon}</span><span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${app.name}</span>`;
   menu.appendChild(header);
 
-  // Вспомогательная функция для создания пунктов меню
-  // Используем стандартную структуру с .menu-icon и .menu-text из CSS
-  const createMenuItem = (textKey, action) => {
+  // Создаём пункт меню: эмодзи в .menu-icon, текст в .menu-text
+  const createMenuItem = (key, action) => {
+    const data = getMenuItemData(key);
     const btn = document.createElement('button');
     btn.className = 'app-card-context-menu-item';
-    // Пустой .menu-icon сохраняет CSS-структуру (flex: 1 у .menu-text)
-    // Текст из перевода уже содержит эмодзи — иконка остаётся пустой
-    btn.innerHTML = `<span class="menu-icon"></span><span class="menu-text">${t(textKey)}</span>`;
+    btn.innerHTML = `<span class="menu-icon">${data.icon}</span><span class="menu-text">${data.text}</span>`;
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -248,9 +260,10 @@ function showCardContextMenu(event, app) {
   }
 
   if (isInstalled) {
+    const data = getMenuItemData('delete');
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'app-card-context-menu-item delete';
-    deleteBtn.innerHTML = `<span class="menu-icon"></span><span class="menu-text">${t('delete')}</span>`;
+    deleteBtn.innerHTML = `<span class="menu-icon">${data.icon}</span><span class="menu-text">${data.text}</span>`;
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -261,7 +274,7 @@ function showCardContextMenu(event, app) {
 
   document.body.appendChild(menu);
 
-  // Позиционирование: привязываем к КАРТОЧКЕ приложения, а не к кнопке ⚙️
+  // Позиционирование: привязываем к КАРТОЧКЕ приложения
   const cardEl = event.target.closest('.app-card');
   const cardRect = cardEl ? cardEl.getBoundingClientRect() : event.target.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
@@ -269,43 +282,36 @@ function showCardContextMenu(event, app) {
   const viewportHeight = window.innerHeight;
   const margin = 8;
 
-  // На мобильном (≤ 600px) меню растягивается на всю ширину карточки
   const isMobile = viewportWidth <= 600;
 
   let top, left;
 
   if (isMobile) {
-    // Мобильный: меню под карточкой, на всю ширину карточки
+    // Мобильный: меню под карточкой, на всю её ширину
     left = cardRect.left;
     top = cardRect.bottom + 4;
 
-    // Если не помещается снизу — показываем над карточкой
     if (top + menuRect.height > viewportHeight - margin) {
       top = cardRect.top - menuRect.height - 4;
     }
-
-    // Если всё равно не помещается сверху — прижимаем к верху экрана
     if (top < margin) top = margin;
 
-    // Растягиваем меню на ширину карточки (но не больше экрана)
+    // Растягиваем на ширину карточки (но не шире экрана)
     const menuWidth = Math.min(cardRect.width, viewportWidth - margin * 2);
     menu.style.width = menuWidth + 'px';
 
-    // Центрируем по горизонтали, если карточка уже меню
     if (cardRect.width > menuWidth) {
       left = cardRect.left + (cardRect.width - menuWidth) / 2;
     }
   } else {
-    // Десктоп: меню справа от карточки, выровнено по верху
+    // Десктоп: меню справа от карточки
     left = cardRect.right + 8;
     top = cardRect.top;
 
-    // Если не помещается справа — показываем слева от карточки
     if (left + menuRect.width > viewportWidth - margin) {
       left = cardRect.left - menuRect.width - 8;
     }
 
-    // Если не помещается по вертикали — прижимаем к нижнему краю экрана
     if (top + menuRect.height > viewportHeight - margin) {
       top = viewportHeight - menuRect.height - margin;
     }
@@ -316,7 +322,6 @@ function showCardContextMenu(event, app) {
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
 
-  // Закрываем меню при клике вне его
   setTimeout(() => {
     document.addEventListener('click', hideCardContextMenu, { once: true });
   }, 0);
@@ -345,7 +350,6 @@ function showAppInfo(app) {
   if (nameEl) nameEl.textContent = app.name;
   if (descEl) descEl.textContent = app.description || t('noDescription');
 
-  // Показываем привязанную ссылку, если есть
   if (linkBlock) {
     const linkedUrl = typeof getAppUrl === 'function' ? getAppUrl(app.id) : null;
     if (linkedUrl) {
@@ -359,13 +363,11 @@ function showAppInfo(app) {
     }
   }
 
-  // Кнопки действий
   if (actionsEl) {
     actionsEl.innerHTML = '';
 
     const isInstalled = installedModules.includes(app.id);
 
-    // Open
     const openBtn = document.createElement('button');
     openBtn.className = 'btn btn-primary';
     openBtn.textContent = t('open');
@@ -375,7 +377,6 @@ function showAppInfo(app) {
     });
     actionsEl.appendChild(openBtn);
 
-    // Edit
     if (isInstalled && app.content) {
       const editBtn = document.createElement('button');
       editBtn.className = 'btn btn-secondary';
@@ -385,10 +386,7 @@ function showAppInfo(app) {
         if (typeof openEditModal === 'function') openEditModal(app);
       });
       actionsEl.appendChild(editBtn);
-    }
 
-    // Share
-    if (isInstalled && app.content) {
       const shareBtn = document.createElement('button');
       shareBtn.className = 'btn btn-secondary';
       shareBtn.textContent = t('share');
@@ -397,10 +395,7 @@ function showAppInfo(app) {
         if (typeof openShareModal === 'function') openShareModal(app);
       });
       actionsEl.appendChild(shareBtn);
-    }
 
-    // Download HTML
-    if (isInstalled && app.content) {
       const downloadBtn = document.createElement('button');
       downloadBtn.className = 'btn btn-secondary';
       downloadBtn.textContent = t('downloadHtml');
@@ -411,7 +406,6 @@ function showAppInfo(app) {
       actionsEl.appendChild(downloadBtn);
     }
 
-    // Delete
     if (isInstalled) {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn btn-secondary';
@@ -443,7 +437,6 @@ function downloadAppHtml(app) {
     return;
   }
 
-  // Формируем безопасное имя файла
   const safeName = app.name
     .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
     .replace(/\s+/g, '_')
@@ -452,7 +445,6 @@ function downloadAppHtml(app) {
 
   const filename = `${safeName}_${app.id}.html`;
 
-  // Создаём Blob и скачиваем
   const blob = new Blob([app.content], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
 
@@ -478,7 +470,6 @@ function showScreen(screen) {
   const sidebar = document.getElementById('sidebar');
   const isAppScreen = screen && screen.id === 'app-screen';
 
-  // Показываем/скрываем сайдбар
   if (sidebar) {
     if (isAppScreen) {
       sidebar.classList.add('sidebar-hidden');
@@ -492,7 +483,6 @@ function closeApp() {
   const appFrame = document.getElementById('app-frame');
   if (appFrame) appFrame.src = 'about:blank';
 
-  // homeScreen — глобальная переменная из state.js
   if (typeof homeScreen !== 'undefined') {
     showScreen(homeScreen);
   }
