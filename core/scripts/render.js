@@ -214,8 +214,6 @@ function showCardContextMenu(event, app) {
   const createMenuItem = (textKey, action) => {
     const btn = document.createElement('button');
     btn.className = 'app-card-context-menu-item';
-    // Используем только текст из перевода (в нём уже есть иконка). 
-    // flex: 1 и text-align: left гарантируют, что кнопка растянется и будет выглядеть ровно.
     btn.innerHTML = `<span style="flex: 1; text-align: left;">${t(textKey)}</span>`;
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -254,11 +252,30 @@ function showCardContextMenu(event, app) {
 
   document.body.appendChild(menu);
 
-  // Позиционируем меню рядом с кнопкой
+  // УМНОЕ ПОЗИЦИОНИРОВАНИЕ С УЧЁТОМ ГРАНИЦ ЭКРАНА
   const rect = event.target.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const margin = 10; // отступ от краёв экрана
+
+  // Позиция по вертикали: под кнопкой, но если не помещается — над кнопкой
+  let top = rect.bottom + 5;
+  if (top + menuRect.height > viewportHeight - margin) {
+    top = rect.top - menuRect.height - 5;
+  }
+  if (top < margin) top = margin;
+
+  // Позиция по горизонтали: слева от кнопки, но если не помещается — прижать к правому краю
+  let left = rect.left;
+  if (left + menuRect.width > viewportWidth - margin) {
+    left = viewportWidth - menuRect.width - margin;
+  }
+  if (left < margin) left = margin;
+
   menu.style.position = 'fixed';
-  menu.style.top = `${rect.bottom + 5}px`;
-  menu.style.left = `${rect.left}px`;
+  menu.style.top = `${top}px`;
+  menu.style.left = `${left}px`;
 
   // Закрываем меню при клике вне его
   setTimeout(() => {
