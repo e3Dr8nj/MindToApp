@@ -188,6 +188,7 @@ function deleteApp(appId) {
 // ==========================================
 // КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
 // Стиль как у выпадающего меню AI в сайдбаре
+// Меню "прилипает" к кнопке ⚙️ при прокрутке
 // ==========================================
 
 // Маппинг: ключ перевода → эмодзи и текст БЕЗ эмодзи
@@ -215,6 +216,10 @@ function getMenuItemData(key) {
   return map[key] || { icon: '', text: t(key) };
 }
 
+// Переменная для хранения ссылки на кнопку ⚙️ и RAF-цикла
+let _contextMenuTarget = null;
+let _contextMenuRAF = null;
+
 // Переключение меню (открыть/закрыть)
 function toggleCardContextMenu(event, app) {
   event.stopPropagation();
@@ -236,10 +241,13 @@ function showCardContextMenu(event, app) {
   menu.id = 'card-context-menu';
   menu.dataset.appId = app.id;
   menu.style.display = 'flex';
+  menu.style.flexDirection = 'column';
   menu.style.gap = '4px';
   menu.style.padding = '6px';
   menu.style.maxHeight = '80vh';
   menu.style.overflowY = 'auto';
+  menu.style.position = 'fixed';
+  menu.style.zIndex = '9999';
 
   const isInstalled = installedModules.includes(app.id);
 
@@ -293,30 +301,54 @@ function showCardContextMenu(event, app) {
 
   document.body.appendChild(menu);
 
-  // Позиционирование: привязываем к кнопке ⚙️
-  const rect = event.target.getBoundingClientRect();
-  const menuRect = menu.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const margin = 8;
+  // Сохраняем ссылку на кнопку ⚙️ для отслеживания при скролле
+  _contextMenuTarget = event.target;
 
-  // Меню появляется СПРАВА от кнопки ⚙️ (как AI-меню)
-  let left = rect.right + 8;
-  let top = rect.top;
+  // Функция обновления позиции меню
+  const updateMenuPosition = () => {
+    if (!_contextMenuTarget || !menu.isConnected) {
+      return;
+    }
 
-  if (left + menuRect.width > viewportWidth - margin) {
-    left = rect.left - menuRect.width - 8;
-  }
+    const rect = _contextMenuTarget.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const margin = 8;
 
-  if (top + menuRect.height > viewportHeight - margin) {
-    top = viewportHeight - menuRect.height - margin;
-  }
-  if (top < margin) top = margin;
-  if (left < margin) left = margin;
+    // Если кнопка ушла за пределы экрана — скрываем меню
+    if (rect.bottom < 0 || rect.top > viewportHeight || rect.right < 0 || rect.left > viewportWidth) {
+      menu.style.visibility = 'hidden';
+      _contextMenuRAF = requestAnimationFrame(updateMenuPosition);
+      return;
+    } else {
+      menu.style.visibility = 'visible';
+    }
 
-  menu.style.position = 'fixed';
-  menu.style.top = `${top}px`;
-  menu.style.left = `${left}px`;
+    // Меню появляется СПРАВА от кнопки ⚙️
+    let left = rect.right + 8;
+    let top = rect.top;
+
+    // Если не помещается справа — показываем слева
+    if (left + menuRect.width > viewportWidth - margin) {
+      left = rect.left - menuRect.width - 8;
+    }
+
+    // Если не помещается по вертикали — прижимаем к нижнему краю
+    if (top + menuRect.height > viewportHeight - margin) {
+      top = viewportHeight - menuRect.height - margin;
+    }
+    if (top < margin) top = margin;
+    if (left < margin) left = margin;
+
+    menu.style.top = `${top}px`;
+    menu.style.left = `${left}px`;
+
+    _contextMenuRAF = requestAnimationFrame(updateMenuPosition);
+  };
+
+  // Запускаем цикл обновления позиции
+  _contextMenuRAF = requestAnimationFrame(updateMenuPosition);
 
   // Закрываем меню при клике вне его
   setTimeout(() => {
@@ -327,6 +359,13 @@ function showCardContextMenu(event, app) {
 function hideCardContextMenu() {
   const menu = document.getElementById('card-context-menu');
   if (menu) menu.remove();
+
+  // Останавливаем RAF-цикл
+  if (_contextMenuRAF) {
+    cancelAnimationFrame(_contextMenuRAF);
+    _contextMenuRAF = null;
+  }
+  _contextMenuTarget = null;
 }
 
 // ==========================================
