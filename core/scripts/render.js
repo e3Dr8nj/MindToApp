@@ -187,7 +187,7 @@ function deleteApp(appId) {
 
 // ==========================================
 // КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
-// Стиль как у выпадающего меню AI в сайдбаре
+// Уникальный стиль, не конфликтующий с AI-меню
 // Меню "прилипает" к кнопке ⚙️ при прокрутке
 // ==========================================
 
@@ -236,29 +236,52 @@ function toggleCardContextMenu(event, app) {
 
 function showCardContextMenu(event, app) {
   const menu = document.createElement('div');
-  // Тот же стиль, что и у AI-меню в сайдбаре
-  menu.className = 'sidebar-ai-dropdown';
+  // Уникальный класс, не конфликтующий с AI-меню
+  menu.className = 'card-context-menu-dropdown';
   menu.id = 'card-context-menu';
   menu.dataset.appId = app.id;
-  menu.style.display = 'flex';
-  menu.style.flexDirection = 'column';
-  menu.style.gap = '4px';
-  menu.style.padding = '6px';
-  menu.style.maxHeight = '80vh';
-  menu.style.overflowY = 'auto';
-  menu.style.position = 'fixed';
-  menu.style.zIndex = '9999';
+  menu.style.cssText = `
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: fixed;
+    z-index: 9999;
+    background: var(--card-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 180px;
+  `;
 
   const isInstalled = installedModules.includes(app.id);
 
-  // Пункт меню в стиле AI-ссылок
+  // Пункт меню
   const createMenuItem = (key, action) => {
     const data = getMenuItemData(key);
     const link = document.createElement('a');
-    link.className = 'sidebar-ai-link';
+    link.className = 'card-context-menu-item';
     link.href = '#';
-    link.style.cssText = 'cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 10px;';
+    link.style.cssText = `
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--text-color);
+      transition: background 0.2s;
+    `;
     link.innerHTML = `<span style="font-size: 16px; width: 20px; text-align: center;">${data.icon}</span><span style="flex: 1; font-size: 13px;">${data.text}</span>`;
+    link.addEventListener('mouseenter', () => {
+      link.style.background = 'var(--hover-bg)';
+    });
+    link.addEventListener('mouseleave', () => {
+      link.style.background = 'transparent';
+    });
     link.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -286,10 +309,26 @@ function showCardContextMenu(event, app) {
   if (isInstalled) {
     const data = getMenuItemData('delete');
     const deleteLink = document.createElement('a');
-    deleteLink.className = 'sidebar-ai-link';
+    deleteLink.className = 'card-context-menu-item';
     deleteLink.href = '#';
-    deleteLink.style.cssText = 'cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 10px; color: var(--delete-btn-bg);';
+    deleteLink.style.cssText = `
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--delete-btn-bg);
+      transition: background 0.2s;
+    `;
     deleteLink.innerHTML = `<span style="font-size: 16px; width: 20px; text-align: center;">${data.icon}</span><span style="flex: 1; font-size: 13px;">${data.text}</span>`;
+    deleteLink.addEventListener('mouseenter', () => {
+      deleteLink.style.background = 'var(--hover-bg)';
+    });
+    deleteLink.addEventListener('mouseleave', () => {
+      deleteLink.style.background = 'transparent';
+    });
     deleteLink.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
