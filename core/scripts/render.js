@@ -72,7 +72,7 @@ function createAppCard(app, isInstalled) {
     settingsBadge.title = t('settings');
     settingsBadge.addEventListener('click', (e) => {
       e.stopPropagation();
-      showCardContextMenu(e, app);
+      toggleCardContextMenu(e, app);
     });
     card.appendChild(settingsBadge);
   }
@@ -187,10 +187,10 @@ function deleteApp(appId) {
 
 // ==========================================
 // КОНТЕКСТНОЕ МЕНЮ КАРТОЧКИ
+// Стиль как у выпадающего меню AI в сайдбаре
 // ==========================================
 
 // Маппинг: ключ перевода → эмодзи и текст БЕЗ эмодзи
-// Чтобы не было задвоения (в переводах уже есть эмодзи)
 const menuItemIcons = {
   info:         { icon: 'ℹ️', text: 'Info' },
   open:         { icon: '🚀', text: 'Open' },
@@ -215,33 +215,49 @@ function getMenuItemData(key) {
   return map[key] || { icon: '', text: t(key) };
 }
 
-function showCardContextMenu(event, app) {
-  hideCardContextMenu();
+// Переключение меню (открыть/закрыть)
+function toggleCardContextMenu(event, app) {
+  event.stopPropagation();
+  const existingMenu = document.getElementById('card-context-menu');
 
+  if (existingMenu && existingMenu.dataset.appId === app.id) {
+    hideCardContextMenu();
+    return;
+  }
+
+  hideCardContextMenu();
+  showCardContextMenu(event, app);
+}
+
+function showCardContextMenu(event, app) {
   const menu = document.createElement('div');
-  menu.className = 'app-card-context-menu';
+  // Тот же стиль, что и у AI-меню в сайдбаре
+  menu.className = 'sidebar-ai-dropdown';
   menu.id = 'card-context-menu';
+  menu.dataset.appId = app.id;
+  menu.style.display = 'flex';
+  menu.style.gap = '4px';
+  menu.style.padding = '6px';
+  menu.style.maxHeight = '80vh';
+  menu.style.overflowY = 'auto';
 
   const isInstalled = installedModules.includes(app.id);
 
-  // Заголовок меню — иконка + название приложения
-  const header = document.createElement('div');
-  header.style.cssText = 'padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--heading-color); border-bottom: 1px solid var(--input-border); display: flex; align-items: center; gap: 10px;';
-  header.innerHTML = `<span style="font-size: 20px;">${app.icon}</span><span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${app.name}</span>`;
-  menu.appendChild(header);
-
-  // Создаём пункт меню: эмодзи в .menu-icon, текст в .menu-text
+  // Пункт меню в стиле AI-ссылок
   const createMenuItem = (key, action) => {
     const data = getMenuItemData(key);
-    const btn = document.createElement('button');
-    btn.className = 'app-card-context-menu-item';
-    btn.innerHTML = `<span class="menu-icon">${data.icon}</span><span class="menu-text">${data.text}</span>`;
-    btn.addEventListener('click', (e) => {
+    const link = document.createElement('a');
+    link.className = 'sidebar-ai-link';
+    link.href = '#';
+    link.style.cssText = 'cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 10px;';
+    link.innerHTML = `<span style="font-size: 16px; width: 20px; text-align: center;">${data.icon}</span><span style="flex: 1; font-size: 13px;">${data.text}</span>`;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       hideCardContextMenu();
       action();
     });
-    return btn;
+    return link;
   };
 
   menu.appendChild(createMenuItem('info', () => showAppInfo(app)));
@@ -261,67 +277,48 @@ function showCardContextMenu(event, app) {
 
   if (isInstalled) {
     const data = getMenuItemData('delete');
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'app-card-context-menu-item delete';
-    deleteBtn.innerHTML = `<span class="menu-icon">${data.icon}</span><span class="menu-text">${data.text}</span>`;
-    deleteBtn.addEventListener('click', (e) => {
+    const deleteLink = document.createElement('a');
+    deleteLink.className = 'sidebar-ai-link';
+    deleteLink.href = '#';
+    deleteLink.style.cssText = 'cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 10px; color: var(--delete-btn-bg);';
+    deleteLink.innerHTML = `<span style="font-size: 16px; width: 20px; text-align: center;">${data.icon}</span><span style="flex: 1; font-size: 13px;">${data.text}</span>`;
+    deleteLink.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       hideCardContextMenu();
       deleteApp(app.id);
     });
-    menu.appendChild(deleteBtn);
+    menu.appendChild(deleteLink);
   }
 
   document.body.appendChild(menu);
 
-  // Позиционирование: привязываем к КАРТОЧКЕ приложения
-  const cardEl = event.target.closest('.app-card');
-  const cardRect = cardEl ? cardEl.getBoundingClientRect() : event.target.getBoundingClientRect();
+  // Позиционирование: привязываем к кнопке ⚙️
+  const rect = event.target.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const margin = 8;
 
-  const isMobile = viewportWidth <= 600;
+  // Меню появляется СПРАВА от кнопки ⚙️ (как AI-меню)
+  let left = rect.right + 8;
+  let top = rect.top;
 
-  let top, left;
-
-  if (isMobile) {
-    // Мобильный: меню под карточкой, на всю её ширину
-    left = cardRect.left;
-    top = cardRect.bottom + 4;
-
-    if (top + menuRect.height > viewportHeight - margin) {
-      top = cardRect.top - menuRect.height - 4;
-    }
-    if (top < margin) top = margin;
-
-    // Растягиваем на ширину карточки (но не шире экрана)
-    const menuWidth = Math.min(cardRect.width, viewportWidth - margin * 2);
-    menu.style.width = menuWidth + 'px';
-
-    if (cardRect.width > menuWidth) {
-      left = cardRect.left + (cardRect.width - menuWidth) / 2;
-    }
-  } else {
-    // Десктоп: меню справа от карточки
-    left = cardRect.right + 8;
-    top = cardRect.top;
-
-    if (left + menuRect.width > viewportWidth - margin) {
-      left = cardRect.left - menuRect.width - 8;
-    }
-
-    if (top + menuRect.height > viewportHeight - margin) {
-      top = viewportHeight - menuRect.height - margin;
-    }
-    if (top < margin) top = margin;
+  if (left + menuRect.width > viewportWidth - margin) {
+    left = rect.left - menuRect.width - 8;
   }
+
+  if (top + menuRect.height > viewportHeight - margin) {
+    top = viewportHeight - menuRect.height - margin;
+  }
+  if (top < margin) top = margin;
+  if (left < margin) left = margin;
 
   menu.style.position = 'fixed';
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
 
+  // Закрываем меню при клике вне его
   setTimeout(() => {
     document.addEventListener('click', hideCardContextMenu, { once: true });
   }, 0);
