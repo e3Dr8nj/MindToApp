@@ -210,11 +210,20 @@ function showCardContextMenu(event, app) {
 
   const isInstalled = installedModules.includes(app.id);
 
-  // Вспомогательная функция для создания красивых, растянутых кнопок без двойных иконок
+  // Заголовок меню с названием приложения (чтобы было понятно, к чему относится)
+  const header = document.createElement('div');
+  header.style.cssText = 'padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--description-color); border-bottom: 1px solid var(--input-border); display: flex; align-items: center; gap: 8px;';
+  header.innerHTML = `<span style="font-size: 18px;">${app.icon}</span><span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${app.name}</span>`;
+  menu.appendChild(header);
+
+  // Вспомогательная функция для создания пунктов меню
+  // Используем стандартную структуру с .menu-icon и .menu-text из CSS
   const createMenuItem = (textKey, action) => {
     const btn = document.createElement('button');
     btn.className = 'app-card-context-menu-item';
-    btn.innerHTML = `<span style="flex: 1; text-align: left;">${t(textKey)}</span>`;
+    // Пустой .menu-icon сохраняет CSS-структуру (flex: 1 у .menu-text)
+    // Текст из перевода уже содержит эмодзи — иконка остаётся пустой
+    btn.innerHTML = `<span class="menu-icon"></span><span class="menu-text">${t(textKey)}</span>`;
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -241,7 +250,7 @@ function showCardContextMenu(event, app) {
   if (isInstalled) {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'app-card-context-menu-item delete';
-    deleteBtn.innerHTML = `<span style="flex: 1; text-align: left;">${t('delete')}</span>`;
+    deleteBtn.innerHTML = `<span class="menu-icon"></span><span class="menu-text">${t('delete')}</span>`;
     deleteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       hideCardContextMenu();
@@ -252,26 +261,56 @@ function showCardContextMenu(event, app) {
 
   document.body.appendChild(menu);
 
-  // УМНОЕ ПОЗИЦИОНИРОВАНИЕ С УЧЁТОМ ГРАНИЦ ЭКРАНА
-  const rect = event.target.getBoundingClientRect();
+  // Позиционирование: привязываем к КАРТОЧКЕ приложения, а не к кнопке ⚙️
+  const cardEl = event.target.closest('.app-card');
+  const cardRect = cardEl ? cardEl.getBoundingClientRect() : event.target.getBoundingClientRect();
   const menuRect = menu.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
-  const margin = 10; // отступ от краёв экрана
+  const margin = 8;
 
-  // Позиция по вертикали: под кнопкой, но если не помещается — над кнопкой
-  let top = rect.bottom + 5;
-  if (top + menuRect.height > viewportHeight - margin) {
-    top = rect.top - menuRect.height - 5;
-  }
-  if (top < margin) top = margin;
+  // На мобильном (≤ 600px) меню растягивается на всю ширину карточки
+  const isMobile = viewportWidth <= 600;
 
-  // Позиция по горизонтали: слева от кнопки, но если не помещается — прижать к правому краю
-  let left = rect.left;
-  if (left + menuRect.width > viewportWidth - margin) {
-    left = viewportWidth - menuRect.width - margin;
+  let top, left;
+
+  if (isMobile) {
+    // Мобильный: меню под карточкой, на всю ширину карточки
+    left = cardRect.left;
+    top = cardRect.bottom + 4;
+
+    // Если не помещается снизу — показываем над карточкой
+    if (top + menuRect.height > viewportHeight - margin) {
+      top = cardRect.top - menuRect.height - 4;
+    }
+
+    // Если всё равно не помещается сверху — прижимаем к верху экрана
+    if (top < margin) top = margin;
+
+    // Растягиваем меню на ширину карточки (но не больше экрана)
+    const menuWidth = Math.min(cardRect.width, viewportWidth - margin * 2);
+    menu.style.width = menuWidth + 'px';
+
+    // Центрируем по горизонтали, если карточка уже меню
+    if (cardRect.width > menuWidth) {
+      left = cardRect.left + (cardRect.width - menuWidth) / 2;
+    }
+  } else {
+    // Десктоп: меню справа от карточки, выровнено по верху
+    left = cardRect.right + 8;
+    top = cardRect.top;
+
+    // Если не помещается справа — показываем слева от карточки
+    if (left + menuRect.width > viewportWidth - margin) {
+      left = cardRect.left - menuRect.width - 8;
+    }
+
+    // Если не помещается по вертикали — прижимаем к нижнему краю экрана
+    if (top + menuRect.height > viewportHeight - margin) {
+      top = viewportHeight - menuRect.height - margin;
+    }
+    if (top < margin) top = margin;
   }
-  if (left < margin) left = margin;
 
   menu.style.position = 'fixed';
   menu.style.top = `${top}px`;
