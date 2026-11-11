@@ -542,6 +542,8 @@
     </div>
   </div>
 
+  <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
+  <!-- app-factory.js должен загружаться ПЕРЕД скриптами, которые используют createAppFromHtml -->
   <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
   <script src="scripts/prompt-editor.js"></script>
