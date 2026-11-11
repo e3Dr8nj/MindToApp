@@ -2034,3 +2034,124 @@ h1 {
 .sidebar-export-btn:hover {
   background: var(--btn-primary-hover-bg);
 }
+/* ==========================================
+// НОВЫЕ СТИЛИ САЙДБАРА: разделён на верх и низ
+// ========================================== */
+
+/* Заголовок "Мои приложения" в сайдбаре */
+.sidebar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heading-color);
+  padding: 12px 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--input-border);
+  margin-bottom: 8px;
+}
+
+/* Верхняя часть сайдбара — всегда видна сверху */
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+/* Нижняя часть сайдбара — всегда видна снизу */
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--input-border);
+  margin-top: auto;
+}
+
+/* Убираем старый spacer, он больше не нужен */
+.sidebar-spacer {
+  display: none;
+}
+
+/* Мобильная адаптация: сайдбар становится горизонтальным сверху */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .sidebar-title {
+    font-size: 14px;
+    padding: 8px 10px 6px;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-top {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 8px;
+  }
+
+  .sidebar-bottom {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-top: 1px solid var(--input-border);
+    margin-top: 0;
+  }
+
+  .sidebar-arrow {
+    display: none;
+  }
+
+  .sidebar-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+
+  .sidebar-ai-wrapper {
+    position: relative;
+  }
+
+  .main-content {
+    margin-top: 120px;
+    margin-left: 0;
+  }
+
+  .sidebar.sidebar-hidden {
+    transform: translateY(-100%);
+  }
+}
+
+/* Маленькие экраны: ещё компактнее */
+@media (max-width: 480px) {
+  .sidebar-title {
+    font-size: 13px;
+    padding: 6px 8px 4px;
+  }
+
+  .sidebar-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .main-content {
+    margin-top: 110px;
+  }
+}

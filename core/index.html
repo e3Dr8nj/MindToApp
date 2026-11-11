@@ -16,21 +16,27 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
 </head>
 <body>
+  <!-- САЙДБАР: разделён на верхнюю и нижнюю части -->
   <div id="sidebar" class="sidebar">
-    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Copy prompt">📋 prompt</button>
-    <div class="sidebar-arrow">↓</div>
-    <div class="sidebar-ai-wrapper">
-      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Hover for AI list">🤖 AI</button>
-      <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown"></div>
+    <!-- ВЕРХНЯЯ ЧАСТЬ: заголовок + меню -->
+    <div class="sidebar-top">
+      <div class="sidebar-title">🏠 My Apps</div>
+      <button id="sidebar-prompt-btn" class="sidebar-btn" title="Copy prompt">📋 prompt</button>
+      <div class="sidebar-arrow">↓</div>
+      <div class="sidebar-ai-wrapper">
+        <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Hover for AI list">🤖 AI</button>
+        <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown"></div>
+      </div>
+      <div class="sidebar-arrow">↓</div>
+      <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">🚀 Create</button>
     </div>
-    <div class="sidebar-arrow">↓</div>
-    <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">🚀 Create</button>
 
-    <div class="sidebar-spacer"></div>
-
-    <button id="sidebar-export-btn" class="sidebar-btn sidebar-export-btn" title="Export apps to folder">📤 Export</button>
-    <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
-    <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
+    <!-- НИЖНЯЯ ЧАСТЬ: Export, Import, URL -->
+    <div class="sidebar-bottom">
+      <button id="sidebar-export-btn" class="sidebar-btn sidebar-export-btn" title="Export apps to folder">📤 Export</button>
+      <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
+      <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
+    </div>
   </div>
 
   <div id="toast-container" class="toast-container"></div>
@@ -542,8 +548,6 @@
     </div>
   </div>
 
-  <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
-  <!-- app-factory.js должен загружаться ПЕРЕД скриптами, которые используют createAppFromHtml -->
   <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
   <script src="scripts/prompt-editor.js"></script>
