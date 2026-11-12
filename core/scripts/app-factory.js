@@ -80,6 +80,45 @@ function injectManifestIntoHtml(html, manifest) {
 }
 
 /**
+ * Очищает HTML-код от Markdown-обёртки (```html ... ```).
+ * @param {string} code - Исходный код
+ * @returns {string} Очищенный код
+ */
+function stripMarkdownWrapper(code) {
+  if (!code || typeof code !== 'string') return code;
+
+  let cleaned = code.trim();
+
+  // Вариант 1: внутри текста есть блок ```html ... ``` — вытаскиваем его содержимое
+  const blockMatch = cleaned.match(/```(?:html|htm|xml)?\s*\r?\n([\s\S]*?)\r?\n?```/i);
+  if (blockMatch) {
+    return blockMatch[1].trim();
+  }
+
+  // Вариант 2: код просто начинается с ``` и заканчивается ```
+  const lines = cleaned.split(/\r?\n/);
+
+  if (lines.length >= 2) {
+    const firstLine = lines[0].trim();
+    const lastLine = lines[lines.length - 1].trim();
+
+    const firstIsFence = /^```/.test(firstLine);
+    const lastIsFence = /^```$/.test(lastLine);
+
+    if (firstIsFence && lastIsFence) {
+      lines.shift(); // убираем первую строку
+      lines.pop();   // убираем последнюю строку
+      cleaned = lines.join('\n').trim();
+    } else if (firstIsFence) {
+      lines.shift(); // убираем только первую строку, если закрывающей нет
+      cleaned = lines.join('\n').trim();
+    }
+  }
+
+  return cleaned;
+}
+
+/**
  * Создаёт приложение из HTML-кода.
  * Парсит manifest, валидирует, проверяет уникальность, сохраняет.
  * Если manifest отсутствует — генерирует и вставляет автоматически.
@@ -95,6 +134,9 @@ function injectManifestIntoHtml(html, manifest) {
  *     error может быть: 'noHtml', 'notHtml', 'invalidManifest', 'missingFields', 'appExists'
  */
 function createAppFromHtml(html, options = {}) {
+  // 0. Очистка кода от Markdown-обёртки (```html ... ```)
+  html = stripMarkdownWrapper(html);
+
   // 1. Проверка входных данных
   if (!html || typeof html !== 'string' || !html.trim()) {
     return { success: false, error: 'noHtml' };

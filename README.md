@@ -144,5 +144,7 @@ git push origin feature/my-feature
 
 MIT License — используй, изменяй, распространяй свободно.
 
+## 📞 Контакты
 
+📱 Telegram: [@твой_ник](https://t.me/H9Skd8) 
 
