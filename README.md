@@ -143,8 +143,8 @@ git push origin feature/my-feature
 ## 📄 Лицензия
 
 MIT License — используй, изменяй, распространяй свободно.
-
+Создано с помощью Qween 3.7 - Plus
 ## 📞 Контакты
 
-📱 Telegram: [@твой_ник](https://t.me/H9Skd8) 
+📱 Telegram: [send message to creator](https://t.me/H9Skd8) 
 
