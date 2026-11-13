@@ -2,655 +2,570 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MindToApp — Build HTML Apps from AI Prompts</title>
-  <meta name="description" content="A local-first PWA platform to create, manage and run HTML apps using AI. No backend, no subscriptions.">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(-45deg, #667eea, #764ba2, #6B8DD6, #8E37D7);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-      color: #333;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    
-    .lang-switcher {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 30px;
-      padding: 6px;
-      display: flex;
-      gap: 4px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      animation: fadeInDown 0.8s ease-out;
-    }
-    
-    .lang-btn {
-      background: transparent;
-      border: none;
-      color: white;
-      padding: 6px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .lang-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
-    .lang-btn.active { background: white; color: #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: white;
-      padding: 40px 20px;
-    }
-    
-    .hero-content .emoji {
-      font-size: 5rem;
-      margin-bottom: 20px;
-      display: block;
-      animation: float 3s ease-in-out infinite, fadeIn 1s ease-out;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-    
-    .hero-content h1 {
-      font-size: 3.5rem;
-      margin-bottom: 20px;
-      font-weight: 800;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.2s forwards;
-    }
-    
-    .hero-content p {
-      font-size: 1.3rem;
-      margin-bottom: 40px;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.4s forwards;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    
-    .cta-buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.6s forwards;
-    }
-    
-    .btn {
-      padding: 16px 32px;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-block;
-    }
-    
-    .btn-primary { background: white; color: #667eea; }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-    
-    .btn-secondary {
-      background: rgba(255,255,255,0.15);
-      color: white;
-      border: 2px solid rgba(255,255,255,0.5);
-      backdrop-filter: blur(5px);
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.25); border-color: white; transform: translateY(-3px); }
-    
-    .features { background: white; padding: 100px 20px; }
-    .features h2 { text-align: center; font-size: 2.5rem; margin-bottom: 60px; color: #333; }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 40px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    
-    .feature-card {
-      text-align: center;
-      padding: 40px 30px;
-      border-radius: 20px;
-      background: #fff;
-      border: 1px solid rgba(0,0,0,0.05);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    .feature-card.visible { opacity: 1; transform: translateY(0); }
-    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15); }
-    
-    .feature-icon { font-size: 3.5rem; margin-bottom: 20px; display: inline-block; transition: transform 0.3s ease; }
-    .feature-card:hover .feature-icon { transform: scale(1.15) rotate(5deg); }
-    .feature-card h3 { font-size: 1.4rem; margin-bottom: 15px; color: #667eea; }
-    .feature-card p { color: #666; font-size: 1rem; line-height: 1.6; }
-    
-    .workflow-section { background: #f8f9fa; padding: 100px 20px; }
-    .workflow-section h2 { text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #333; }
-    .workflow-subtitle { text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 60px; max-width: 600px; margin: 0 auto 60px; }
-
-    .workflow-grid {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      gap: 30px;
-      max-width: 1100px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-    }
-
-    .workflow-card {
-      background: white;
-      border-radius: 20px;
-      padding: 30px 25px;
-      width: 320px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-      border: 1px solid rgba(0,0,0,0.05);
-      transition: all 0.4s ease;
-      opacity: 0;
-      transform: translateY(30px);
-      display: flex;
-      flex-direction: column;
-    }
-    .workflow-card.visible { opacity: 1; transform: translateY(0); }
-    .workflow-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15); }
-
-    .workflow-step-num {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;
-    }
-    .workflow-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: #333; }
-    .workflow-card p { color: #666; font-size: 0.95rem; margin-bottom: 20px; }
-
-    .mock-ui {
-      background: #1e1e2e; border-radius: 12px; padding: 15px;
-      margin-top: auto; font-family: 'Courier New', monospace;
-      font-size: 12px; color: #a6accd; position: relative; overflow: hidden;
-    }
-    .mock-ui::before {
-      content: '● ● ●'; color: #3b3b4f; font-size: 10px;
-      letter-spacing: 2px; display: block; margin-bottom: 10px;
-    }
-    .mock-textarea {
-      background: #2a2a3c; border: 1px solid #3b3b4f; border-radius: 6px;
-      padding: 10px; color: #e0e0e0; margin-bottom: 10px; min-height: 60px;
-    }
-    .mock-btn {
-      background: #667eea; color: white; border: none; padding: 8px 16px;
-      border-radius: 6px; font-size: 12px; font-weight: bold; width: 100%;
-      cursor: default; display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .mock-code { color: #a6e3a1; }
-    .mock-tag { color: #f38ba8; }
-    .mock-attr { color: #89b4fa; }
-    
-    .arrow-connector {
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: #667eea;
-      animation: pulseArrow 1.5s infinite; align-self: center;
-    }
-    @keyframes pulseArrow {
-      0%, 100% { opacity: 0.4; transform: translateX(0); }
-      50% { opacity: 1; transform: translateX(8px); }
-    }
-
-    /* ==========================================
-       НОВАЯ СЕКЦИЯ: БЫСТРОЕ СОЗДАНИЕ ЧЕРЕЗ САЙДБАР
-       ========================================== */
-    .fast-track-section {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      color: white;
-      padding: 100px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .fast-track-section::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-      animation: rotateBg 20s linear infinite;
-    }
-    @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    .fast-track-container {
-      position: relative;
-      z-index: 1;
-      max-width: 1000px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .fast-track-section h2 { font-size: 2.5rem; margin-bottom: 20px; }
-    .fast-track-section .subtitle { color: #a6accd; font-size: 1.1rem; margin-bottom: 60px; }
-
-    .fast-track-demo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-
-    .demo-step {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 30px;
-      width: 280px;
-      backdrop-filter: blur(10px);
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.5s ease;
-    }
-    .demo-step.visible { opacity: 1; transform: translateY(0); }
-    .demo-step h3 { font-size: 1.2rem; margin-bottom: 15px; color: #a6e3a1; }
-    .demo-step p { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 20px; }
-
-    /* Мокап буфера обмена */
-    .clipboard-mock {
-      background: #2a2a3c; border-radius: 12px; padding: 15px;
-      text-align: left; font-family: monospace; font-size: 11px; color: #a6accd;
-      border: 1px solid #3b3b4f; position: relative;
-    }
-    .clipboard-mock .copy-badge {
-      position: absolute; top: -10px; right: -10px;
-      background: #a6e3a1; color: #1e1e2e; font-size: 10px; font-weight: bold;
-      padding: 4px 8px; border-radius: 20px;
-      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
-    }
-    @keyframes popIn { from { transform: scale(1); } to { transform: scale(1.1); } }
-
-    /* Мокап сайдбара */
-    .sidebar-mock {
-      width: 70px; height: 180px; background: #ffffff; border-radius: 12px;
-      margin: 0 auto; display: flex; flex-direction: column; align-items: center;
-      padding: 10px 0; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    .sidebar-mock-btn {
-      width: 44px; height: 44px; border-radius: 10px; background: #f1f5f9;
-      display: flex; align-items: center; justify-content: center; font-size: 18px;
-    }
-    .sidebar-mock-btn.create {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white; font-size: 12px; font-weight: bold; flex-direction: column;
-      animation: glowPulse 2s infinite;
-    }
-    @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
-      50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
-    }
-
-    /* Мокап сетки приложений */
-    .app-grid-mock {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    }
-    .app-card-mock {
-      background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px 10px;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-    }
-    .app-card-mock.new {
-      background: rgba(166, 227, 161, 0.2); border: 1px solid #a6e3a1;
-      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .app-icon-mock { font-size: 24px; }
-    .app-name-mock { font-size: 10px; color: #e2e8f0; font-weight: 600; }
-
-    .demo-arrow {
-      font-size: 2rem; color: #667eea;
-      animation: pulseArrow 1.5s infinite;
-    }
-    @media (max-width: 900px) {
-      .demo-arrow { transform: rotate(90deg); margin: 10px 0; animation: pulseArrowDown 1.5s infinite; }
-      @keyframes pulseArrowDown {
-        0%, 100% { opacity: 0.4; transform: rotate(90deg) translateX(0); }
-        50% { opacity: 1; transform: rotate(90deg) translateX(8px); }
-      }
-      .fast-track-demo { flex-direction: column; }
-    }
-
-    footer { background: #1a1a2e; color: white; text-align: center; padding: 60px 20px; }
-    footer p { margin-bottom: 15px; }
-    footer a { color: #8E37D7; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
-    footer a:hover { color: #a855f7; text-decoration: underline; }
-    
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    
-    @media (max-width: 768px) {
-      .workflow-grid { flex-direction: column; align-items: center; }
-      .arrow-connector { transform: rotate(90deg); margin: 10px 0; animation: pulseArrowDown 1.5s infinite; }
-      @keyframes pulseArrowDown {
-        0%, 100% { opacity: 0.4; transform: rotate(90deg) translateX(0); }
-        50% { opacity: 1; transform: rotate(90deg) translateX(8px); }
-      }
-      .hero-content h1 { font-size: 2.5rem; }
-      .hero-content p { font-size: 1.1rem; }
-      .lang-switcher { top: 10px; right: 10px; }
-    }
-  </style>
-
-    <script type="application/json" id="manifest">{"id":"rjkasf1eMjvAb3BT4Dtl","name":"m55FzaI5UX","icon":"📱","description":"no description"}</script>
-  </head>
+  <title>MindToApp Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles/themes/light.css" data-theme="light">
+  <link rel="stylesheet" href="styles/themes/cyberpunk.css" data-theme="cyberpunk">
+  <link rel="stylesheet" href="styles/themes/discord.css" data-theme="discord">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#667eea">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
+</head>
 <body>
-  <div class="lang-switcher">
-    <button class="lang-btn" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="ru">RU</button>
+  <div id="sidebar" class="sidebar">
+    <button id="sidebar-prompt-btn" class="sidebar-btn" title="Copy prompt">📋 prompt</button>
+    <div class="sidebar-arrow">↓</div>
+    <div class="sidebar-ai-wrapper">
+      <button id="sidebar-ai-btn" class="sidebar-btn sidebar-ai-btn" title="Hover for AI list">🤖 AI</button>
+      <div id="sidebar-ai-dropdown" class="sidebar-ai-dropdown"></div>
+    </div>
+    <div class="sidebar-arrow">↓</div>
+    <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">🚀 Create</button>
+
+    <div class="sidebar-spacer"></div>
+
+    <button id="sidebar-export-btn" class="sidebar-btn sidebar-export-btn" title="Export apps to folder">📤 Export</button>
+    <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
+    <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
   </div>
 
-  <section class="hero">
-    <div class="hero-content">
-      <span class="emoji">🐹</span>
-      <h1 data-i18n="title">MindToApp</h1>
-      <p data-i18n="subtitle">Build HTML apps from AI prompts — 100% local, no backend, no subscriptions. Your code never leaves your device.</p>
-      <div class="cta-buttons">
-        <a href="core/" class="btn btn-primary" data-i18n="launch">🚀 Launch App</a>
-        <a href="https://github.com/e3Dr8nj/MindToApp" class="btn btn-secondary" data-i18n="github">⭐ View on GitHub</a>
+  <div id="toast-container" class="toast-container"></div>
+
+  <div id="main-content" class="main-content">
+    <div id="home-screen" class="screen active">
+      <header>
+        <h1>🏠 My Apps</h1>
+        <button id="burger-menu-btn" class="burger-menu-btn" title="Menu">☰</button>
+        <div class="header-buttons" id="header-menu">
+          <button id="language-toggle-btn" class="btn" title="Switch language">EN</button>
+          <button id="refresh-btn" class="btn" title="Clear cache and refresh">🔄</button>
+          <button id="manage-themes-btn" class="btn" title="Manage themes">🎨 Themes</button>
+          <button id="manage-ai-btn" class="btn" title="Edit AI list">🤖 AI</button>
+          <button id="edit-prompts-btn" class="btn" title="Edit prompt">⚙️ Prompt</button>
+          <button id="builder-btn" class="btn btn-primary">🛠 Builder</button>
+          <button id="add-custom-btn" class="btn">➕ Add</button>
+          <button id="open-store-btn" class="btn">📦 Store</button>
+          <button id="export-urls-btn" class="btn">📤 Export URLs</button>
+          <button id="reset-pwa-btn" class="btn" title="Reset PWA data (fix installation issues)">🧹 Reset PWA</button>
+        </div>
+      </header>
+
+      <div id="ai-panel" class="ai-panel" style="display: none;">
+        <div class="ai-panel-header">
+          <h2>🤖 AI for creating apps</h2>
+          <button id="ai-panel-close-btn" class="modal-close" title="Close">&times;</button>
+        </div>
+        <p class="ai-panel-hint">You can change the list via «🤖 AI».</p>
+        <div id="ai-panel-grid" class="ai-panel-grid"></div>
       </div>
-    </div>
-  </section>
 
-  <section class="features">
-    <div class="container">
-      <h2 data-i18n="featuresTitle">✨ Why MindToApp?</h2>
-      <div class="features-grid">
-        <div class="feature-card reveal">
-          <div class="feature-icon">🔒</div>
-          <h3 data-i18n="f1Title">Privacy First</h3>
-          <p data-i18n="f1Desc">Everything runs locally in your browser. No servers, no tracking, no data collection.</p>
+      <div id="builder-panel" class="builder-panel" style="display: none;">
+        <div class="builder-panel-header">
+          <h2>🛠 App Builder</h2>
+          <button id="builder-close-btn" class="modal-close" title="Close">&times;</button>
         </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">⚡</div>
-          <h3 data-i18n="f2Title">Instant Results</h3>
-          <p data-i18n="f2Desc">Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.</p>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">💸</div>
-          <h3 data-i18n="f3Title">Free Forever</h3>
-          <p data-i18n="f3Desc">No subscriptions, no hidden fees. Open source and free to use for everyone.</p>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">📦</div>
-          <h3 data-i18n="f4Title">Portable</h3>
-          <p data-i18n="f4Desc">Export all your apps to a folder, share them anywhere, import them on any device.</p>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">🎨</div>
-          <h3 data-i18n="f5Title">Beautiful Themes</h3>
-          <p data-i18n="f5Desc">3 built-in themes (Light, Cyberpunk, Discord) + create your own with AI.</p>
-        </div>
-        <div class="feature-card reveal">
-          <div class="feature-icon">📱</div>
-          <h3 data-i18n="f6Title">PWA Ready</h3>
-          <p data-i18n="f6Desc">Install as a desktop app. Works offline after first load. No app store needed.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="workflow-section">
-    <div class="container">
-      <h2 data-i18n="workflowTitle">🎯 How It Works</h2>
-      <p class="workflow-subtitle" data-i18n="workflowSubtitle">Three simple steps to turn your idea into a working application.</p>
-      
-      <div class="workflow-grid">
-        <div class="workflow-card reveal">
-          <div class="workflow-step-num">1</div>
-          <h3 data-i18n="w1Title">Describe & Copy</h3>
-          <p data-i18n="w1Desc">Type your idea into the builder. MindToApp will generate a perfect, optimized prompt for the AI.</p>
-          <div class="mock-ui">
-            <div class="mock-textarea" data-i18n="mockIdea">"Make a dark theme expense tracker with charts..."</div>
-            <div class="mock-btn">📋 <span data-i18n="mockCopyBtn">Copy Prompt</span></div>
+        <div class="builder-container">
+          <div class="builder-block">
+            <div class="builder-block-number">1</div>
+            <h3 class="builder-block-title">💡 Describe your idea</h3>
+            <p class="builder-block-desc">Describe the app you want to create. The more details — the better the result.</p>
+            <textarea id="builder-idea-input" class="idea-input" placeholder="For example: Expense calculator with charts, dark theme, and history saved in localStorage..."></textarea>
+            <button id="builder-copy-prompt-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Copy prompt</button>
+            <div id="builder-status-1" class="modal-status"></div>
           </div>
-        </div>
-
-        <div class="arrow-connector">➜</div>
-
-        <div class="workflow-card reveal">
-          <div class="workflow-step-num">2</div>
-          <h3 data-i18n="w2Title">Ask Any AI</h3>
-          <p data-i18n="w2Desc">Paste the prompt into ChatGPT, Claude, Qwen, or any other AI. Copy the HTML code it returns.</p>
-          <div class="mock-ui">
-            <div style="margin-bottom: 8px; color: #89b4fa;">AI:</div>
-            <div><span class="mock-tag">&lt;!DOCTYPE</span> <span class="mock-attr">html</span><span class="mock-tag">&gt;</span></div>
-            <div style="padding-left: 10px;"><span class="mock-tag">&lt;html&gt;</span>...</div>
-            <div class="mock-code" style="margin-top: 5px;">// ✨ Your app code is ready!</div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-block">
+            <div class="builder-block-number">2</div>
+            <h3 class="builder-block-title">🤖 Send to AI</h3>
+            <p class="builder-block-desc">Paste the copied prompt into any AI and wait for the response.</p>
+            <select id="builder-ai-select" class="builder-select"></select>
+            <button id="builder-open-ai-btn" class="btn btn-secondary" style="width: 100%; margin-top: 10px;">🌐 Open AI</button>
+            <p class="builder-hint">After receiving the response, copy the entire HTML code.</p>
           </div>
-        </div>
-
-        <div class="arrow-connector">➜</div>
-
-        <div class="workflow-card reveal">
-          <div class="workflow-step-num">3</div>
-          <h3 data-i18n="w3Title">Paste & Create</h3>
-          <p data-i18n="w3Desc">Bring the code back to MindToApp. Click "Create", and your app is instantly installed and ready to use!</p>
-          <div class="mock-ui">
-            <div class="mock-textarea" style="color: #a6e3a1;">&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;</div>
-            <div class="mock-btn" style="background: #a6e3a1; color: #1e1e2e;">🚀 <span data-i18n="mockCreateBtn">Create App</span></div>
+          <div class="builder-arrow">→</div>
+          <div class="builder-block">
+            <div class="builder-block-number">3</div>
+            <h3 class="builder-block-title">🚀 Create app</h3>
+            <p class="builder-block-desc">Paste the HTML code returned by AI and click "Create".</p>
+            <textarea id="builder-code-input" class="code-input" placeholder="Paste the entire HTML code from AI here..."></textarea>
+            <button id="builder-create-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🚀 Create app</button>
+            <div id="builder-status-3" class="modal-status"></div>
           </div>
         </div>
       </div>
+
+      <div id="installed-apps" class="app-grid"></div>
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <p>You don't have any installed apps yet</p>
+        <button id="go-to-store-btn" class="btn btn-primary">Go to store</button>
+      </div>
     </div>
-  </section>
 
-  <!-- НОВАЯ СЕКЦИЯ: БЫСТРОЕ СОЗДАНИЕ ЧЕРЕЗ БОКОВОЕ МЕНЮ -->
-  <section class="fast-track-section">
-    <div class="fast-track-container">
-      <h2 data-i18n="fastTrackTitle">⚡ Lightning Fast Mode</h2>
-      <p class="subtitle" data-i18n="fastTrackSubtitle">Already have the code? Skip the builder and create apps in 1 click directly from the sidebar.</p>
-      
-      <div class="fast-track-demo">
-        <!-- Шаг 1: Буфер -->
-        <div class="demo-step reveal">
-          <h3 data-i18n="ftStep1Title">1. Copy HTML Code</h3>
-          <p data-i18n="ftStep1Desc">Copy the complete HTML code from any AI or source to your clipboard.</p>
-          <div class="clipboard-mock">
-            <div class="copy-badge" data-i18n="ftCopied">Copied!</div>
-            <div>&lt;!DOCTYPE html&gt;</div>
-            <div>&lt;html&gt;</div>
-            <div style="padding-left: 10px; color: #89b4fa;">&lt;head&gt;...&lt;/head&gt;</div>
-            <div style="padding-left: 10px; color: #a6e3a1;">&lt;body&gt;...&lt;/body&gt;</div>
-            <div>&lt;/html&gt;</div>
+    <div id="store-screen" class="screen">
+      <header>
+        <button id="back-to-home-btn" class="btn">← Back</button>
+        <h1>📦 Store</h1>
+        <button id="add-custom-btn-store" class="btn">➕ Add</button>
+      </header>
+      <div id="all-apps" class="app-grid"></div>
+    </div>
+
+    <div id="app-screen" class="screen">
+      <header class="app-header">
+        <button id="close-app-btn" class="btn btn-back" title="Back to home">← Back</button>
+        <h1 id="current-app-name">Application</h1>
+        <div class="header-spacer"></div>
+      </header>
+      <iframe id="app-frame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads allow-popups" title="App"></iframe>
+    </div>
+
+    <div id="clipboard-screen" class="screen">
+      <header class="app-header">
+        <button id="close-clipboard-screen-btn" class="btn btn-back" title="Close">← Back</button>
+        <h1>📋 Clipboard</h1>
+        <div class="header-spacer"></div>
+      </header>
+      <div id="clipboard-content-area" class="clipboard-content-area"></div>
+    </div>
+  </div>
+
+  <div id="create-modal" class="modal">
+    <div class="modal-content modal-create">
+      <div class="modal-header">
+        <h2>✨ Create app with AI</h2>
+        <button class="modal-close" id="close-create-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>1. Describe your idea:</h3>
+          <textarea id="user-idea-input" class="idea-input" placeholder="For example: Expense calculator with charts and history in dark theme..."></textarea>
+        </div>
+        <div class="step-box">
+          <h3>2. Ready prompt (updates automatically):</h3>
+          <div class="prompt-code-box">
+            <textarea id="prompt-text" readonly></textarea>
+          </div>
+          <button id="copy-prompt-btn" class="btn btn-small">📋 1. Copy prompt</button>
+        </div>
+        <div class="step-box">
+          <h3>3. Paste prompt into AI:</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Open the link, paste the prompt, wait for response and copy HTML code.</p>
+          <div id="create-ai-links" class="ai-links"></div>
+        </div>
+        <div class="step-box">
+          <h3>4. Paste the received HTML code:</h3>
+          <textarea id="generated-code-input" class="code-input" placeholder="Paste the entire index.html code here..."></textarea>
+          <div id="create-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-create-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-create-btn" class="btn btn-primary">🚀 Create app</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="add-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ Add module</h2>
+        <button class="modal-close" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tab" data-tab="url">
+          <p class="modal-description">Paste a direct link to the HTML file or folder.<br>Supported: <code>.html</code>, <code>.txt</code>, GitHub Gist (Raw), GitHub Pages.</p>
+          <input type="url" id="module-url-input" placeholder="https://example.com/module/" class="url-input">
+        </div>
+        <div class="tab" data-tab="local" style="display: none;">
+          <p class="modal-description">Select <b>one .html file</b> from your computer.</p>
+          <input type="file" id="local-file-input" accept=".html" style="display: none;">
+          <button class="btn btn-secondary" id="select-file-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📂 Select .html file</button>
+          <div id="selected-file-name" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
+        </div>
+        <div class="tab" data-tab="folder" style="display: none;">
+          <p class="modal-description">Select a <b>folder</b> with the module (must have index.html).</p>
+          <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
+          <button class="btn btn-secondary" id="select-folder-btn" style="width: 100%; padding: 14px; margin-bottom: 10px;">📁 Select folder</button>
+          <div id="selected-folder-info" style="color: var(--accent-color); font-size: 14px; text-align: center; font-weight: 500;"></div>
+          <div class="folder-warning">⚠️ Works in Chrome, Edge, Firefox. Doesn't work in Safari.</div>
+        </div>
+        <div class="tab" data-tab="code" style="display: none;">
+          <p class="modal-description">Paste the full HTML code of the app. Code must contain <code>&lt;script id="manifest"&gt;</code> in <code>&lt;head&gt;</code>.</p>
+          <textarea id="code-input-textarea" class="code-input" placeholder="Paste the app HTML code here..."></textarea>
+        </div>
+        <div class="tab-switcher">
+          <button class="tab-btn active" data-target="url">🔗 Link</button>
+          <button class="tab-btn" data-target="local">📄 File</button>
+          <button class="tab-btn" data-target="folder">📁 Folder</button>
+          <button class="tab-btn" data-target="code">📋 Code</button>
+        </div>
+        <div id="modal-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-modal-btn" class="btn btn-secondary">Cancel</button>
+        <button id="confirm-add-btn" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="modal">
+    <div class="modal-content modal-edit">
+      <div class="modal-header">
+        <h2 id="edit-modal-title">✏️ Edit</h2>
+        <button class="modal-close" id="close-edit-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-preview">
+          <div class="edit-preview-icon" id="edit-preview-icon">📱</div>
+          <div class="edit-preview-info">
+            <div class="edit-preview-name" id="edit-preview-name">Name</div>
+            <div class="edit-preview-desc" id="edit-preview-desc">Description</div>
+          </div>
+        </div>
+        <div class="step-box">
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button id="toggle-code-btn" class="btn btn-secondary" style="flex: 1;">👁 Show code</button>
+            <button id="copy-code-btn" class="btn btn-primary" style="flex: 1;">📋 Copy code</button>
+          </div>
+          <textarea id="edit-source-code" class="code-input" style="display: none;" readonly></textarea>
+        </div>
+        <div class="step-box">
+          <button id="copy-edit-prompt-btn" class="btn btn-primary" style="width: 100%;">📋 Copy prompt + code for AI</button>
+          <div id="edit-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-edit-btn" class="btn btn-secondary" style="width: 100%;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="share-modal" class="modal">
+    <div class="modal-content modal-share">
+      <div class="modal-header">
+        <h2>📤 Поделиться приложением</h2>
+        <button class="modal-close" id="close-share-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="share-preview">
+          <div class="share-preview-icon" id="share-preview-icon">📱</div>
+          <div class="share-preview-info">
+            <div class="share-preview-name" id="share-preview-name">Name</div>
+            <div class="share-preview-desc" id="share-preview-desc">Description</div>
           </div>
         </div>
 
-        <div class="demo-arrow">➜</div>
+        <div class="step-box" id="share-file-block">
+          <h3>📤 Поделиться файлом</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Отправьте HTML-файл через Telegram, WhatsApp или другие приложения.</p>
+          <button id="share-file-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📤 Поделиться файлом</button>
+        </div>
 
-        <!-- Шаг 2: Сайдбар -->
-        <div class="demo-step reveal">
-          <h3 data-i18n="ftStep2Title">2. Click "Create" in Sidebar</h3>
-          <p data-i18n="ftStep2Desc">Just click the 🚀 Create button in the left sidebar. The platform reads your clipboard automatically.</p>
-          <div class="sidebar-mock">
-            <div class="sidebar-mock-btn">📋</div>
-            <div class="sidebar-mock-btn">🤖</div>
-            <div class="sidebar-mock-btn create">🚀<br>Create</div>
+        <div id="share-or-divider" style="text-align: center; color: var(--description-color); font-size: 14px; margin: 15px 0; font-weight: 500;">— или —</div>
+
+        <div class="step-box">
+          <h3>1️⃣ Скопируйте код приложения</h3>
+          <button id="copy-app-code-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📋 Скопировать код</button>
+          <div id="copy-code-status" class="modal-status"></div>
+        </div>
+
+        <div class="step-box">
+          <h3>2️⃣ Разместите код и получите ссылку</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Выберите сервис, вставьте код и сохраните:</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <a href="https://gist.github.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="text-align: center; text-decoration: none;">GitHub Gist</a>
+            <a href="https://privatebin.net/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="text-align: center; text-decoration: none;">PrivateBin</a>
+            <a href="https://www.toptal.com/developers/hastebin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="text-align: center; text-decoration: none;">Toptal Hastebin</a>
           </div>
         </div>
 
-        <div class="demo-arrow">➜</div>
+        <div class="step-box">
+          <h3>3️⃣ Привяжите ссылку к приложению</h3>
+          <input type="url" id="share-url-input" class="url-input" placeholder="https://..." style="margin-bottom: 10px;">
+          <div id="share-url-status" class="modal-status"></div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="bind-url-btn" class="btn btn-primary" style="flex: 1;">🔗 Привязать ссылку</button>
+            <button id="unbind-url-btn" class="btn btn-secondary" style="display: none; flex: 1;">✂️ Отвязать</button>
+          </div>
+        </div>
 
-        <!-- Шаг 3: Результат -->
-        <div class="demo-step reveal">
-          <h3 data-i18n="ftStep3Title">3. Done! App Installed</h3>
-          <p data-i18n="ftStep3Desc">The app is instantly parsed, saved, and appears in your "My Apps" grid. Ready to run!</p>
-          <div class="app-grid-mock">
-            <div class="app-card-mock">
-              <div class="app-icon-mock">🧮</div>
-              <div class="app-name-mock">Calc</div>
+        <div class="step-box" id="share-telegram-block" style="display: none;">
+          <h3>4️⃣ Поделитесь ссылкой в Telegram</h3>
+          <button id="share-telegram-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">📱 Поделиться в Telegram</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-share-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="export-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📤 Экспорт приложений в папку</h2>
+        <button class="modal-close" id="close-export-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <p id="export-modal-desc" style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Выберите папку для сохранения всех установленных приложений в виде отдельных HTML-файлов. Имена файлов будут в формате Название_ID.html. Существующие файлы будут пропущены.
+          </p>
+
+          <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: var(--description-color); margin-bottom: 5px;">📁 Выбранная папка:</div>
+            <div id="export-folder-path" style="font-size: 14px; color: var(--text-color); font-weight: 500; word-break: break-all;">Папка не выбрана</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="export-select-folder-btn" class="btn btn-secondary" style="flex: 1;">📁 Выбрать папку для экспорта</button>
+            <button id="export-clear-btn" class="btn btn-secondary" style="flex: 0 0 auto;">🗑 Очистить</button>
+          </div>
+
+          <div id="export-status" class="modal-status" style="margin-top: 15px;"></div>
+
+          <div id="export-log" class="export-log" style="display: none; margin-top: 15px; max-height: 250px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="export-run-btn" class="btn btn-primary">🚀 Начать экспорт</button>
+        <button id="close-export-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="import-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📥 Импорт приложений из папки</h2>
+        <button class="modal-close" id="close-import-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <p id="import-modal-desc" style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">
+            Выберите папку с HTML-файлами. Система рекурсивно просканирует все вложенные папки и создаст приложения из файлов с корректным manifest. Приложения с существующими ID будут пропущены.
+          </p>
+          <p id="import-default-hint" style="font-size: 12px; color: var(--accent-color); margin-bottom: 15px; font-style: italic;">
+            💡 По умолчанию: папка загрузок Telegram
+          </p>
+
+          <div style="background: var(--card-bg); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: var(--description-color); margin-bottom: 5px;">📁 Выбранная папка:</div>
+            <div id="import-folder-path" style="font-size: 14px; color: var(--text-color); font-weight: 500; word-break: break-all;">Папка не выбрана</div>
+          </div>
+
+          <input type="file" id="import-folder-input" webkitdirectory directory multiple style="display: none;">
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="import-select-folder-btn" class="btn btn-secondary" style="flex: 1;">📁 Выбрать папку</button>
+            <button id="import-clear-btn" class="btn btn-secondary" style="flex: 0 0 auto;">🗑 Очистить</button>
+          </div>
+
+          <div id="import-status" class="modal-status" style="margin-top: 15px;"></div>
+
+          <div id="import-log" class="import-log" style="display: none; margin-top: 15px; max-height: 250px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="import-run-btn" class="btn btn-primary">🚀 Начать импорт</button>
+        <button id="close-import-footer-btn" class="btn btn-secondary">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="themes-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🎨 Manage themes</h2>
+        <button class="modal-close" id="close-themes-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>System themes</h3>
+          <div class="themes-list">
+            <div class="theme-item">
+              <span>☀️ Light</span>
+              <button class="btn btn-small" onclick="applyTheme('light')">Apply</button>
             </div>
-            <div class="app-card-mock new">
-              <div class="app-icon-mock">🚀</div>
-              <div class="app-name-mock" data-i18n="ftNewApp">New App!</div>
+            <div class="theme-item">
+              <span>🌆 Cyberpunk</span>
+              <button class="btn btn-small" onclick="applyTheme('cyberpunk')">Apply</button>
+            </div>
+            <div class="theme-item">
+              <span>💬 Discord</span>
+              <button class="btn btn-small" onclick="applyTheme('discord')">Apply</button>
             </div>
           </div>
         </div>
+        <div class="step-box">
+          <h3>Custom themes</h3>
+          <div id="custom-themes-list" class="custom-themes-list"></div>
+          <button id="add-theme-btn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">➕ Add custom theme</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-themes-footer-btn" class="btn btn-secondary">Close</button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <footer>
-    <div class="container">
-      <p><strong data-i18n="footerTitle">MindToApp</strong> — <span data-i18n="footerDesc">Open Source & Free Forever</span></p>
-      <p>
-        <a href="https://github.com/e3Dr8nj/MindToApp" data-i18n="footerGithub">GitHub</a> · 
-        <a href="core/" data-i18n="footerLaunch">Launch App</a> · 
-        <a href="https://t.me/H9Skd8" data-i18n="footerTelegram">Telegram</a>
-      </p>
-      <p style="margin-top: 20px; opacity: 0.7; font-size: 0.9rem;" data-i18n="footerMade">
-        Made with 🐹 and ❤️ · 2026
-      </p>
+  <div id="add-theme-modal" class="modal">
+    <div class="modal-content modal-create">
+      <div class="modal-header">
+        <h2>➕ Add custom theme</h2>
+        <button class="modal-close" id="close-add-theme-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>1. Copy theme template</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Copy the template below and send it to AI.</p>
+          <button id="copy-theme-template-btn" class="btn btn-secondary" style="width: 100%;">📋 Copy template</button>
+        </div>
+        <div class="step-box">
+          <h3>2. Send template to AI</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 10px;">Paste the template into AI and describe what theme you want (colors, style, mood, etc.).</p>
+          <div id="theme-ai-links" class="ai-links"></div>
+        </div>
+        <div class="step-box">
+          <h3>3. Paste the result</h3>
+          <input type="text" id="theme-name-input" class="url-input" placeholder="Theme name (e.g., Green Neon)" style="margin-bottom: 10px;">
+          <textarea id="theme-css-input" class="code-input" placeholder="Paste the CSS code from AI here..." style="height: 250px;"></textarea>
+          <div id="add-theme-status" class="modal-status"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-add-theme-btn" class="btn btn-secondary">Cancel</button>
+        <button id="submit-theme-btn" class="btn btn-primary">Add theme</button>
+      </div>
     </div>
-  </footer>
+  </div>
 
-  <script>
-    const translations = {
-      en: {
-        title: "MindToApp",
-        subtitle: "Build HTML apps from AI prompts — 100% local, no backend, no subscriptions. Your code never leaves your device.",
-        launch: "🚀 Launch App",
-        github: "⭐ View on GitHub",
-        featuresTitle: "✨ Why MindToApp?",
-        f1Title: "Privacy First", f1Desc: "Everything runs locally in your browser. No servers, no tracking, no data collection.",
-        f2Title: "Instant Results", f2Desc: "Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.",
-        f3Title: "Free Forever", f3Desc: "No subscriptions, no hidden fees. Open source and free to use for everyone.",
-        f4Title: "Portable", f4Desc: "Export all your apps to a folder, share them anywhere, import them on any device.",
-        f5Title: "Beautiful Themes", f5Desc: "3 built-in themes (Light, Cyberpunk, Discord) + create your own with AI.",
-        f6Title: "PWA Ready", f6Desc: "Install as a desktop app. Works offline after first load. No app store needed.",
-        workflowTitle: "🎯 How It Works",
-        workflowSubtitle: "Three simple steps to turn your idea into a working application.",
-        w1Title: "Describe & Copy",
-        w1Desc: "Type your idea into the builder. MindToApp will generate a perfect, optimized prompt for the AI.",
-        mockIdea: '"Make a dark theme expense tracker with charts..."',
-        mockCopyBtn: "Copy Prompt",
-        w2Title: "Ask Any AI",
-        w2Desc: "Paste the prompt into ChatGPT, Claude, Qwen, or any other AI. Copy the HTML code it returns.",
-        w3Title: "Paste & Create",
-        w3Desc: "Bring the code back to MindToApp. Click 'Create', and your app is instantly installed and ready to use!",
-        mockCreateBtn: "Create App",
-        fastTrackTitle: "⚡ Lightning Fast Mode",
-        fastTrackSubtitle: "Already have the code? Skip the builder and create apps in 1 click directly from the sidebar.",
-        ftStep1Title: "1. Copy HTML Code",
-        ftStep1Desc: "Copy the complete HTML code from any AI or source to your clipboard.",
-        ftCopied: "Copied!",
-        ftStep2Title: "2. Click 'Create' in Sidebar",
-        ftStep2Desc: "Just click the 🚀 Create button in the left sidebar. The platform reads your clipboard automatically.",
-        ftStep3Title: "3. Done! App Installed",
-        ftStep3Desc: "The app is instantly parsed, saved, and appears in your 'My Apps' grid. Ready to run!",
-        ftNewApp: "New App!",
-        footerTitle: "MindToApp", footerDesc: "Open Source & Free Forever",
-        footerGithub: "GitHub", footerLaunch: "Launch App", footerTelegram: "Telegram",
-        footerMade: "Made with 🐹 and ❤️ · 2026"
-      },
-      ru: {
-        title: "MindToApp",
-        subtitle: "Создавайте HTML-приложения из AI-промптов — 100% локально, без сервера, без подписок. Ваш код не покидает устройство.",
-        launch: "🚀 Запустить",
-        github: "⭐ GitHub",
-        featuresTitle: "✨ Почему MindToApp?",
-        f1Title: "Приватность прежде всего", f1Desc: "Всё работает локально в вашем браузере. Никаких серверов, трекинга и сбора данных.",
-        f2Title: "Мгновенный результат", f2Desc: "Опишите идею, скопируйте промпт, вставьте в любой AI — получите работающее приложение за секунды.",
-        f3Title: "Бесплатно навсегда", f3Desc: "Никаких подписок и скрытых платежей. Открытый исходный код, свободное использование.",
-        f4Title: "Портативность", f4Desc: "Экспортируйте все приложения в папку, делитесь ими где угодно, импортируйте на любом устройстве.",
-        f5Title: "Красивые темы", f5Desc: "3 встроенные темы (Light, Cyberpunk, Discord) + создание своих через AI.",
-        f6Title: "Готово к PWA", f6Desc: "Устанавливается как десктопное приложение. Работает офлайн после первой загрузки.",
-        workflowTitle: "🎯 Как это работает",
-        workflowSubtitle: "Три простых шага, чтобы превратить вашу идею в работающее приложение.",
-        w1Title: "Опишите и скопируйте",
-        w1Desc: "Введите идею в конструктор. MindToApp сгенерирует идеальный, оптимизированный промпт для нейросети.",
-        mockIdea: '"Сделай трекер расходов с графиками в тёмной теме..."',
-        mockCopyBtn: "Копировать промпт",
-        w2Title: "Спросите любой AI",
-        w2Desc: "Вставьте промпт в ChatGPT, Claude, Qwen или другой AI. Скопируйте возвращённый HTML-код.",
-        w3Title: "Вставьте и создайте",
-        w3Desc: "Верните код в MindToApp. Нажмите 'Создать', и ваше приложение мгновенно установлено и готово к работе!",
-        mockCreateBtn: "Создать приложение",
-        fastTrackTitle: "⚡ Молниеносный режим",
-        fastTrackSubtitle: "Код уже есть? Пропустите конструктор и создавайте приложения в 1 клик прямо из бокового меню.",
-        ftStep1Title: "1. Скопируйте HTML-код",
-        ftStep1Desc: "Скопируйте полный HTML-код из любой нейросети или источника в буфер обмена.",
-        ftCopied: "Скопировано!",
-        ftStep2Title: "2. Нажмите 'Create' в меню",
-        ftStep2Desc: "Просто нажмите кнопку 🚀 Create в левом сайдбаре. Платформа автоматически прочитает ваш буфер.",
-        ftStep3Title: "3. Готово! Приложение установлено",
-        ftStep3Desc: "Код мгновенно обрабатывается, сохраняется и появляется в сетке 'Мои приложения'. Можно запускать!",
-        ftNewApp: "Новое!",
-        footerTitle: "MindToApp", footerDesc: "Открытый исходный код, бесплатно навсегда",
-        footerGithub: "GitHub", footerLaunch: "Запустить", footerTelegram: "Telegram",
-        footerMade: "Сделано с 🐹 и ❤️ · 2026"
-      }
-    };
+  <div id="prompts-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2>⚙️ Prompt editor</h2>
+        <button class="modal-close" id="close-prompts-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">This prompt is used when creating and editing apps. Change it to customize AI behavior.</p>
+          <textarea id="prompt-editor-textarea" class="code-input" style="height: 400px;"></textarea>
+        </div>
+        <div id="prompt-editor-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="reset-prompt-btn" class="btn btn-secondary">🔄 Reset to default</button>
+        <button id="save-prompt-btn" class="btn btn-primary">💾 Save changes</button>
+      </div>
+    </div>
+  </div>
 
-    function applyLanguage(lang) {
-      const dict = translations[lang] || translations.en;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.textContent = dict[key];
-      });
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-      });
-      document.documentElement.lang = lang;
-      localStorage.setItem('landingLang', lang);
-    }
+  <div id="ai-manager-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>🤖 AI list</h2>
+        <button class="modal-close" id="close-ai-manager-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="step-box">
+          <h3>Your AI</h3>
+          <p style="font-size: 13px; color: var(--description-color); margin-bottom: 12px;">Order in list = order in menu.</p>
+          <div id="ai-manager-list" class="ai-manager-list"></div>
+        </div>
+        <div class="step-box ai-editor-box" id="ai-editor-box" style="display: none;">
+          <h3 id="ai-editor-title">➕ New AI</h3>
+          <input type="hidden" id="ai-edit-id">
+          <label for="ai-edit-name">Name</label>
+          <input type="text" id="ai-edit-name" class="url-input" placeholder="For example: Qwen Chat">
+          <label for="ai-edit-url">URL</label>
+          <input type="url" id="ai-edit-url" class="url-input" placeholder="https://chat.qwenlm.ai">
+          <div id="ai-editor-status" class="modal-status"></div>
+          <div class="ai-editor-buttons">
+            <button id="save-ai-btn" class="btn btn-primary">💾 Save</button>
+            <button id="cancel-ai-edit-btn" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="add-ai-btn" class="btn btn-primary">➕ Add AI</button>
+        <button id="reset-ai-list-btn" class="btn btn-secondary">🔄 Reset list</button>
+        <button id="close-ai-manager-footer-btn" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
 
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => applyLanguage(btn.getAttribute('data-lang')));
-    });
+  <div id="app-info-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="app-info-title">Application</h2>
+        <button class="modal-close" id="close-app-info-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="app-info-preview">
+          <div class="app-info-icon" id="app-info-icon">📱</div>
+          <div class="app-info-details">
+            <div class="app-info-name" id="app-info-name">Name</div>
+            <div class="app-info-desc" id="app-info-desc">Description</div>
+          </div>
+        </div>
+        <div id="app-info-link-block" class="app-info-link-block" style="display: none;"></div>
+        <div id="app-info-actions" class="app-info-actions"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="close-app-info-footer-btn" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
 
-    (function initLanguage() {
-      const saved = localStorage.getItem('landingLang');
-      if (saved && translations[saved]) { applyLanguage(saved); return; }
-      applyLanguage((navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en');
-    })();
+  <div id="export-urls-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2>📤 Export URLs</h2>
+        <button class="modal-close" id="close-export-urls-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--description-color); margin-bottom: 15px;">List of apps from "My Apps" with bound links.</p>
+        <div id="export-urls-empty" class="export-urls-empty" style="display: none;">
+          <p>📭 No apps with bound links</p>
+          <p style="font-size: 14px; color: var(--description-color); margin-top: 10px;">Bind links via the "📤" button on app cards.</p>
+        </div>
+        <textarea id="export-urls-text" class="export-urls-text" readonly></textarea>
+        <div id="export-urls-status" class="modal-status"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="copy-export-urls-btn" class="btn btn-primary">📋 Copy list</button>
+        <button id="close-export-urls-footer-btn" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add('visible'), index * 150);
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15 });
-
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
-  </script>
+  <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
+  <!-- app-factory.js должен загружаться ПЕРЕД скриптами, которые используют createAppFromHtml -->
+  <script src="scripts/i18n.js"></script>
+  <script src="scripts/prompts.js"></script>
+  <script src="scripts/prompt-editor.js"></script>
+  <script src="scripts/db.js"></script>
+  <script src="scripts/state.js"></script>
+  <script src="scripts/theme.js"></script>
+  <script src="scripts/custom-themes.js"></script>
+  <script src="scripts/ai-list.js"></script>
+  <script src="scripts/registry.js"></script>
+  <script src="scripts/render.js"></script>
+  <script src="scripts/app-factory.js"></script>
+  <script src="scripts/create.js"></script>
+  <script src="scripts/edit.js"></script>
+  <script src="scripts/add.js"></script>
+  <script src="scripts/share.js"></script>
+  <script src="scripts/import.js"></script>
+  <script src="scripts/export.js"></script>
+  <script src="scripts/app-core.js"></script>
+  <script src="scripts/app-clipboard.js"></script>
+  <script src="scripts/app-builder.js"></script>
+  <script src="scripts/app-ai.js"></script>
+  <script src="scripts/app-events.js"></script>
 </body>
 </html>
