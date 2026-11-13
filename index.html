@@ -10,12 +10,20 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(-45deg, #667eea, #764ba2, #6B8DD6, #8E37D7);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
       color: #333;
       line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     
-    /* Language Switcher */
     .lang-switcher {
       position: fixed;
       top: 20px;
@@ -30,6 +38,7 @@
       gap: 4px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeInDown 0.8s ease-out;
     }
     
     .lang-btn {
@@ -41,25 +50,14 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
-      transition: all 0.2s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .lang-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
+    .lang-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.05); }
+    .lang-btn.active { background: white; color: #667eea; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     
-    .lang-btn.active {
-      background: white;
-      color: #667eea;
-    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
     
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-    
-    /* Hero Section */
     .hero {
       min-height: 100vh;
       display: flex;
@@ -70,22 +68,31 @@
       padding: 40px 20px;
     }
     
-    .hero-content h1 {
-      font-size: 3.5rem;
-      margin-bottom: 20px;
-      font-weight: 800;
-    }
-    
     .hero-content .emoji {
       font-size: 5rem;
       margin-bottom: 20px;
       display: block;
+      animation: float 3s ease-in-out infinite, fadeIn 1s ease-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .hero-content h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      font-weight: 800;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.2s forwards;
     }
     
     .hero-content p {
       font-size: 1.3rem;
       margin-bottom: 40px;
-      opacity: 0.95;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.4s forwards;
       max-width: 700px;
       margin-left: auto;
       margin-right: auto;
@@ -96,6 +103,8 @@
       gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.6s forwards;
     }
     
     .btn {
@@ -104,42 +113,23 @@
       font-size: 1.1rem;
       font-weight: 600;
       text-decoration: none;
-      transition: all 0.3s;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-block;
     }
     
-    .btn-primary {
-      background: white;
-      color: #667eea;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+    .btn-primary { background: white; color: #667eea; }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
     
     .btn-secondary {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       color: white;
-      border: 2px solid white;
+      border: 2px solid rgba(255,255,255,0.5);
+      backdrop-filter: blur(5px);
     }
+    .btn-secondary:hover { background: rgba(255,255,255,0.25); border-color: white; transform: translateY(-3px); }
     
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.3);
-    }
-    
-    /* Features Section */
-    .features {
-      background: white;
-      padding: 80px 20px;
-    }
-    
-    .features h2 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 60px;
-      color: #333;
-    }
+    .features { background: white; padding: 100px 20px; }
+    .features h2 { text-align: center; font-size: 2.5rem; margin-bottom: 60px; color: #333; }
     
     .features-grid {
       display: grid;
@@ -151,134 +141,239 @@
     
     .feature-card {
       text-align: center;
-      padding: 30px;
+      padding: 40px 30px;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: translateY(40px);
     }
+    .feature-card.visible { opacity: 1; transform: translateY(0); }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15); }
     
-    .feature-icon {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
+    .feature-icon { font-size: 3.5rem; margin-bottom: 20px; display: inline-block; transition: transform 0.3s ease; }
+    .feature-card:hover .feature-icon { transform: scale(1.15) rotate(5deg); }
+    .feature-card h3 { font-size: 1.4rem; margin-bottom: 15px; color: #667eea; }
+    .feature-card p { color: #666; font-size: 1rem; line-height: 1.6; }
     
-    .feature-card h3 {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: #667eea;
-    }
-    
-    .feature-card p {
-      color: #666;
-      font-size: 1rem;
-    }
-    
-    /* How It Works */
-    .how-it-works {
-      background: #f8f9fa;
-      padding: 80px 20px;
-    }
-    
-    .how-it-works h2 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 60px;
-      color: #333;
-    }
-    
-    .steps {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    .step {
+    .workflow-section { background: #f8f9fa; padding: 100px 20px; }
+    .workflow-section h2 { text-align: center; font-size: 2.5rem; margin-bottom: 20px; color: #333; }
+    .workflow-subtitle { text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 60px; max-width: 600px; margin: 0 auto 60px; }
+
+    .workflow-grid {
       display: flex;
-      align-items: flex-start;
-      gap: 30px;
-      margin-bottom: 40px;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
-    
-    .step-number {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      flex-shrink: 0;
+      align-items: stretch;
+      gap: 30px;
+      max-width: 1100px;
+      margin: 0 auto;
+      flex-wrap: wrap;
     }
-    
-    .step-content h3 {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
-      color: #333;
+
+    .workflow-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px 25px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+      transition: all 0.4s ease;
+      opacity: 0;
+      transform: translateY(30px);
+      display: flex;
+      flex-direction: column;
     }
-    
-    .step-content p {
-      color: #666;
+    .workflow-card.visible { opacity: 1; transform: translateY(0); }
+    .workflow-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15); }
+
+    .workflow-step-num {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 1.2rem; margin-bottom: 20px;
     }
+    .workflow-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: #333; }
+    .workflow-card p { color: #666; font-size: 0.95rem; margin-bottom: 20px; }
+
+    .mock-ui {
+      background: #1e1e2e; border-radius: 12px; padding: 15px;
+      margin-top: auto; font-family: 'Courier New', monospace;
+      font-size: 12px; color: #a6accd; position: relative; overflow: hidden;
+    }
+    .mock-ui::before {
+      content: '● ● ●'; color: #3b3b4f; font-size: 10px;
+      letter-spacing: 2px; display: block; margin-bottom: 10px;
+    }
+    .mock-textarea {
+      background: #2a2a3c; border: 1px solid #3b3b4f; border-radius: 6px;
+      padding: 10px; color: #e0e0e0; margin-bottom: 10px; min-height: 60px;
+    }
+    .mock-btn {
+      background: #667eea; color: white; border: none; padding: 8px 16px;
+      border-radius: 6px; font-size: 12px; font-weight: bold; width: 100%;
+      cursor: default; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .mock-code { color: #a6e3a1; }
+    .mock-tag { color: #f38ba8; }
+    .mock-attr { color: #89b4fa; }
     
-    /* Footer */
-    footer {
-      background: #1a1a2e;
+    .arrow-connector {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #667eea;
+      animation: pulseArrow 1.5s infinite; align-self: center;
+    }
+    @keyframes pulseArrow {
+      0%, 100% { opacity: 0.4; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(8px); }
+    }
+
+    /* ==========================================
+       НОВАЯ СЕКЦИЯ: БЫСТРОЕ СОЗДАНИЕ ЧЕРЕЗ САЙДБАР
+       ========================================== */
+    .fast-track-section {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       color: white;
+      padding: 100px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fast-track-section::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+      animation: rotateBg 20s linear infinite;
+    }
+    @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .fast-track-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
       text-align: center;
-      padding: 40px 20px;
     }
-    
-    footer p {
-      margin-bottom: 10px;
+    .fast-track-section h2 { font-size: 2.5rem; margin-bottom: 20px; }
+    .fast-track-section .subtitle { color: #a6accd; font-size: 1.1rem; margin-bottom: 60px; }
+
+    .fast-track-demo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      flex-wrap: wrap;
     }
-    
-    footer a {
-      color: #667eea;
-      text-decoration: none;
+
+    .demo-step {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      width: 280px;
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.5s ease;
     }
-    
-    footer a:hover {
-      text-decoration: underline;
+    .demo-step.visible { opacity: 1; transform: translateY(0); }
+    .demo-step h3 { font-size: 1.2rem; margin-bottom: 15px; color: #a6e3a1; }
+    .demo-step p { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 20px; }
+
+    /* Мокап буфера обмена */
+    .clipboard-mock {
+      background: #2a2a3c; border-radius: 12px; padding: 15px;
+      text-align: left; font-family: monospace; font-size: 11px; color: #a6accd;
+      border: 1px solid #3b3b4f; position: relative;
     }
+    .clipboard-mock .copy-badge {
+      position: absolute; top: -10px; right: -10px;
+      background: #a6e3a1; color: #1e1e2e; font-size: 10px; font-weight: bold;
+      padding: 4px 8px; border-radius: 20px;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate;
+    }
+    @keyframes popIn { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+    /* Мокап сайдбара */
+    .sidebar-mock {
+      width: 70px; height: 180px; background: #ffffff; border-radius: 12px;
+      margin: 0 auto; display: flex; flex-direction: column; align-items: center;
+      padding: 10px 0; gap: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .sidebar-mock-btn {
+      width: 44px; height: 44px; border-radius: 10px; background: #f1f5f9;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .sidebar-mock-btn.create {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; font-size: 12px; font-weight: bold; flex-direction: column;
+      animation: glowPulse 2s infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+    }
+
+    /* Мокап сетки приложений */
+    .app-grid-mock {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .app-card-mock {
+      background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .app-card-mock.new {
+      background: rgba(166, 227, 161, 0.2); border: 1px solid #a6e3a1;
+      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .app-icon-mock { font-size: 24px; }
+    .app-name-mock { font-size: 10px; color: #e2e8f0; font-weight: 600; }
+
+    .demo-arrow {
+      font-size: 2rem; color: #667eea;
+      animation: pulseArrow 1.5s infinite;
+    }
+    @media (max-width: 900px) {
+      .demo-arrow { transform: rotate(90deg); margin: 10px 0; animation: pulseArrowDown 1.5s infinite; }
+      @keyframes pulseArrowDown {
+        0%, 100% { opacity: 0.4; transform: rotate(90deg) translateX(0); }
+        50% { opacity: 1; transform: rotate(90deg) translateX(8px); }
+      }
+      .fast-track-demo { flex-direction: column; }
+    }
+
+    footer { background: #1a1a2e; color: white; text-align: center; padding: 60px 20px; }
+    footer p { margin-bottom: 15px; }
+    footer a { color: #8E37D7; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
+    footer a:hover { color: #a855f7; text-decoration: underline; }
     
-    /* Responsive */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    
     @media (max-width: 768px) {
-      .hero-content h1 {
-        font-size: 2.5rem;
+      .workflow-grid { flex-direction: column; align-items: center; }
+      .arrow-connector { transform: rotate(90deg); margin: 10px 0; animation: pulseArrowDown 1.5s infinite; }
+      @keyframes pulseArrowDown {
+        0%, 100% { opacity: 0.4; transform: rotate(90deg) translateX(0); }
+        50% { opacity: 1; transform: rotate(90deg) translateX(8px); }
       }
-      
-      .hero-content p {
-        font-size: 1.1rem;
-      }
-      
-      .step {
-        flex-direction: column;
-        gap: 15px;
-      }
-      
-      .lang-switcher {
-        top: 10px;
-        right: 10px;
-      }
-      
-      .lang-btn {
-        padding: 5px 10px;
-        font-size: 13px;
-      }
+      .hero-content h1 { font-size: 2.5rem; }
+      .hero-content p { font-size: 1.1rem; }
+      .lang-switcher { top: 10px; right: 10px; }
     }
   </style>
-</head>
+
+    <script type="application/json" id="manifest">{"id":"rjkasf1eMjvAb3BT4Dtl","name":"m55FzaI5UX","icon":"📱","description":"no description"}</script>
+  </head>
 <body>
-  <!-- Language Switcher -->
   <div class="lang-switcher">
     <button class="lang-btn" data-lang="en">EN</button>
     <button class="lang-btn" data-lang="ru">RU</button>
   </div>
 
-  <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
       <span class="emoji">🐹</span>
@@ -291,42 +386,36 @@
     </div>
   </section>
 
-  <!-- Features Section -->
   <section class="features">
     <div class="container">
       <h2 data-i18n="featuresTitle">✨ Why MindToApp?</h2>
       <div class="features-grid">
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">🔒</div>
           <h3 data-i18n="f1Title">Privacy First</h3>
           <p data-i18n="f1Desc">Everything runs locally in your browser. No servers, no tracking, no data collection.</p>
         </div>
-        
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">⚡</div>
           <h3 data-i18n="f2Title">Instant Results</h3>
           <p data-i18n="f2Desc">Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.</p>
         </div>
-        
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">💸</div>
           <h3 data-i18n="f3Title">Free Forever</h3>
           <p data-i18n="f3Desc">No subscriptions, no hidden fees. Open source and free to use for everyone.</p>
         </div>
-        
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">📦</div>
           <h3 data-i18n="f4Title">Portable</h3>
           <p data-i18n="f4Desc">Export all your apps to a folder, share them anywhere, import them on any device.</p>
         </div>
-        
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">🎨</div>
           <h3 data-i18n="f5Title">Beautiful Themes</h3>
           <p data-i18n="f5Desc">3 built-in themes (Light, Cyberpunk, Discord) + create your own with AI.</p>
         </div>
-        
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">📱</div>
           <h3 data-i18n="f6Title">PWA Ready</h3>
           <p data-i18n="f6Desc">Install as a desktop app. Works offline after first load. No app store needed.</p>
@@ -335,47 +424,106 @@
     </div>
   </section>
 
-  <!-- How It Works -->
-  <section class="how-it-works">
+  <section class="workflow-section">
     <div class="container">
-      <h2 data-i18n="howTitle">🎯 How It Works</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h3 data-i18n="s1Title">Describe Your Idea</h3>
-            <p data-i18n="s1Desc">Tell the AI what you want to build. Be as detailed as possible — the more context, the better the result.</p>
+      <h2 data-i18n="workflowTitle">🎯 How It Works</h2>
+      <p class="workflow-subtitle" data-i18n="workflowSubtitle">Three simple steps to turn your idea into a working application.</p>
+      
+      <div class="workflow-grid">
+        <div class="workflow-card reveal">
+          <div class="workflow-step-num">1</div>
+          <h3 data-i18n="w1Title">Describe & Copy</h3>
+          <p data-i18n="w1Desc">Type your idea into the builder. MindToApp will generate a perfect, optimized prompt for the AI.</p>
+          <div class="mock-ui">
+            <div class="mock-textarea" data-i18n="mockIdea">"Make a dark theme expense tracker with charts..."</div>
+            <div class="mock-btn">📋 <span data-i18n="mockCopyBtn">Copy Prompt</span></div>
           </div>
         </div>
-        
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h3 data-i18n="s2Title">Copy the Prompt</h3>
-            <p data-i18n="s2Desc">MindToApp generates an optimized prompt for you. Copy it with one click.</p>
+
+        <div class="arrow-connector">➜</div>
+
+        <div class="workflow-card reveal">
+          <div class="workflow-step-num">2</div>
+          <h3 data-i18n="w2Title">Ask Any AI</h3>
+          <p data-i18n="w2Desc">Paste the prompt into ChatGPT, Claude, Qwen, or any other AI. Copy the HTML code it returns.</p>
+          <div class="mock-ui">
+            <div style="margin-bottom: 8px; color: #89b4fa;">AI:</div>
+            <div><span class="mock-tag">&lt;!DOCTYPE</span> <span class="mock-attr">html</span><span class="mock-tag">&gt;</span></div>
+            <div style="padding-left: 10px;"><span class="mock-tag">&lt;html&gt;</span>...</div>
+            <div class="mock-code" style="margin-top: 5px;">// ✨ Your app code is ready!</div>
           </div>
         </div>
-        
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h3 data-i18n="s3Title">Paste into Any AI</h3>
-            <p data-i18n="s3Desc">Use ChatGPT, Claude, Qwen, or any other AI. Paste the prompt and wait for the response.</p>
-          </div>
-        </div>
-        
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <h3 data-i18n="s4Title">Get Your App</h3>
-            <p data-i18n="s4Desc">Copy the HTML code from the AI response, paste it back into MindToApp, and your app is ready!</p>
+
+        <div class="arrow-connector">➜</div>
+
+        <div class="workflow-card reveal">
+          <div class="workflow-step-num">3</div>
+          <h3 data-i18n="w3Title">Paste & Create</h3>
+          <p data-i18n="w3Desc">Bring the code back to MindToApp. Click "Create", and your app is instantly installed and ready to use!</p>
+          <div class="mock-ui">
+            <div class="mock-textarea" style="color: #a6e3a1;">&lt;!DOCTYPE html&gt;&lt;html&gt;...&lt;/html&gt;</div>
+            <div class="mock-btn" style="background: #a6e3a1; color: #1e1e2e;">🚀 <span data-i18n="mockCreateBtn">Create App</span></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- НОВАЯ СЕКЦИЯ: БЫСТРОЕ СОЗДАНИЕ ЧЕРЕЗ БОКОВОЕ МЕНЮ -->
+  <section class="fast-track-section">
+    <div class="fast-track-container">
+      <h2 data-i18n="fastTrackTitle">⚡ Lightning Fast Mode</h2>
+      <p class="subtitle" data-i18n="fastTrackSubtitle">Already have the code? Skip the builder and create apps in 1 click directly from the sidebar.</p>
+      
+      <div class="fast-track-demo">
+        <!-- Шаг 1: Буфер -->
+        <div class="demo-step reveal">
+          <h3 data-i18n="ftStep1Title">1. Copy HTML Code</h3>
+          <p data-i18n="ftStep1Desc">Copy the complete HTML code from any AI or source to your clipboard.</p>
+          <div class="clipboard-mock">
+            <div class="copy-badge" data-i18n="ftCopied">Copied!</div>
+            <div>&lt;!DOCTYPE html&gt;</div>
+            <div>&lt;html&gt;</div>
+            <div style="padding-left: 10px; color: #89b4fa;">&lt;head&gt;...&lt;/head&gt;</div>
+            <div style="padding-left: 10px; color: #a6e3a1;">&lt;body&gt;...&lt;/body&gt;</div>
+            <div>&lt;/html&gt;</div>
+          </div>
+        </div>
+
+        <div class="demo-arrow">➜</div>
+
+        <!-- Шаг 2: Сайдбар -->
+        <div class="demo-step reveal">
+          <h3 data-i18n="ftStep2Title">2. Click "Create" in Sidebar</h3>
+          <p data-i18n="ftStep2Desc">Just click the 🚀 Create button in the left sidebar. The platform reads your clipboard automatically.</p>
+          <div class="sidebar-mock">
+            <div class="sidebar-mock-btn">📋</div>
+            <div class="sidebar-mock-btn">🤖</div>
+            <div class="sidebar-mock-btn create">🚀<br>Create</div>
+          </div>
+        </div>
+
+        <div class="demo-arrow">➜</div>
+
+        <!-- Шаг 3: Результат -->
+        <div class="demo-step reveal">
+          <h3 data-i18n="ftStep3Title">3. Done! App Installed</h3>
+          <p data-i18n="ftStep3Desc">The app is instantly parsed, saved, and appears in your "My Apps" grid. Ready to run!</p>
+          <div class="app-grid-mock">
+            <div class="app-card-mock">
+              <div class="app-icon-mock">🧮</div>
+              <div class="app-name-mock">Calc</div>
+            </div>
+            <div class="app-card-mock new">
+              <div class="app-icon-mock">🚀</div>
+              <div class="app-name-mock" data-i18n="ftNewApp">New App!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer>
     <div class="container">
       <p><strong data-i18n="footerTitle">MindToApp</strong> — <span data-i18n="footerDesc">Open Source & Free Forever</span></p>
@@ -391,7 +539,6 @@
   </footer>
 
   <script>
-    // Переводы
     const translations = {
       en: {
         title: "MindToApp",
@@ -399,32 +546,35 @@
         launch: "🚀 Launch App",
         github: "⭐ View on GitHub",
         featuresTitle: "✨ Why MindToApp?",
-        f1Title: "Privacy First",
-        f1Desc: "Everything runs locally in your browser. No servers, no tracking, no data collection.",
-        f2Title: "Instant Results",
-        f2Desc: "Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.",
-        f3Title: "Free Forever",
-        f3Desc: "No subscriptions, no hidden fees. Open source and free to use for everyone.",
-        f4Title: "Portable",
-        f4Desc: "Export all your apps to a folder, share them anywhere, import them on any device.",
-        f5Title: "Beautiful Themes",
-        f5Desc: "3 built-in themes (Light, Cyberpunk, Discord) + create your own with AI.",
-        f6Title: "PWA Ready",
-        f6Desc: "Install as a desktop app. Works offline after first load. No app store needed.",
-        howTitle: "🎯 How It Works",
-        s1Title: "Describe Your Idea",
-        s1Desc: "Tell the AI what you want to build. Be as detailed as possible — the more context, the better the result.",
-        s2Title: "Copy the Prompt",
-        s2Desc: "MindToApp generates an optimized prompt for you. Copy it with one click.",
-        s3Title: "Paste into Any AI",
-        s3Desc: "Use ChatGPT, Claude, Qwen, or any other AI. Paste the prompt and wait for the response.",
-        s4Title: "Get Your App",
-        s4Desc: "Copy the HTML code from the AI response, paste it back into MindToApp, and your app is ready!",
-        footerTitle: "MindToApp",
-        footerDesc: "Open Source & Free Forever",
-        footerGithub: "GitHub",
-        footerLaunch: "Launch App",
-        footerTelegram: "Telegram",
+        f1Title: "Privacy First", f1Desc: "Everything runs locally in your browser. No servers, no tracking, no data collection.",
+        f2Title: "Instant Results", f2Desc: "Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.",
+        f3Title: "Free Forever", f3Desc: "No subscriptions, no hidden fees. Open source and free to use for everyone.",
+        f4Title: "Portable", f4Desc: "Export all your apps to a folder, share them anywhere, import them on any device.",
+        f5Title: "Beautiful Themes", f5Desc: "3 built-in themes (Light, Cyberpunk, Discord) + create your own with AI.",
+        f6Title: "PWA Ready", f6Desc: "Install as a desktop app. Works offline after first load. No app store needed.",
+        workflowTitle: "🎯 How It Works",
+        workflowSubtitle: "Three simple steps to turn your idea into a working application.",
+        w1Title: "Describe & Copy",
+        w1Desc: "Type your idea into the builder. MindToApp will generate a perfect, optimized prompt for the AI.",
+        mockIdea: '"Make a dark theme expense tracker with charts..."',
+        mockCopyBtn: "Copy Prompt",
+        w2Title: "Ask Any AI",
+        w2Desc: "Paste the prompt into ChatGPT, Claude, Qwen, or any other AI. Copy the HTML code it returns.",
+        w3Title: "Paste & Create",
+        w3Desc: "Bring the code back to MindToApp. Click 'Create', and your app is instantly installed and ready to use!",
+        mockCreateBtn: "Create App",
+        fastTrackTitle: "⚡ Lightning Fast Mode",
+        fastTrackSubtitle: "Already have the code? Skip the builder and create apps in 1 click directly from the sidebar.",
+        ftStep1Title: "1. Copy HTML Code",
+        ftStep1Desc: "Copy the complete HTML code from any AI or source to your clipboard.",
+        ftCopied: "Copied!",
+        ftStep2Title: "2. Click 'Create' in Sidebar",
+        ftStep2Desc: "Just click the 🚀 Create button in the left sidebar. The platform reads your clipboard automatically.",
+        ftStep3Title: "3. Done! App Installed",
+        ftStep3Desc: "The app is instantly parsed, saved, and appears in your 'My Apps' grid. Ready to run!",
+        ftNewApp: "New App!",
+        footerTitle: "MindToApp", footerDesc: "Open Source & Free Forever",
+        footerGithub: "GitHub", footerLaunch: "Launch App", footerTelegram: "Telegram",
         footerMade: "Made with 🐹 and ❤️ · 2026"
       },
       ru: {
@@ -433,81 +583,74 @@
         launch: "🚀 Запустить",
         github: "⭐ GitHub",
         featuresTitle: "✨ Почему MindToApp?",
-        f1Title: "Приватность прежде всего",
-        f1Desc: "Всё работает локально в вашем браузере. Никаких серверов, трекинга и сбора данных.",
-        f2Title: "Мгновенный результат",
-        f2Desc: "Опишите идею, скопируйте промпт, вставьте в любой AI — получите работающее приложение за секунды.",
-        f3Title: "Бесплатно навсегда",
-        f3Desc: "Никаких подписок и скрытых платежей. Открытый исходный код, свободное использование.",
-        f4Title: "Портативность",
-        f4Desc: "Экспортируйте все приложения в папку, делитесь ими где угодно, импортируйте на любом устройстве.",
-        f5Title: "Красивые темы",
-        f5Desc: "3 встроенные темы (Light, Cyberpunk, Discord) + создание своих через AI.",
-        f6Title: "Готово к PWA",
-        f6Desc: "Устанавливается как десктопное приложение. Работает офлайн после первой загрузки.",
-        howTitle: "🎯 Как это работает",
-        s1Title: "Опишите идею",
-        s1Desc: "Расскажите AI, что хотите создать. Чем больше деталей — тем лучше результат.",
-        s2Title: "Скопируйте промпт",
-        s2Desc: "MindToApp сгенерирует оптимизированный промпт. Скопируйте его одним кликом.",
-        s3Title: "Вставьте в любой AI",
-        s3Desc: "Используйте ChatGPT, Claude, Qwen или любой другой AI. Вставьте промпт и дождитесь ответа.",
-        s4Title: "Получите приложение",
-        s4Desc: "Скопируйте HTML-код из ответа AI, вставьте обратно в MindToApp — и ваше приложение готово!",
-        footerTitle: "MindToApp",
-        footerDesc: "Открытый исходный код, бесплатно навсегда",
-        footerGithub: "GitHub",
-        footerLaunch: "Запустить",
-        footerTelegram: "Telegram",
+        f1Title: "Приватность прежде всего", f1Desc: "Всё работает локально в вашем браузере. Никаких серверов, трекинга и сбора данных.",
+        f2Title: "Мгновенный результат", f2Desc: "Опишите идею, скопируйте промпт, вставьте в любой AI — получите работающее приложение за секунды.",
+        f3Title: "Бесплатно навсегда", f3Desc: "Никаких подписок и скрытых платежей. Открытый исходный код, свободное использование.",
+        f4Title: "Портативность", f4Desc: "Экспортируйте все приложения в папку, делитесь ими где угодно, импортируйте на любом устройстве.",
+        f5Title: "Красивые темы", f5Desc: "3 встроенные темы (Light, Cyberpunk, Discord) + создание своих через AI.",
+        f6Title: "Готово к PWA", f6Desc: "Устанавливается как десктопное приложение. Работает офлайн после первой загрузки.",
+        workflowTitle: "🎯 Как это работает",
+        workflowSubtitle: "Три простых шага, чтобы превратить вашу идею в работающее приложение.",
+        w1Title: "Опишите и скопируйте",
+        w1Desc: "Введите идею в конструктор. MindToApp сгенерирует идеальный, оптимизированный промпт для нейросети.",
+        mockIdea: '"Сделай трекер расходов с графиками в тёмной теме..."',
+        mockCopyBtn: "Копировать промпт",
+        w2Title: "Спросите любой AI",
+        w2Desc: "Вставьте промпт в ChatGPT, Claude, Qwen или другой AI. Скопируйте возвращённый HTML-код.",
+        w3Title: "Вставьте и создайте",
+        w3Desc: "Верните код в MindToApp. Нажмите 'Создать', и ваше приложение мгновенно установлено и готово к работе!",
+        mockCreateBtn: "Создать приложение",
+        fastTrackTitle: "⚡ Молниеносный режим",
+        fastTrackSubtitle: "Код уже есть? Пропустите конструктор и создавайте приложения в 1 клик прямо из бокового меню.",
+        ftStep1Title: "1. Скопируйте HTML-код",
+        ftStep1Desc: "Скопируйте полный HTML-код из любой нейросети или источника в буфер обмена.",
+        ftCopied: "Скопировано!",
+        ftStep2Title: "2. Нажмите 'Create' в меню",
+        ftStep2Desc: "Просто нажмите кнопку 🚀 Create в левом сайдбаре. Платформа автоматически прочитает ваш буфер.",
+        ftStep3Title: "3. Готово! Приложение установлено",
+        ftStep3Desc: "Код мгновенно обрабатывается, сохраняется и появляется в сетке 'Мои приложения'. Можно запускать!",
+        ftNewApp: "Новое!",
+        footerTitle: "MindToApp", footerDesc: "Открытый исходный код, бесплатно навсегда",
+        footerGithub: "GitHub", footerLaunch: "Запустить", footerTelegram: "Telegram",
         footerMade: "Сделано с 🐹 и ❤️ · 2026"
       }
     };
 
-    // Применение языка
     function applyLanguage(lang) {
       const dict = translations[lang] || translations.en;
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
-        if (dict[key]) {
-          el.textContent = dict[key];
-        }
+        if (dict[key]) el.textContent = dict[key];
       });
-      
-      // Обновляем активную кнопку
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
       });
-      
-      // Меняем lang у html
       document.documentElement.lang = lang;
-      
-      // Сохраняем выбор
       localStorage.setItem('landingLang', lang);
     }
 
-    // Обработчики кнопок
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        applyLanguage(btn.getAttribute('data-lang'));
-      });
+      btn.addEventListener('click', () => applyLanguage(btn.getAttribute('data-lang')));
     });
 
-    // Определяем язык при загрузке
     (function initLanguage() {
-      // Приоритет: сохранённый выбор → язык браузера → английский
       const saved = localStorage.getItem('landingLang');
-      if (saved && translations[saved]) {
-        applyLanguage(saved);
-        return;
-      }
-      
-      const browserLang = (navigator.language || 'en').toLowerCase();
-      if (browserLang.startsWith('ru')) {
-        applyLanguage('ru');
-      } else {
-        applyLanguage('en');
-      }
+      if (saved && translations[saved]) { applyLanguage(saved); return; }
+      applyLanguage((navigator.language || 'en').toLowerCase().startsWith('ru') ? 'ru' : 'en');
     })();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('visible'), index * 150);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    });
   </script>
 </body>
 </html>
