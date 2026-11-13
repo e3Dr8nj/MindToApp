@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindToApp — Build HTML Apps from AI Prompts</title>
+  <meta name="description" content="A local-first PWA platform to create, manage and run HTML apps using AI. No backend, no subscriptions.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#2d2d3a;line-height:1.6}
+    .container{max-width:1100px;margin:0 auto;padding:0 20px}
+
+    .lang-toggle{position:fixed;top:16px;right:16px;z-index:100;padding:8px 16px;border:2px solid rgba(255,255,255,.6);border-radius:10px;background:rgba(255,255,255,.15);color:#fff;font-size:14px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);transition:all .2s}
+    .lang-toggle:hover{background:rgba(255,255,255,.3)}
+
+    .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:60px 20px}
+    .hero .emoji{font-size:5rem;display:block;margin-bottom:10px}
+    .hero h1{font-size:3.5rem;font-weight:800;margin-bottom:16px}
+    .hero p{font-size:1.25rem;max-width:680px;margin:0 auto 36px;opacity:.95}
+    .cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+    .btn{padding:16px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .25s;display:inline-block}
+    .btn-primary{background:#fff;color:#667eea}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .btn-secondary{background:rgba(255,255,255,.15);color:#fff;border:2px solid #fff}
+    .btn-secondary:hover{background:rgba(255,255,255,.3)}
+
+    section.block{padding:80px 20px}
+    section.block h2{text-align:center;font-size:2.3rem;margin-bottom:50px}
+    .features{background:#fff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:32px}
+    .card{text-align:center;padding:24px}
+    .card .icon{font-size:2.8rem;margin-bottom:14px}
+    .card h3{font-size:1.3rem;color:#667eea;margin-bottom:10px}
+    .card p{color:#666}
+
+    .how{background:#f6f7fb}
+    .steps{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+    .step{display:flex;gap:24px;align-items:flex-start;background:#fff;padding:26px;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+    .num{width:46px;height:46px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700}
+    .step h3{font-size:1.2rem;margin-bottom:6px}
+    .step p{color:#666}
+
+    footer{background:#1a1a2e;color:#fff;text-align:center;padding:44px 20px}
+    footer a{color:#8b9bff;text-decoration:none}
+    footer a:hover{text-decoration:underline}
+    footer .links{margin:12px 0}
+    footer .made{margin-top:18px;opacity:.65;font-size:.9rem}
+
+    @media(max-width:768px){
+      .hero h1{font-size:2.4rem}
+      .hero p{font-size:1.05rem}
+      section.block h2{font-size:1.8rem}
+      .step{flex-direction:column;gap:14px}
+    }
+  </style>
+</head>
+<body>
+  <button id="lang-toggle" class="lang-toggle">RU</button>
+
+  <section class="hero">
+    <div>
+      <span class="emoji">🐹</span>
+      <h1>MindToApp</h1>
+      <p data-i18n="heroText"></p>
+      <div class="cta">
+        <a href="core/" class="btn btn-primary" data-i18n="launch"></a>
+        <a href="https://github.com/твой-ник/ai-apps-platform" class="btn btn-secondary" data-i18n="github"></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block features">
+    <div class="container">
+      <h2 data-i18n="whyTitle"></h2>
+      <div class="grid">
+        <div class="card"><div class="icon">🔒</div><h3 data-i18n="f1t"></h3><p data-i18n="f1d"></p></div>
+        <div class="card"><div class="icon">⚡</div><h3 data-i18n="f2t"></h3><p data-i18n="f2d"></p></div>
+        <div class="card"><div class="icon">💸</div><h3 data-i18n="f3t"></h3><p data-i18n="f3d"></p></div>
+        <div class="card"><div class="icon">📦</div><h3 data-i18n="f4t"></h3><p data-i18n="f4d"></p></div>
+        <div class="card"><div class="icon">🎨</div><h3 data-i18n="f5t"></h3><p data-i18n="f5d"></p></div>
+        <div class="card"><div class="icon">📱</div><h3 data-i18n="f6t"></h3><p data-i18n="f6d"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block how">
+    <div class="container">
+      <h2 data-i18n="howTitle"></h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div><h3 data-i18n="s1t"></h3><p data-i18n="s1d"></p></div></div>
+        <div class="step"><div class="num">2</div><div><h3 data-i18n="s2t"></h3><p data-i18n="s2d"></p></div></div>
+        <div class="step"><div class="num">3</div><div><h3 data-i18n="s3t"></h3><p data-i18n="s3d"></p></div></div>
+        <div class="step"><div class="num">4</div><div><h3 data-i18n="s4t"></h3><p data-i18n="s4d"></p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><strong>MindToApp</strong> — <span data-i18n="footerTag"></span></p>
+      <p class="links">
+        <a href="https://github.com/твой-ник/ai-apps-platform">GitHub</a> ·
+        <a href="core/" data-i18n="launchShort"></a> ·
+        <a href="https://t.me/твой_ник">Telegram</a>
+      </p>
+      <p class="made" data-i18n="made"></p>
+    </div>
+  </footer>
+
+  <script>
+    const translations = {
+      en: {
+        heroText: "Build HTML apps from AI prompts — 100% local, no backend, no subscriptions. Your code never leaves your device.",
+        launch: "🚀 Launch App",
+        launchShort: "Launch App",
+        github: "⭐ View on GitHub",
+        whyTitle: "✨ Why MindToApp?",
+        f1t: "Privacy First", f1d: "Everything runs locally in your browser. No servers, no tracking, no data collection.",
+        f2t: "Instant Results", f2d: "Describe your idea, copy the prompt, paste it into any AI, and get a working app in seconds.",
+        f3t: "Free Forever", f3d: "No subscriptions, no hidden fees. Open source and free for everyone.",
+        f4t: "Portable", f4d: "Export all your apps to a folder, share them anywhere, import them on any device.",
+        f5t: "Beautiful Themes", f5d: "3 built-in themes (Light, Cyberpunk, Discord) plus create your own with AI.",
+        f6t: "PWA Ready", f6d: "Install as a desktop app. Works offline after first load. No app store needed.",
+        howTitle: "🎯 How It Works",
+        s1t: "Describe Your Idea", s1d: "Tell the AI what you want to build. The more details you give, the better the result.",
+        s2t: "Copy the Prompt", s2d: "MindToApp generates an optimized prompt for you. Copy it with one click.",
+        s3t: "Paste into Any AI", s3d: "Use ChatGPT, Claude, Qwen or any other AI. Paste the prompt and wait for the response.",
+        s4t: "Get Your App", s4d: "Copy the HTML code from the AI response, paste it back into MindToApp — your app is ready!",
+        footerTag: "Open Source & Free Forever",
+        made: "Made with 🐹 and ❤️ · 2026"
+      },
+      ru: {
+        heroText: "Создавай HTML-приложения из промптов для нейросетей — полностью локально, без серверов и подписок. Твой код не покидает устройство.",
+        launch: "🚀 Открыть платформу",
+        launchShort: "Открыть платформу",
+        github: "⭐ Смотреть на GitHub",
+        whyTitle: "✨ Почему MindToApp?",
+        f1t: "Приватность", f1d: "Всё работает локально в браузере. Никаких серверов, отслеживания и сбора данных.",
+        f2t: "Мгновенный результат", f2d: "Опиши идею, скопируй промпт, вставь в любую нейросеть — и получи готовое приложение за секунды.",
+        f3t: "Бесплатно навсегда", f3d: "Без подписок и скрытых платежей. Открытый исходный код, бесплатно для всех.",
+        f4t: "Переносимость", f4d: "Экспортируй все приложения в папку, делись ими и импортируй на любом устройстве.",
+        f5t: "Красивые темы", f5d: "3 встроенные темы (Light, Cyberpunk, Discord) и создание своих через AI.",
+        f6t: "PWA", f6d: "Устанавливается как приложение на рабочий стол. Работает офлайн после первой загрузки.",
+        howTitle: "🎯 Как это работает",
+        s1t: "Опиши идею", s1d: "Расскажи, какое приложение хочешь создать. Чем больше деталей — тем лучше результат.",
+        s2t: "Скопируй промпт", s2d: "MindToApp соберёт оптимизированный промпт. Копирование в один клик.",
+        s3t: "Вставь в нейросеть", s3d: "Подойдёт ChatGPT, Claude, Qwen или любая другая. Вставь промпт и дождись ответа.",
+        s4t: "Получи приложение", s4d: "Скопируй HTML-код из ответа, вставь обратно в MindToApp — приложение готово!",
+        footerTag: "Открытый код, бесплатно навсегда",
+        made: "Сделано с 🐹 и ❤️ · 2026"
+      }
+    };
+
+    const langBtn = document.getElementById('lang-toggle');
+
+    function applyLanguage(lang) {
+      const dict = translations[lang] || translations.en;
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key]) el.textContent = dict[key];
+      });
+      langBtn.textContent = lang === 'ru' ? 'EN' : 'RU';
+      localStorage.setItem('language', lang);
+    }
+
+    langBtn.addEventListener('click', () => {
+      const current = localStorage.getItem('language') || 'en';
+      applyLanguage(current === 'ru' ? 'en' : 'ru');
+    });
+
+    const saved = localStorage.getItem('language');
+    const detected = navigator.language && navigator.language.toLowerCase().startsWith('ru') ? 'ru' : 'en';
+    applyLanguage(saved || detected);
+  </script>
+</body>
+</html>
