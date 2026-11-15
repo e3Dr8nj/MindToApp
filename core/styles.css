@@ -2063,3 +2063,27 @@ h1 {
   box-shadow: 0 6px 12px var(--card-shadow-hover);
   border-color: var(--accent-color);
 }
+
+/* Кликабельные ссылки в описании модалки "Информация" */
+.app-info-desc-link {
+  color: var(--ai-link-color, #667eea);
+  background: var(--ai-link-bg, rgba(102, 126, 234, 0.1));
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  word-break: break-all;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.app-info-desc-link:hover {
+  background: var(--ai-link-hover-bg, rgba(102, 126, 234, 0.2));
+  color: var(--ai-link-hover-color, #5568d3);
+  border-color: var(--ai-link-hover-bg, rgba(102, 126, 234, 0.2));
+  text-decoration-style: solid;
+}
