@@ -2034,3 +2034,43 @@ h1 {
 .sidebar-export-btn:hover {
   background: var(--btn-primary-hover-bg);
 }
+
+/* ==========================================
+// СТИЛИ ДЛЯ ОПИСАНИЯ В КАРТОЧКЕ ПРИЛОЖЕНИЯ (STORE)
+// ========================================== */
+
+.app-card-desc {
+  font-size: 12px;
+  color: var(--description-color);
+  line-height: 1.4;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  text-align: center;
+  
+  /* Ограничение до 3 строк с многоточием (как в Chrome Web Store) */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  /* Растягивает блок, чтобы кнопка "Установить" всегда была прижата к низу карточки */
+  flex-grow: 1;
+}
+
+/* Курсор-указатель для карточек в складе, чтобы было понятно, что они кликабельны */
+.app-card-store {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.app-card-store:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px var(--card-shadow-hover);
+  border-color: var(--accent-color);
+}
+
+/* Убираем стандартный hover-эффект поднятия для кнопки внутри, чтобы не конфликтовал */
+.app-card-store .app-card-install-btn:hover {
+  transform: translateY(0);
+}

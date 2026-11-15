@@ -65,6 +65,15 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
+  // === ПРАВКА 1: Добавляем краткое описание ===
+  if (app.description && app.description !== 'no description') {
+    const desc = document.createElement('div');
+    desc.className = 'app-card-desc';
+    desc.textContent = app.description;
+    card.appendChild(desc);
+  }
+  // ============================================
+
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
     settingsBadge.className = 'app-card-settings-badge';
@@ -96,9 +105,20 @@ function createAppCard(app, isInstalled) {
     card.appendChild(installBtn);
   }
 
-  card.addEventListener('click', () => {
-    openApp(app);
+  // === ПРАВКА 2: Меняем логику клика по карточке ===
+  card.addEventListener('click', (e) => {
+    if (!isInstalled) {
+      // В СКЛАДЕ: открываем внешнюю ссылку, если она есть. Иначе ничего не делаем.
+      const linkedUrl = app.url || (typeof getAppUrl === 'function' ? getAppUrl(app.id) : null);
+      if (linkedUrl) {
+        window.open(linkedUrl, '_blank', 'noopener,noreferrer');
+      }
+    } else {
+      // УСТАНОВЛЕННОЕ: открываем приложение как обычно
+      openApp(app);
+    }
   });
+  // ================================================
 
   return card;
 }
