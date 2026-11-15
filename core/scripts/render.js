@@ -65,14 +65,14 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
-  // === ПРАВКА 1: Добавляем краткое описание ===
+  // === ДОБАВЛЕНО: краткое описание для склада ===
   if (app.description && app.description !== 'no description') {
     const desc = document.createElement('div');
     desc.className = 'app-card-desc';
     desc.textContent = app.description;
     card.appendChild(desc);
   }
-  // ============================================
+  // ==============================================
 
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
@@ -99,27 +99,29 @@ function createAppCard(app, isInstalled) {
     installBtn.className = 'app-card-install-btn';
     installBtn.textContent = t('install');
     installBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Чтобы клик по кнопке не открывал ссылку
+      e.stopPropagation();
       installApp(app);
     });
     card.appendChild(installBtn);
   }
 
-  // === ПРАВКА 2: Меняем логику клика по карточке ===
+  // === ИЗМЕНЕНО: ссылка берётся из description ===
   card.addEventListener('click', (e) => {
     if (!isInstalled) {
-      // В СКЛАДЕ: если есть привязанная ссылка, открываем её ВНУТРИ платформы
-      const linkedUrl = app.url || (typeof getAppUrl === 'function' ? getAppUrl(app.id) : null);
+      // В СКЛАДЕ: ищем первую ссылку в description и открываем её ВНУТРИ платформы
+      const desc = app.description || '';
+      const urlMatch = desc.match(/https?:\/\/[^\s<>"']+/);
+      const linkedUrl = urlMatch ? urlMatch[0] : null;
       if (linkedUrl) {
         openApp({ ...app, url: linkedUrl });
       }
-      // Если ссылки нет, ничего не происходит
+      // Если ссылки в description нет — ничего не происходит
     } else {
       // УСТАНОВЛЕННОЕ: открываем приложение как обычно
       openApp(app);
     }
   });
-  // ================================================
+  // ==============================================
 
   return card;
 }
