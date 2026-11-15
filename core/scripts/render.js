@@ -450,7 +450,30 @@ function showAppInfo(app) {
 
   if (iconEl) iconEl.textContent = app.icon;
   if (nameEl) nameEl.textContent = app.name;
-  if (descEl) descEl.textContent = app.description || t('noDescription');
+
+  // === ИЗМЕНЕНО: описание с кликабельными ссылками внутри платформы ===
+  if (descEl) {
+    const rawDesc = app.description || t('noDescription');
+    // Превращаем ссылки в кликабельные элементы, которые открываются ВНУТРИ платформы
+    const descWithLinks = rawDesc.replace(
+      /(https?:\/\/[^\s<>"']+)/g,
+      '<a href="#" class="app-info-desc-link" data-url="$1">$1</a>'
+    );
+    descEl.innerHTML = descWithLinks;
+
+    // Обработчики кликов по ссылкам в описании
+    descEl.querySelectorAll('.app-info-desc-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = link.getAttribute('data-url');
+        if (url) {
+          closeAppInfoModal();
+          openApp({ name: app.name, icon: app.icon, url: url });
+        }
+      });
+    });
+  }
+  // ===================================================================
 
   if (linkBlock) {
     const linkedUrl = typeof getAppUrl === 'function' ? getAppUrl(app.id) : null;
