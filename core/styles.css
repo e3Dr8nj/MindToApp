@@ -2087,3 +2087,35 @@ h1 {
   border-color: var(--ai-link-hover-bg, rgba(102, 126, 234, 0.2));
   text-decoration-style: solid;
 }
+/* Кнопка ℹ️ в правом нижнем углу карточки (если в description есть ссылка) */
+.app-card-info-btn {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent-color, #667eea);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+}
+
+.app-card-info-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Карточка должна быть relative, чтобы кнопка позиционировалась относительно неё */
+.app-card {
+  position: relative;
+}

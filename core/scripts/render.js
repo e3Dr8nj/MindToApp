@@ -96,23 +96,27 @@ function createAppCard(app, isInstalled) {
     card.appendChild(installBtn);
   }
 
-  // === ЛОГИКА КЛИКА ПО КАРТОЧКЕ ===
-  card.addEventListener('click', (e) => {
-    // Ищем ссылку в description
-    const desc = app.description || '';
-    const urlMatch = desc.match(/https?:\/\/[^\s<>"']+/);
-    const linkedUrl = urlMatch ? urlMatch[0] : null;
-    
-    if (linkedUrl) {
-      // Если есть ссылка в description — открываем её ВНУТРИ платформы (для всех карточек)
-      openApp({ ...app, url: linkedUrl });
-    } else if (isInstalled) {
-      // Если ссылки нет и приложение установлено — открываем приложение как обычно
+  // === КНОПКА ℹ️ В ПРАВОМ НИЖНЕМ УГЛУ (если в description есть ссылка) ===
+  const desc = app.description || '';
+  const urlMatch = desc.match(/https?:\/\/[^\s<>"']+/);
+  if (urlMatch) {
+    const infoBtn = document.createElement('button');
+    infoBtn.className = 'app-card-info-btn';
+    infoBtn.textContent = 'ℹ️';
+    infoBtn.title = 'Open link';
+    infoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openApp({ name: app.name, icon: app.icon, url: urlMatch[0] });
+    });
+    card.appendChild(infoBtn);
+  }
+  // ======================================================================
+
+  card.addEventListener('click', () => {
+    if (isInstalled) {
       openApp(app);
     }
-    // Если ссылки нет и приложение не установлено (склад) — ничего не происходит
   });
-  // =================================
 
   return card;
 }
