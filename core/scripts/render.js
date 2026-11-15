@@ -99,7 +99,7 @@ function createAppCard(app, isInstalled) {
     installBtn.className = 'app-card-install-btn';
     installBtn.textContent = t('install');
     installBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+      e.stopPropagation(); // Чтобы клик по кнопке не открывал ссылку
       installApp(app);
     });
     card.appendChild(installBtn);
@@ -108,11 +108,12 @@ function createAppCard(app, isInstalled) {
   // === ПРАВКА 2: Меняем логику клика по карточке ===
   card.addEventListener('click', (e) => {
     if (!isInstalled) {
-      // В СКЛАДЕ: открываем внешнюю ссылку, если она есть. Иначе ничего не делаем.
+      // В СКЛАДЕ: если есть привязанная ссылка, открываем её ВНУТРИ платформы
       const linkedUrl = app.url || (typeof getAppUrl === 'function' ? getAppUrl(app.id) : null);
       if (linkedUrl) {
-        window.open(linkedUrl, '_blank', 'noopener,noreferrer');
+        openApp({ ...app, url: linkedUrl });
       }
+      // Если ссылки нет, ничего не происходит
     } else {
       // УСТАНОВЛЕННОЕ: открываем приложение как обычно
       openApp(app);
