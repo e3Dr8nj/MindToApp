@@ -2088,10 +2088,14 @@ h1 {
   text-decoration-style: solid;
 }
 /* Кнопка ℹ️ в правом нижнем углу карточки (если в description есть ссылка) */
+/* Карточка должна быть relative, чтобы кнопки позиционировались относительно неё */
+.app-card {
+  position: relative;
+}
+
+/* Базовый стиль кнопки ℹ️ */
 .app-card-info-btn {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -2115,7 +2119,14 @@ h1 {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-/* Карточка должна быть relative, чтобы кнопка позиционировалась относительно неё */
-.app-card {
-  position: relative;
+/* Если есть скрепка 🔗 — кнопка ℹ️ ПОД ней (справа сверху) */
+.app-card-info-btn-below-link {
+  top: 44px;
+  right: 8px;
+}
+
+/* Если скрепки нет — кнопка ℹ️ в ЛЕВОМ верхнем углу */
+.app-card-info-btn-top-left {
+  top: 8px;
+  left: 8px;
 }

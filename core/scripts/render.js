@@ -65,6 +65,9 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
+  // Определяем, будет ли значок 🔗 (скрепка)
+  const hasLinkBadge = isInstalled && typeof getAppUrl === 'function' && getAppUrl(app.id);
+
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
     settingsBadge.className = 'app-card-settings-badge';
@@ -77,7 +80,7 @@ function createAppCard(app, isInstalled) {
     card.appendChild(settingsBadge);
   }
 
-  if (isInstalled && typeof getAppUrl === 'function' && getAppUrl(app.id)) {
+  if (hasLinkBadge) {
     const linkBadge = document.createElement('div');
     linkBadge.className = 'app-card-link-badge';
     linkBadge.textContent = '🔗';
@@ -96,12 +99,19 @@ function createAppCard(app, isInstalled) {
     card.appendChild(installBtn);
   }
 
-  // === КНОПКА ℹ️ В ПРАВОМ НИЖНЕМ УГЛУ (если в description есть ссылка) ===
+  // === КНОПКА ℹ️ (если в description есть ссылка) ===
+  // Если есть скрепка 🔗 — кнопка ℹ️ ПОД ней (справа сверху)
+  // Если скрепки нет — кнопка ℹ️ в ЛЕВОМ верхнем углу
   const desc = app.description || '';
   const urlMatch = desc.match(/https?:\/\/[^\s<>"']+/);
   if (urlMatch) {
     const infoBtn = document.createElement('button');
     infoBtn.className = 'app-card-info-btn';
+    if (hasLinkBadge) {
+      infoBtn.classList.add('app-card-info-btn-below-link');
+    } else {
+      infoBtn.classList.add('app-card-info-btn-top-left');
+    }
     infoBtn.textContent = 'ℹ️';
     infoBtn.title = 'Open link';
     infoBtn.addEventListener('click', (e) => {
@@ -110,7 +120,7 @@ function createAppCard(app, isInstalled) {
     });
     card.appendChild(infoBtn);
   }
-  // ======================================================================
+  // ===================================================
 
   card.addEventListener('click', () => {
     if (isInstalled) {
