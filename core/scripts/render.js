@@ -65,18 +65,18 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
-  // === КРАТКОЕ ОПИСАНИЕ ДЛЯ СКЛАДА (БЕЗ ССЫЛКИ) ===
+  // === КРАТКОЕ ОПИСАНИЕ ДЛЯ СКЛАДА (БЕЗ ССЫЛКИ, С ЗНАЧКОМ ℹ️) ===
   if (app.description && app.description !== 'no description') {
     const desc = document.createElement('div');
     desc.className = 'app-card-desc';
     // Убираем все ссылки (http/https) из описания перед отображением
     const cleanDescription = app.description.replace(/https?:\/\/[^\s<>"']+/g, '').trim();
     if (cleanDescription) {
-      desc.textContent = cleanDescription;
+      desc.textContent = 'ℹ️ ' + cleanDescription;
       card.appendChild(desc);
     }
   }
-  // ================================================
+  // ==================================================================
 
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
@@ -451,7 +451,7 @@ function showAppInfo(app) {
   if (iconEl) iconEl.textContent = app.icon;
   if (nameEl) nameEl.textContent = app.name;
 
-  // === ИЗМЕНЕНО: описание с кликабельными ссылками внутри платформы ===
+  // === ОПИСАНИЕ С КЛИКАБЕЛЬНЫМИ ССЫЛКАМИ ВНУТРИ ПЛАТФОРМЫ ===
   if (descEl) {
     const rawDesc = app.description || t('noDescription');
     // Превращаем ссылки в кликабельные элементы, которые открываются ВНУТРИ платформы
@@ -473,7 +473,7 @@ function showAppInfo(app) {
       });
     });
   }
-  // ===================================================================
+  // ============================================================
 
   if (linkBlock) {
     const linkedUrl = typeof getAppUrl === 'function' ? getAppUrl(app.id) : null;
