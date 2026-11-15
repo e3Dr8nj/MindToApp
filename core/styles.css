@@ -2035,37 +2035,7 @@ h1 {
   background: var(--btn-primary-hover-bg);
 }
 
-/* Описание приложения в складе (как в Chrome Web Store) */
-.app-card-desc {
-  font-size: 12px;
-  color: var(--description-color);
-  line-height: 1.4;
-  margin-top: 6px;
-  margin-bottom: 8px;
-  text-align: center;
-  
-  /* Ограничиваем описание 3 строками с многоточием */
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  
-  /* Растягиваем блок, чтобы кнопка "Установить" всегда была прижата к низу */
-  flex-grow: 1;
-}
 
-/* Делаем карточки в складе явно кликабельными при наведении */
-.app-card:not(.app-card-installed) {
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-}
-
-.app-card:not(.app-card-installed):hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px var(--card-shadow-hover);
-  border-color: var(--accent-color);
-}
 
 /* Описание приложения в складе (как в Chrome Web Store) */
 .app-card-desc {

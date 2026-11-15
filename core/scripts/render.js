@@ -65,14 +65,18 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
-  // === ДОБАВЛЕНО: краткое описание для склада ===
+  // === КРАТКОЕ ОПИСАНИЕ ДЛЯ СКЛАДА (БЕЗ ССЫЛКИ) ===
   if (app.description && app.description !== 'no description') {
     const desc = document.createElement('div');
     desc.className = 'app-card-desc';
-    desc.textContent = app.description;
-    card.appendChild(desc);
+    // Убираем все ссылки (http/https) из описания перед отображением
+    const cleanDescription = app.description.replace(/https?:\/\/[^\s<>"']+/g, '').trim();
+    if (cleanDescription) {
+      desc.textContent = cleanDescription;
+      card.appendChild(desc);
+    }
   }
-  // ==============================================
+  // ================================================
 
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
@@ -105,7 +109,7 @@ function createAppCard(app, isInstalled) {
     card.appendChild(installBtn);
   }
 
-  // === ИЗМЕНЕНО: ссылка берётся из description ===
+  // === ЛОГИКА КЛИКА ПО КАРТОЧКЕ ===
   card.addEventListener('click', (e) => {
     if (!isInstalled) {
       // В СКЛАДЕ: ищем первую ссылку в description и открываем её ВНУТРИ платформы
@@ -121,7 +125,7 @@ function createAppCard(app, isInstalled) {
       openApp(app);
     }
   });
-  // ==============================================
+  // =================================
 
   return card;
 }
