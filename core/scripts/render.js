@@ -65,18 +65,21 @@ function createAppCard(app, isInstalled) {
   name.textContent = app.name;
   card.appendChild(name);
 
-  // === КРАТКОЕ ОПИСАНИЕ ДЛЯ СКЛАДА (БЕЗ ССЫЛКИ, С ЗНАЧКОМ ℹ️) ===
+  // === КРАТКОЕ ОПИСАНИЕ ДЛЯ СКЛАДА ===
   if (app.description && app.description !== 'no description') {
     const desc = document.createElement('div');
     desc.className = 'app-card-desc';
+    // Проверяем, есть ли ссылка в описании
+    const hasLink = /https?:\/\/[^\s<>"']+/.test(app.description);
     // Убираем все ссылки (http/https) из описания перед отображением
     const cleanDescription = app.description.replace(/https?:\/\/[^\s<>"']+/g, '').trim();
     if (cleanDescription) {
-      desc.textContent = 'ℹ️ ' + cleanDescription;
+      // Если есть ссылка — добавляем значок ℹ️ в начало
+      desc.textContent = hasLink ? 'ℹ️ ' + cleanDescription : cleanDescription;
       card.appendChild(desc);
     }
   }
-  // ==================================================================
+  // ====================================
 
   if (isInstalled) {
     const settingsBadge = document.createElement('div');
