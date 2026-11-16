@@ -68,6 +68,6 @@
     --bg-gradient-start: #0a0a0a;
   --bg-gradient-end: #111111;
   --bg-image: url('/MindToApp/core/wallpaper/purple.webp');
-  --bg-overlay: rgba(10, 10, 10, 0.6); /* Обязательно темная вуаль, а не белая! */
+  --bg-overlay: rgba(10, 10, 10, 0.2); /* Обязательно темная вуаль, а не белая! */
   
 }
