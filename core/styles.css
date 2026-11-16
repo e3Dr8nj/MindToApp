@@ -15,7 +15,9 @@ body {
   color: var(--text-color);
   transition: background 0.3s, color 0.3s;
   
-  
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-attachment: fixed;
 
 }
 
