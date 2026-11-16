@@ -65,6 +65,6 @@
   --toast-success-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --toast-error-bg: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
 
-   --bg-image: url('/core/wallpaper/purple.webp');
+   --bg-image: url('../../wallpaper/purple.webp');
   --bg-opacity: 0.15;  /* прозрачность обоев */
 }
