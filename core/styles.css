@@ -22,7 +22,7 @@ body {
 body {
   /* ... твои текущие стили ... */
   background-image: var(--bg-image, none);
-  background-size: cover;
+  background-size: 60px;
   background-position: center;
   background-attachment: fixed;
   background-repeat: repeat;
