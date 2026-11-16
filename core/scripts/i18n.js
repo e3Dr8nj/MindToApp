@@ -17,7 +17,7 @@ const translations = {
       'Return ONLY complete HTML code in one markdown block. DO NOT add text explanations.'
     ].join('\n'),
 
-    myApps: '🏠 My Apps',
+    myApps: '🏠',
     store: '📦 Store',
     themes: '🎨 Themes',
     ai: '🤖 AI',
@@ -257,7 +257,7 @@ const translations = {
       'Верни ТОЛЬКО полный HTML-код в одном блоке markdown. НЕ добавляй пояснений текстом.'
     ].join('\n'),
 
-    myApps: '🏠 Мои приложения',
+    myApps: '🏠',
     store: '📦 Склад',
     themes: '🎨 Темы',
     ai: '🤖 ИИ',
