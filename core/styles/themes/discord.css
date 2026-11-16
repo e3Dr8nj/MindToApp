@@ -1,4 +1,4 @@
-[data-theme="discord"] {
+:root {
   --bg-gradient-start: #36393f;
   --bg-gradient-end: #2f3136;
   --text-color: #dcddde;
