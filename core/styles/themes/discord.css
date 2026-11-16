@@ -66,5 +66,5 @@
   --toast-error-bg: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
 
    --bg-image: url('/MindToApp/core/wallpaper/purple.webp');
-  --bg-opacity: 0.15;  /* прозрачность обоев */
+  --bg-opacity: 0.55;  /* прозрачность обоев */
 }
