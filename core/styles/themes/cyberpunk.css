@@ -1,6 +1,6 @@
 :root {
---bg-image: url('/MindToApp/core/wallpaper/cyber2.webp');
-  --bg-overlay: rgba(10, 10, 10, 0.85); /* Темная вуаль для глубины */
+--bg-image: url('/MindToApp/core/wallpaper/purple.webp');
+  --bg-overlay: rgba(10, 10, 10, 0.50); /* Темная вуаль для глубины */
   
   --bg-gradient-start: #0a0a0a;
   --bg-gradient-end: #1a1a1a;
