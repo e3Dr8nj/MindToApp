@@ -1,6 +1,6 @@
 :root {
     --bg-image: url('/MindToApp/core/wallpaper/purple.webp');
-  --bg-overlay: rgba(255, 255, 255, 0.85); /* Светлая вуаль, чтобы фон был ярким */
+  --bg-overlay: rgba(255, 255, 255, 0.15); /* Светлая вуаль, чтобы фон был ярким */
   
   --bg-gradient-start: #f7f7f7;
   --bg-gradient-end: #e8e8e8;
