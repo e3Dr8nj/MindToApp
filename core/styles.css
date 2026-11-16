@@ -58,7 +58,7 @@ body::before {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: var(--bg-image, none);
-  background-size: 200px; /* Не растягивать, оставлять оригинальный размер */
+  background-size: 300px; /* Не растягивать, оставлять оригинальный размер */
   background-position: center;
   background-attachment: fixed;
   background-repeat: repeat; /* Повторять как плитку */
