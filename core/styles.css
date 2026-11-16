@@ -15,17 +15,10 @@ body {
   color: var(--text-color);
   transition: background 0.3s, color 0.3s;
   
- 
-
-}
-
-body {
-  /* ... твои текущие стили ... */
-  background-image: var(--bg-image, none);
-  background-size: 200px;
-  background-position: center;
+  background-image: var(--bg-image);
+  background-size: cover;
   background-attachment: fixed;
-  background-repeat: repeat;
+
 }
 
 .screen {
@@ -2141,4 +2134,4 @@ h1 {
 .app-card-info-btn-top-left {
   top: 8px;
   left: 8px;
-} 
+}
