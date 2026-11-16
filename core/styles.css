@@ -1,7 +1,7 @@
 /* ==========================================
    СБРОС И БАЗОВЫЕ СТИЛИ
    ========================================== */
-
+//*
 * {
   margin: 0;
   padding: 0;
@@ -30,6 +30,65 @@ body {
 .screen.active {
   display: block;
 }
+*/
+
+/* ==========================================
+   СБРОС И БАЗОВЫЕ СТИЛИ
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Базовый цвет/градиент фона */
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  min-height: 100vh;
+  color: var(--text-color);
+  transition: background 0.3s, color 0.3s;
+  position: relative; /* Обязательно для слоев */
+}
+
+/* СЛОЙ 1: Обои (паттерн). Если переменной нет, будет 'none' */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: var(--bg-image, none);
+  background-size: auto; /* Не растягивать, оставлять оригинальный размер */
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: repeat; /* Повторять как плитку */
+  opacity: 0.25; /* Легкая прозрачность, чтобы узор был стильным */
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* СЛОЙ 2: Вуаль для читаемости текста. Цвет берется из темы */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-overlay, rgba(255, 255, 255, 0.85)); /* По умолчанию светлая */
+  z-index: -1;
+  pointer-events: none;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.screen.active {
+  display: block;
+}
+
+
+
 
 header {
   display: flex;
