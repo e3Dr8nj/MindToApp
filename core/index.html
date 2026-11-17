@@ -26,13 +26,13 @@
     <div class="sidebar-arrow">↓</div>
     <button id="sidebar-create-btn" class="sidebar-btn sidebar-create-btn" title="Create app from clipboard">🚀 Create</button>
 
-    <!-- НОВАЯ КНОПКА ПОСЕРЕДИНЕ -->
+    <!-- НОВАЯ КНОПКА Add ПОСЕРЕДИНЕ -->
     <div class="sidebar-spacer-half"></div>
     <button id="add-custom-btn" class="sidebar-btn sidebar-add-btn" title="Add app">➕ Add</button>
     <div class="sidebar-spacer-half"></div>
     <!-- КОНЕЦ НОВОЙ КНОПКИ -->
 
-    <button id="sidebar-export-btn" class="sidebar-btn sidebar-export-btn" title="Export apps to folder">📤 Export</button>
+    <!-- КНОПКА Export ОТСЮДА УДАЛЕНА -->
     <button id="sidebar-import-btn" class="sidebar-btn sidebar-import-btn" title="Import apps from folder">📥 Import</button>
     <button id="sidebar-url-btn" class="sidebar-btn sidebar-url-btn" title="Open URL from clipboard">🔗 URL</button>
   </div>
@@ -51,8 +51,9 @@
           <button id="manage-ai-btn" class="btn" title="Edit AI list">🤖 AI</button>
           <button id="edit-prompts-btn" class="btn" title="Edit prompt">⚙️ Prompt</button>
           <button id="builder-btn" class="btn btn-primary">🛠 Builder</button>
-          <!-- КНОПКА ➕ Add ОТСЮДА УДАЛЕНА -->
           <button id="open-store-btn" class="btn">📦 Store</button>
+          <!-- КНОПКА Export ПЕРЕНЕСЕНА СЮДА (обычный стиль) -->
+          <button id="sidebar-export-btn" class="btn">📤 Export</button>
           <button id="export-urls-btn" class="btn">📤 Export URLs</button>
           <button id="reset-pwa-btn" class="btn" title="Reset PWA data (fix installation issues)">🧹 Reset PWA</button>
         </div>
@@ -548,7 +549,6 @@
   </div>
 
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
-  <!-- app-factory.js должен загружаться ПЕРЕД скриптами, которые используют createAppFromHtml -->
   <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
   <script src="scripts/prompt-editor.js"></script>
