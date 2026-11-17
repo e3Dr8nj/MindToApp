@@ -11,10 +11,8 @@
   <link rel="stylesheet" href="styles/themes/light.css" data-theme="light">
   <link rel="stylesheet" href="styles/themes/cyberpunk.css" data-theme="cyberpunk">
   <link rel="stylesheet" href="styles/themes/discord.css" data-theme="discord">
-  <link rel="stylesheet" href="styles/themes/dark-neon.css" data-theme="dark-neon">
-  <link rel="stylesheet" href="styles/themes/light-neon.css" data-theme="light-neon">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#7c3aed">
+  <meta name="theme-color" content="#667eea">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐹</text></svg>">
 </head>
 <body>
@@ -44,7 +42,7 @@
   <div id="main-content" class="main-content">
     <div id="home-screen" class="screen active">
       <header>
-        <h1>🏠 My Apps</h1>
+        <h1>🏠</h1>
         <button id="burger-menu-btn" class="burger-menu-btn" title="Menu">☰</button>
         <div class="header-buttons" id="header-menu">
           <button id="language-toggle-btn" class="btn" title="Switch language">EN</button>
@@ -405,14 +403,6 @@
               <span>💬 Discord</span>
               <button class="btn btn-small" onclick="applyTheme('discord')">Apply</button>
             </div>
-            <div class="theme-item">
-              <span>🌸 Light Neon</span>
-              <button class="btn btn-small" onclick="applyTheme('light-neon')">Apply</button>
-            </div>
-            <div class="theme-item">
-              <span>🌃 Dark Neon</span>
-              <button class="btn btn-small" onclick="applyTheme('dark-neon')">Apply</button>
-            </div>
           </div>
         </div>
         <div class="step-box">
@@ -558,6 +548,7 @@
   </div>
 
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
+  <!-- app-factory.js должен загружаться ПЕРЕД скриптами, которые используют createAppFromHtml -->
   <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
   <script src="scripts/prompt-editor.js"></script>
