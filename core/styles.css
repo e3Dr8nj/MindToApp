@@ -1287,6 +1287,23 @@ h1 {
   min-height: 10px;
 }
 
+/*
+*/
+
+.sidebar-spacer-half {
+  flex: 0.5;
+  min-height: 5px;
+}
+
+.sidebar-add-btn {
+  background: var(--btn-primary-bg);
+}
+
+.sidebar-add-btn:hover {
+  background: var(--btn-primary-hover-bg);
+  transform: scale(1.08);
+}
+/**/
 .sidebar-btn {
   width: 60px;
   height: 60px;
