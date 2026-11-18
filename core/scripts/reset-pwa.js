@@ -1,112 +1,71 @@
 // ==========================================
-// СБРОС ДАННЫХ PWA
-// Очищает Service Workers, Cache Storage, IndexedDB
-// НЕ трогает localStorage (приложения, темы, настройки остаются)
+// RESET PWA — полная очистка данных сайта
 // ==========================================
 
-(function () {
-  'use strict';
-
-  const TEXTS = {
-    en: {
-      confirm: 'Reset PWA data?\n\nThis will clear:\n• Service Workers\n• Browser cache\n• IndexedDB (folder handles)\n\nYour apps, themes and settings will NOT be deleted.\n\nThe page will reload afterwards.',
-      done: 'PWA data reset:\n\n',
-      reloading: '\n\nReloading page...',
-      noSw: '✓ No Service Workers found',
-      swOk: '✓ Service Workers removed: ',
-      cacheOk: '✓ Cache cleared: ',
-      dbOk: '✓ IndexedDB cleared',
-      fail: '✗ Error: '
-    },
-    ru: {
-      confirm: 'Сбросить данные PWA?\n\nБудет очищено:\n• Service Workers\n• Кэш браузера\n• IndexedDB (привязки папок)\n\nВаши приложения, темы и настройки НЕ будут удалены.\n\nПосле этого страница перезагрузится.',
-      done: 'Данные PWA сброшены:\n\n',
-      reloading: '\n\nПерезагрузка страницы...',
-      noSw: '✓ Service Workers не найдены',
-      swOk: '✓ Service Workers удалено: ',
-      cacheOk: '✓ Кэш очищен, записей: ',
-      dbOk: '✓ IndexedDB очищена',
-      fail: '✗ Ошибка: '
-    }
-  };
-
-  function getLang() {
-    try {
-      const saved = localStorage.getItem('language');
-      if (saved === 'ru' || saved === 'en') return saved;
-    } catch (e) {}
-    const nav = (navigator.language || 'en').toLowerCase();
-    return nav.startsWith('ru') ? 'ru' : 'en';
+async function resetPWAData() {
+  if (!confirm('🧹 Сбросить все данные PWA (Service Worker, кэш, локальные данные)?\n\nПриложения и темы будут удалены с этого устройства.')) {
+    return;
   }
 
-  async function resetPwa() {
-    const lang = getLang();
-    const T = TEXTS[lang] || TEXTS.en;
+  try {
+    console.log('[Reset] Начинаю сброс PWA...');
 
-    if (!confirm(T.confirm)) return;
+    // 1. Отписываем все Service Workers
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const reg of registrations) {
+        await reg.unregister();
+        console.log('[Reset] SW отписан:', reg.scope);
+      }
+    }
 
-    const results = [];
+    // 2. Удаляем весь Cache Storage
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      for (const name of cacheNames) {
+        await caches.delete(name);
+        console.log('[Reset] Кэш удалён:', name);
+      }
+    }
 
-    // 1. Service Workers
-    try {
-      if ('serviceWorker' in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        let count = 0;
-        for (const reg of regs) {
-          if (await reg.unregister()) count++;
+    // 3. Удаляем localStorage (приложения, темы, настройки)
+    localStorage.clear();
+    console.log('[Reset] localStorage очищен');
+
+    // 4. Удаляем все IndexedDB базы
+    if (window.indexedDB && window.indexedDB.databases) {
+      const dbs = await window.indexedDB.databases();
+      for (const db of dbs) {
+        if (db.name) {
+          window.indexedDB.deleteDatabase(db.name);
+          console.log('[Reset] IndexedDB удалён:', db.name);
         }
-        results.push(count > 0 ? T.swOk + count : T.noSw);
-      } else {
-        results.push(T.noSw);
       }
-    } catch (e) {
-      results.push(T.fail + e.message);
     }
 
-    // 2. Cache Storage
-    try {
-      if ('caches' in window) {
-        const keys = await caches.keys();
-        for (const key of keys) {
-          await caches.delete(key);
-        }
-        results.push(T.cacheOk + keys.length);
-      }
-    } catch (e) {
-      results.push(T.fail + e.message);
-    }
-
-    // 3. IndexedDB (только служебные базы привязок папок)
-    try {
-      const dbNames = ['MindToAppExportDB', 'MindToAppImportDB'];
-      for (const name of dbNames) {
-        indexedDB.deleteDatabase(name);
-      }
-      results.push(T.dbOk);
-    } catch (e) {
-      results.push(T.fail + e.message);
-    }
-
-    alert(T.done + results.join('\n') + T.reloading);
-
-    setTimeout(function () {
-      location.reload(true);
-    }, 1200);
-  }
-
-  function init() {
-    const btn = document.getElementById('reset-pwa-btn');
-    if (!btn) return;
-    btn.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      resetPwa();
+    // 5. Удаляем cookie (если есть)
+    document.cookie.split(';').forEach(c => {
+      const name = c.split('=')[0].trim();
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
     });
-  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+    console.log('[Reset] ✅ Сброс завершён!');
+
+    // 6. Жёсткая перезагрузка с новым query-параметром,
+    // чтобы браузер точно не использовал старый кэш
+    const freshUrl = window.location.pathname + '?reset=' + Date.now();
+    window.location.replace(freshUrl);
+
+  } catch (error) {
+    console.error('[Reset] ❌ Ошибка сброса:', error);
+    alert('Не удалось полностью сбросить данные. Попробуй вручную:\nНастройки → Chrome → Очистить данные сайта.');
   }
-})();
+}
+
+// Подключаем к кнопке 🧹 Reset PWA
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('reset-pwa-btn');
+  if (btn) {
+    btn.addEventListener('click', resetPWAData);
+  }
+});
