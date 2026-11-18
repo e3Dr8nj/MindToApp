@@ -1,10 +1,11 @@
-const CACHE_NAME = 'mind-to-app-v10';
+const CACHE_NAME = 'mind-to-app-v11';
 
 const urlsToCache = [
-  '/MindToApp/core/',
-  '/MindToApp/core/index.html',
+  '/MindToApp/core/index.html', // Убрали '/' в конце, оставили конкретный файл
   '/MindToApp/core/styles.css',
   '/MindToApp/core/sw.js',
+  '/MindToApp/core/manifest.json',
+  '/MindToApp/core/icon-512.png',
   '/MindToApp/core/scripts/db.js',
   '/MindToApp/core/scripts/state.js',
   '/MindToApp/core/scripts/registry.js',
@@ -12,9 +13,9 @@ const urlsToCache = [
   '/MindToApp/core/scripts/create.js',
   '/MindToApp/core/scripts/edit.js',
   '/MindToApp/core/scripts/add.js',
-  '/MindToApp/core/scripts/share.js',
-  '/MindToApp/core/scripts/app.js'
+  '/MindToApp/core/scripts/share.js'
 ];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -22,15 +23,15 @@ self.addEventListener('install', (event) => {
         cacheNames
           .filter((name) => name.startsWith('nexus-ai-') || name.startsWith('mind-to-app-'))
           .filter((name) => name !== CACHE_NAME)
-          .map((name) => {
-            console.log('[SW] Удаляю старый кэш:', name);
-            return caches.delete(name);
-          })
+          .map((name) => caches.delete(name))
       );
     }).then(() => {
       return caches.open(CACHE_NAME).then((cache) => {
-        console.log('[SW] Открыт новый кэш:', CACHE_NAME);
-        return cache.addAll(urlsToCache);
+        console.log('[SW] Кэширую файлы...');
+        // Добавляем .catch(), чтобы установка не падала, если один файл недоступен
+        return cache.addAll(urlsToCache).catch(err => {
+          console.warn('[SW] Не все файлы закэшированы, но установка продолжается:', err);
+        });
       });
     })
   );
@@ -42,23 +43,23 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/modules/')) {
+  if (event.request.method !== 'GET' || event.request.url.includes('/modules/')) {
     return;
   }
   
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse; // Сначала отдаем из кэша (работает офлайн!)
+      
+      return fetch(event.request).then((response) => {
         if (response && response.status === 200) {
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
         return response;
-      })
-      .catch(() => {
-        return caches.match(event.request);
-      })
+      }).catch(() => {
+        return caches.match('/MindToApp/core/index.html');
+      });
+    })
   );
 });
