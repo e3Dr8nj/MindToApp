@@ -1,16 +1,17 @@
 {
   "name": "MindToApp Platform",
   "short_name": "MindToApp",
+  "id": "/MindToApp/core/",
   "description": "Превращай идеи в приложения за минуту",
-  "start_url": "/MindToApp/core/index.html?v=11",
+  "start_url": "/MindToApp/core/index.html?v=12",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><text y='.9em' x='80' font-size='450'>🐹</text></svg>",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
