@@ -2211,3 +2211,115 @@ h1 {
   top: 8px;
   left: 8px;
 }
+
+/* ==========================================
+   МОДАЛКА ЛЕНДИНГА С ХОМЯКОМ
+   ========================================== */
+
+.modal-landing {
+  max-width: 1100px;
+  width: 95%;
+  height: 85vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-landing .modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--input-border);
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landing-container {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #000;
+}
+
+#landing-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Плавающий хомяк в правом нижнем углу */
+.hamster-install {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card-bg, rgba(20, 20, 20, 0.95));
+  border: 1px solid var(--input-border);
+  border-radius: 50px;
+  padding: 8px 16px 8px 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 10;
+  animation: hamsterBounce 2.5s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+
+.hamster-install:hover {
+  transform: scale(1.05);
+}
+
+@keyframes hamsterBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.hamster-emoji {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: hamsterWiggle 3s ease-in-out infinite;
+}
+
+@keyframes hamsterWiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.hamster-btn {
+  background: var(--btn-primary-bg, linear-gradient(135deg, #7c3aed, #db2777));
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+}
+
+.hamster-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.6);
+}
+
+.hamster-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+@media (max-width: 600px) {
+  .hamster-install {
+    right: 10px;
+    bottom: 10px;
+    padding: 6px 12px 6px 8px;
+  }
+  .hamster-emoji { font-size: 24px; }
+  .hamster-btn { font-size: 12px; padding: 8px 12px; }
+}

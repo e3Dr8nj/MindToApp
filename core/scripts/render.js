@@ -113,10 +113,16 @@ function createAppCard(app, isInstalled) {
       infoBtn.classList.add('app-card-info-btn-top-left');
     }
     infoBtn.textContent = 'ℹ️';
-    infoBtn.title = 'Open link';
+    infoBtn.title = t('openLanding') || 'Открыть лендинг';
     infoBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      openApp({ name: app.name, icon: app.icon, url: urlMatch[0] });
+      // ИЗМЕНЕНИЕ: Открываем модалку с лендингом и хомяком вместо прямого открытия URL
+      if (typeof openAppLanding === 'function') {
+        openAppLanding(app);
+      } else {
+        // Fallback на случай, если скрипт app-landing.js еще не загрузился
+        openApp({ name: app.name, icon: app.icon, url: urlMatch[0] });
+      }
     });
     card.appendChild(infoBtn);
   }
@@ -319,7 +325,15 @@ function showCardContextMenu(event, app) {
     return link;
   };
 
-  menu.appendChild(createMenuItem('info', () => showAppInfo(app)));
+  // ИЗМЕНЕНИЕ: Для приложений из Склада (не установленных) пункт "Информация" открывает лендинг
+  menu.appendChild(createMenuItem('info', () => {
+    if (typeof openAppLanding === 'function' && !isInstalled) {
+      openAppLanding(app);
+    } else {
+      showAppInfo(app);
+    }
+  }));
+  
   menu.appendChild(createMenuItem('open', () => openApp(app)));
 
   if (isInstalled && app.content) {

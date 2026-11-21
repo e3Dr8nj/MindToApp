@@ -548,6 +548,26 @@
     </div>
   </div>
 
+  <!-- ========================================== -->
+  <!-- НОВАЯ МОДАЛКА ЛЕНДИНГА ПРИЛОЖЕНИЯ С ХОМЯКОМ -->
+  <!-- ========================================== -->
+  <div id="app-landing-modal" class="modal">
+    <div class="modal-content modal-landing">
+      <div class="modal-header">
+        <h2 id="landing-modal-title">📱 Application</h2>
+        <button class="modal-close" id="close-landing-modal-btn">&times;</button>
+      </div>
+      <div class="landing-container">
+        <iframe id="landing-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" title="Landing"></iframe>
+        <div class="hamster-install" id="hamster-install" title="Install app">
+          <div class="hamster-emoji">🐹</div>
+          <button class="hamster-btn" id="hamster-install-btn">Install</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ========================================== -->
+
   <!-- ПОРЯДОК ПОДКЛЮЧЕНИЯ СКРИПТОВ ВАЖЕН! -->
   <script src="scripts/i18n.js"></script>
   <script src="scripts/prompts.js"></script>
@@ -567,6 +587,10 @@
   <script src="scripts/import.js"></script>
   <script src="scripts/export.js"></script>
   <script src="scripts/app-core.js"></script>
+  
+  <!-- НОВОЕ: Подключение логики лендинга с хомяком -->
+  <script src="scripts/app-landing.js"></script>
+  
   <script src="scripts/app-clipboard.js"></script>
   <script src="scripts/app-builder.js"></script>
   <script src="scripts/app-ai.js"></script>
