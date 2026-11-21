@@ -1,22 +1,15 @@
 <!DOCTYPE html>
-<!--
-  ЛЕНДИНГ «Планировщик дел»
-  Положи файл в корень репозитория (рядом с папкой core/).
-  Кнопка «Установить» добавляет приложение в общую область платформы
-  (localStorage: customModules + installedModules) и открывает платформу.
-  Язык синхронизирован с платформой через localStorage['language'] ('ru' | 'en').
--->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Планировщик дел настолько хорош, что задачи выполняются сами. Установи в платформу одним кликом.">
-<title>Планировщик дел — установи хаос</title>
+<meta name="description" content="Планировщик дел — организуй хаос. Установи в MindToApp одним кликом.">
+<title>Планировщик дел — организуй хаос</title>
 <style>
   :root{
     --bg:#070712; --card:rgba(255,255,255,.05); --stroke:rgba(255,255,255,.12);
     --txt:#ecedf7; --muted:#9a9ab8;
-    --g1:#8b7bff; --g2:#ff7a59; --g3:#ffb347;
+    --g1:#8b7bff; --g2:#ff7a59; --g3:#ffb347; --ok:#3ecf8e;
     --grad:linear-gradient(135deg,#8b7bff 0%,#ff7a59 60%,#ffb347 100%);
     --grad-shadow:rgba(139,123,255,.45);
   }
@@ -27,7 +20,6 @@
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
     overflow-x:hidden; line-height:1.55;
   }
-  /* ---------- фоновые эффекты ---------- */
   #fx{position:fixed; inset:0; z-index:0; pointer-events:none}
   .aurora{position:fixed; inset:-20%; z-index:0; pointer-events:none; filter:blur(70px); opacity:.55;
     background:
@@ -48,7 +40,6 @@
   }
   main,header.topbar,footer{position:relative; z-index:2}
 
-  /* ---------- шапка ---------- */
   header.topbar{
     position:fixed; top:0; left:0; right:0; z-index:50;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -66,7 +57,6 @@
   }
   .lang-btn:hover{border-color:var(--g1); box-shadow:0 0 0 3px rgba(139,123,255,.18)}
 
-  /* ---------- кнопки ---------- */
   .btn{
     border:0; cursor:pointer; border-radius:14px; color:#fff; font-weight:800; font-family:inherit;
     background:var(--grad); background-size:180% 180%;
@@ -83,7 +73,6 @@
     50%{box-shadow:0 8px 44px rgba(255,122,89,.55), 0 0 0 10px rgba(139,123,255,.10)}
   }
 
-  /* ---------- hero ---------- */
   .hero{min-height:96vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:120px 18px 40px}
   .hero-badge{
@@ -105,7 +94,6 @@
   .hero-cta{display:flex; flex-direction:column; align-items:center; gap:12px; margin-bottom:46px}
   .hint{font-size:13px; color:var(--muted); max-width:420px}
 
-  /* ---------- мокап ---------- */
   .mock-wrap{perspective:1100px}
   .mock{
     width:min(430px,92vw); background:rgba(255,255,255,.055); border:1px solid var(--stroke);
@@ -137,14 +125,12 @@
   .mb.g1{background:var(--grad)}
   .mb.g2{background:rgba(255,255,255,.08); border:1px solid var(--stroke)}
 
-  /* ---------- бегущая строка ---------- */
   .ticker{overflow:hidden; border-top:1px solid var(--stroke); border-bottom:1px solid var(--stroke);
     background:rgba(255,255,255,.03); padding:12px 0; margin:20px 0 0}
   .ticker-track{display:flex; gap:44px; width:max-content; animation:tick 34s linear infinite; will-change:transform}
   .ticker-track span{white-space:nowrap; color:var(--muted); font-size:14px; font-weight:600}
   @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
-  /* ---------- секции ---------- */
   section{max-width:1080px; margin:0 auto; padding:70px 18px}
   h2{font-size:clamp(26px,5vw,44px); font-weight:900; letter-spacing:-.03em; margin:0 0 14px; text-align:center}
   h2 .shimmer{background-size:300% 100%}
@@ -188,11 +174,9 @@
 
   footer{border-top:1px solid var(--stroke); padding:34px 18px 44px; text-align:center; color:var(--muted); font-size:13px}
 
-  /* ---------- reveal ---------- */
   .reveal{opacity:0; transform:translateY(30px); transition:opacity .8s ease, transform .8s ease}
   .reveal.in{opacity:1; transform:translateY(0)}
 
-  /* ---------- toast / confetti ---------- */
   #toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(30px);
     background:var(--grad); color:#fff; padding:12px 22px; border-radius:14px; font-weight:700; font-size:14px;
     opacity:0; pointer-events:none; transition:.3s; z-index:90; box-shadow:0 10px 30px var(--grad-shadow);
@@ -284,11 +268,11 @@
   <section>
     <h2 class="reveal"><span class="shimmer" data-i18n="qTitle"></span></h2>
     <div class="grid">
-      <div class="qcard tilt reveal"><span class="qm">“</span><span class="ava">🐹</span>
+      <div class="qcard tilt reveal"><span class="qm">"</span><span class="ava">🐹</span>
         <p data-i18n="q1"></p><div class="who"><b data-i18n="q1a"></b><span data-i18n="q1r"></span></div></div>
-      <div class="qcard tilt reveal"><span class="qm">“</span><span class="ava">🐈</span>
+      <div class="qcard tilt reveal"><span class="qm">"</span><span class="ava">🐈</span>
         <p data-i18n="q2"></p><div class="who"><b data-i18n="q2a"></b><span data-i18n="q2r"></span></div></div>
-      <div class="qcard tilt reveal"><span class="qm">“</span><span class="ava">🎖️</span>
+      <div class="qcard tilt reveal"><span class="qm">"</span><span class="ava">🎖️</span>
         <p data-i18n="q3"></p><div class="who"><b data-i18n="q3a"></b><span data-i18n="q3r"></span></div></div>
     </div>
   </section>
@@ -303,10 +287,8 @@
 <footer><span data-i18n="footer"></span></footer>
 <div id="toast"></div>
 
-<!-- ============================================================
-     ИСХОДНИК ПРИЛОЖЕНИЯ (встраивается в платформу при установке).
-     Закрывающие теги script внутри экранированы как <\/script>
-     ============================================================ -->
+<!-- ИСХОДНИК ПРИЛОЖЕНИЯ (встраивается в платформу при установке).
+     Закрывающие теги script экранированы как <\/script> -->
 <script type="text/plain" id="app-source">
 <!DOCTYPE html>
 <html lang="ru">
@@ -946,7 +928,9 @@
   load();
   renderAll();
 })();
-
+<\/script>
+</body>
+</html>
 </script>
 
 <script>
@@ -954,8 +938,9 @@
   'use strict';
 
   /* ================== НАСТРОЙКИ ================== */
-  const PLATFORM_URL = 'core/index.html'; // если лендинг лежит внутри core/ — поставь 'index.html'
-  const LS_LANG = 'language';            // тот же ключ, что использует платформа
+  // Лендинг лежит в modules/task-planner/, платформа — в core/
+  const PLATFORM_URL = '../../core/index.html';
+  const LS_LANG = 'language';
 
   const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1086,7 +1071,7 @@
   function buildTicker(){
     const items = t('ticker');
     const html = items.map(s => '<span>' + s + '</span>').join('');
-    $('#tickerTrack').innerHTML = html + html; // дублируем для бесшовной петли
+    $('#tickerTrack').innerHTML = html + html;
   }
   function updateInstallLabels(){
     const key = isInstalled() ? 'installUpdate' : 'install';
@@ -1094,10 +1079,10 @@
   }
   function applyLang(){
     document.documentElement.lang = lang;
-    document.title = lang === 'ru' ? 'Планировщик дел — установи хаос' : 'Task Planner — install the chaos';
+    document.title = lang === 'ru' ? 'Планировщик дел — организуй хаос' : 'Task Planner — organize the chaos';
     $$('[data-i18n]').forEach(el => {
       const k = el.getAttribute('data-i18n');
-      if (k === 'install') return; // проставится в updateInstallLabels
+      if (k === 'install') return;
       el.innerHTML = t(k);
     });
     $('#langBtn').textContent = lang === 'ru' ? 'EN' : 'RU';
@@ -1106,7 +1091,7 @@
   }
   $('#langBtn').addEventListener('click', () => {
     lang = lang === 'ru' ? 'en' : 'ru';
-    safeSet(LS_LANG, lang); // платформа прочитает тот же ключ
+    safeSet(LS_LANG, lang);
     applyLang();
     toast(t('langToast'));
   });
@@ -1178,9 +1163,9 @@
         x: Math.random()*W, y: Math.random()*H,
         r: .8 + Math.random()*2.2,
         vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.25,
-        h: Math.random() < .5 ? 250 : 20, // фиолетовый или оранжевый оттенок
+        h: Math.random() < .5 ? 250 : 20,
         a: .25 + Math.random()*.4,
-        d: .4 + Math.random()*1.2 // глубина параллакса
+        d: .4 + Math.random()*1.2
       });
     }
   }
