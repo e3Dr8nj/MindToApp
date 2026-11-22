@@ -2219,6 +2219,20 @@ h1 {
    МОДАЛКА ЛЕНДИНГА — МАКСИМАЛЬНЫЙ РАЗМЕР
    ========================================== */
 
+.modal-landing {
+  max-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 0 !important;
+  border: none;
+}
+
+
 .modal-landing .modal-header {
   padding: 6px 16px; /* Было 12px 20px — делаем панель тоньше */
   border-bottom: 1px solid var(--input-border);
@@ -2244,6 +2258,9 @@ h1 {
   padding: 2px 8px;
   line-height: 1;
 }
+
+
+
 .landing-container {
   position: relative;
   flex: 1;
