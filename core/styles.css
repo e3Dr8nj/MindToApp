@@ -2227,7 +2227,7 @@ h1 {
 }
 
 .modal-landing .modal-header {
-  padding: 5px 5px;
+  padding: 0px 0px;
   border-bottom: 1px solid var(--input-border);
   flex-shrink: 0;
   display: flex;
