@@ -2218,8 +2218,8 @@ h1 {
 
 .modal-landing {
   max-width: 95vw;
-  width: 95vw;
-  height: 92vh;
+  width: 99vw;
+  height: 99vh;
   padding: 0;
   display: flex;
   flex-direction: column;
