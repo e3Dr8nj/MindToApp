@@ -2265,10 +2265,10 @@ h1 {
   display: block;
 }
 
-/* Плавающий крестик закрытия в правом верхнем углу */
+/* Плавающий крестик закрытия в правом верхнем углу (поднят выше, чтобы не мешать переключателю языка в лендинге) */
 .landing-close-btn {
   position: absolute;
-  top: 16px;
+  top: 8px;
   right: 16px;
   width: 40px;
   height: 40px;
@@ -2368,7 +2368,7 @@ h1 {
 /* На мобильных крестик и хомяк чуть ближе к углам */
 @media (max-width: 600px) {
   .landing-close-btn {
-    top: 10px;
+    top: 4px;
     right: 10px;
     width: 36px;
     height: 36px;
