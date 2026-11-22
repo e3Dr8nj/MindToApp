@@ -2265,18 +2265,18 @@ h1 {
   display: block;
 }
 
-/* Плавающий крестик закрытия в правом верхнем углу (поднят выше, чтобы не мешать переключателю языка в лендинге) */
+/* Плавающий крестик закрытия: максимально компактный и прижат к верхнему краю */
 .landing-close-btn {
   position: absolute;
-  top: 8px;
+  top: 2px;
   right: 16px;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: rgba(20, 20, 20, 0.75);
   color: #fff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -2365,14 +2365,14 @@ h1 {
   transform: translateY(0) scale(0.96);
 }
 
-/* На мобильных крестик и хомяк чуть ближе к углам */
+/* На мобильных крестик и хомяк ещё компактнее */
 @media (max-width: 600px) {
   .landing-close-btn {
-    top: 4px;
+    top: 2px;
     right: 10px;
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
   }
   .hamster-install {
     right: 12px;
