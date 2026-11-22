@@ -2217,7 +2217,7 @@ h1 {
    ========================================== */
 
 .modal-landing {
-  max-width: 95vw;
+  max-width: 99vw;
   width: 99vw;
   height: 99vh;
   padding: 0;
@@ -2227,7 +2227,7 @@ h1 {
 }
 
 .modal-landing .modal-header {
-  padding: 16px 20px;
+  padding: 5px 5px;
   border-bottom: 1px solid var(--input-border);
   flex-shrink: 0;
   display: flex;
