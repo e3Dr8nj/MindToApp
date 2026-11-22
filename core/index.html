@@ -549,16 +549,17 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- НОВАЯ МОДАЛКА ЛЕНДИНГА ПРИЛОЖЕНИЯ С ХОМЯКОМ -->
+  <!-- МОДАЛКА ЛЕНДИНГА (ПОЛНЫЙ ЭКРАН С ХОМЯКОМ) -->
   <!-- ========================================== -->
   <div id="app-landing-modal" class="modal">
     <div class="modal-content modal-landing">
-      <div class="modal-header">
-        <h2 id="landing-modal-title">📱 Application</h2>
-        <button class="modal-close" id="close-landing-modal-btn">&times;</button>
-      </div>
       <div class="landing-container">
         <iframe id="landing-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" title="Landing"></iframe>
+        
+        <!-- Плавающий крестик закрытия (справа сверху) -->
+        <button class="landing-close-btn" id="close-landing-modal-btn" title="Close">✕</button>
+        
+        <!-- Хомяк с кнопкой установки (справа снизу) -->
         <div class="hamster-install" id="hamster-install" title="Install app">
           <div class="hamster-emoji">🐹</div>
           <button class="hamster-btn" id="hamster-install-btn">Install</button>
