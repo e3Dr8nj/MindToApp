@@ -1,42 +1,54 @@
 :root {
-    --bg-image: url('/MindToApp/core/wallpaper/w.webp');
-  --bg-overlay: rgba(255, 255, 255, 0.55); /* Светлая вуаль, чтобы фон был ярким */
+  --bg-image: url('/MindToApp/core/wallpaper/w.webp');
+  --bg-overlay: rgba(255, 255, 255, 0.55);
   
   --bg-gradient-start: #f7f7f7;
   --bg-gradient-end: #e8e8e8;
-
-
-  --bg-gradient-start: #f7f7f7;
-  --bg-gradient-end: #e8e8e8;
+  
   --text-color: #1f1f1f;
   --heading-color: #000000;
   --description-color: #666666;
+  
   --card-bg: #ffffff;
   --card-shadow: rgba(0, 0, 0, 0.08);
   --card-shadow-hover: rgba(0, 0, 0, 0.16);
-  --btn-bg: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-  --btn-hover-bg: linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%);
-  --btn-primary-bg: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+  
+  /* Основные кнопки - улучшенные градиенты */
+  --btn-bg: linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%);
+  --btn-hover-bg: linear-gradient(135deg, #f8f8f8 0%, #ebebeb 50%, #dcdcdc 100%);
+  
+  --btn-primary-bg: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #db2777 100%);
   --btn-primary-color: #ffffff;
-  --btn-primary-hover-bg: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-  --btn-secondary-bg: linear-gradient(135deg, #ececec 0%, #dcdcdc 100%);
+  --btn-primary-hover-bg: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
+  
+  --btn-secondary-bg: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 50%, #dcdcdc 100%);
   --btn-secondary-color: #1f1f1f;
-  --btn-secondary-hover-bg: linear-gradient(135deg, #dcdcdc 0%, #cccccc 100%);
-  --btn-back-bg: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --btn-back-hover-bg: linear-gradient(135deg, #7d80f5 0%, #b975f9 100%);
+  --btn-secondary-hover-bg: linear-gradient(135deg, #ebebeb 0%, #dcdcdc 50%, #cccccc 100%);
+  
+  --btn-back-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  --btn-back-hover-bg: linear-gradient(135deg, #7d80f5 0%, #9d7dfa 50%, #b975f9 100%);
   --btn-back-shadow: rgba(139, 92, 246, 0.25);
-  --delete-btn-bg: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-  --share-btn-bg: linear-gradient(135deg, #10b981 0%, #047857 100%);
-  --share-btn-hover-bg: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  
+  /* Кнопка удаления - улучшенный градиент */
+  --delete-btn-bg: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  
+  /* Кнопка поделиться - улучшенный градиент */
+  --share-btn-bg: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  --share-btn-hover-bg: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+  
   --accent-color: #7c3aed;
   --accent-hover: #8b5cf6;
+  
   --input-border: #d4d4d4;
   --input-focus-border: #8b5cf6;
+  
   --code-input-bg: #f0f0f0;
   --code-input-text: #1f1f1f;
   --code-input-border: #d4d4d4;
+  
   --code-bg: #f0f0f0;
   --code-text: #1f1f1f;
+  
   --modal-bg: #ffffff;
   --modal-shadow: rgba(0, 0, 0, 0.18);
   --modal-heading-color: #000000;
@@ -44,34 +56,38 @@
   --modal-close-color: #666666;
   --modal-close-hover-bg: #e0e0e0;
   --modal-close-hover-color: #000000;
+  
   --status-error-bg: rgba(239, 68, 68, 0.12);
   --status-error-color: #dc2626;
   --status-success-bg: rgba(16, 185, 129, 0.12);
   --status-success-color: #059669;
   --status-loading-bg: rgba(139, 92, 246, 0.12);
   --status-loading-color: #7c3aed;
+  
   --tab-bg: #e8e8e8;
   --tab-color: #666666;
-  --tab-active-bg: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+  --tab-active-bg: linear-gradient(135deg, #7c3aed 0%, #9333ea 50%, #db2777 100%);
   --tab-active-color: #ffffff;
   --tab-hover-color: #000000;
+  
   --folder-warning-bg: rgba(251, 191, 36, 0.15);
   --folder-warning-color: #b45309;
+  
   --edit-preview-bg: #f0f0f0;
   --edit-preview-name-color: #000000;
   --edit-preview-desc-color: #666666;
+  
   --ai-link-bg: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
   --ai-link-color: #7c3aed;
   --ai-link-hover-bg: linear-gradient(135deg, #e0e0e0 0%, #d0d0d0 100%);
   --ai-link-hover-color: #8b5cf6;
   --ai-link-hover-shadow: rgba(139, 92, 246, 0.25);
+  
   --app-header-bg: #ffffff;
   --app-header-text: #000000;
   --app-header-shadow: rgba(0, 0, 0, 0.1);
-  --toast-info-bg: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --toast-success-bg: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --toast-error-bg: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
- 
-
   
+  --toast-info-bg: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  --toast-success-bg: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  --toast-error-bg: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
 }
