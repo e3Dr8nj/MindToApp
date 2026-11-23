@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Конструктор фитнес занятий</title>
+<script type="application/json" id="manifest">{"id":"fitness-constructor-583917","name":"Конструктор фитнес занятий v1","icon":"💪","description":"Создавайте элементы занятий с фото, видео и ссылками, собирайте из них планы тренировок и запускайте их с таймером."}</script>
+<style>
+:root{
+  --g-primary:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);
+  --g-info:linear-gradient(135deg,#06b6d4 0%,#3b82f6 100%);
+  --g-success:linear-gradient(135deg,#10b981 0%,#84cc16 100%);
+  --g-danger:linear-gradient(135deg,#ef4444 0%,#f97316 100%);
+  --g-warm:linear-gradient(135deg,#f59e0b 0%,#ef4444 100%);
+  --radius:18px;
+}
+[data-theme="dark"]{
+  --bg:#0d0e1a;--card:rgba(255,255,255,.06);--card-solid:#1a1c35;--border:rgba(255,255,255,.11);
+  --text:#f2f3ff;--muted:#9b9eba;--input:rgba(255,255,255,.07);--shadow:0 12px 34px rgba(0,0,0,.45);
+  --orb1:#7c3aed;--orb2:#ec4899;--orb3:#06b6d4;--orb-op:.32;--chip-l:74%;--modal-bg:#17192f;--hover:rgba(255,255,255,.09);
+}
+[data-theme="light"]{
+  --bg:#f3f4ff;--card:rgba(255,255,255,.82);--card-solid:#ffffff;--border:rgba(90,90,170,.16);
+  --text:#1c1e3a;--muted:#686b8d;--input:#ffffff;--shadow:0 12px 30px rgba(80,70,170,.16);
+  --orb1:#a78bfa;--orb2:#f9a8d4;--orb3:#67e8f9;--orb-op:.45;--chip-l:36%;--modal-bg:#ffffff;--hover:rgba(120,100,220,.09);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{min-height:calc(100vh - 60px);margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s;position:relative;overflow-x:hidden;line-height:1.45}
+body.modal-open{overflow:hidden}
+button,input,select,textarea{font-family:inherit;font-size:15px;color:inherit}
+.orbs{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orbs i{position:absolute;border-radius:50%;filter:blur(90px);opacity:var(--orb-op)}
+.orbs i:nth-child(1){width:440px;height:440px;background:var(--orb1);top:-140px;left:-120px}
+.orbs i:nth-child(2){width:380px;height:380px;background:var(--orb2);top:30%;right:-140px}
+.orbs i:nth-child(3){width:420px;height:420px;background:var(--orb3);bottom:-160px;left:25%}
+.topbar,.tabs,.app{position:relative;z-index:1}
+.topbar{max-width:1200px;margin:0 auto;padding:16px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:15px;background:var(--g-primary);display:grid;place-items:center;font-size:24px;box-shadow:0 8px 22px rgba(236,72,153,.4)}
+.brand b{font-size:20px;letter-spacing:.2px;background:var(--g-primary);-webkit-background-clip:text;background-clip:text;color:transparent;display:block;line-height:1.1}
+.brand small{color:var(--muted);font-size:12px}
+.icon-btn{width:46px;height:46px;border-radius:15px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:21px;backdrop-filter:blur(12px);transition:transform .2s,background .2s}
+.icon-btn:hover{transform:rotate(15deg) scale(1.06);background:var(--hover)}
+.tabs{display:flex;gap:6px;padding:6px;margin:6px auto 18px;width:fit-content;max-width:calc(100% - 24px);background:var(--card);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(16px);box-shadow:var(--shadow)}
+.tab{border:0;background:transparent;cursor:pointer;padding:10px 18px;border-radius:14px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--text);background:var(--hover)}
+.tab.active{background:var(--g-primary);color:#fff;box-shadow:0 6px 18px rgba(236,72,153,.4)}
+.badge{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:rgba(127,127,160,.25);font-size:12px;display:inline-grid;place-items:center;font-weight:700}
+.tab.active .badge{background:rgba(255,255,255,.28)}
+.app{max-width:1200px;margin:0 auto;padding:0 16px 40px}
+.view{display:none;animation:fade .3s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2,h3{margin:0}
+.muted{color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.panel-head h2{font-size:19px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.toolbar .grow{flex:1;min-width:180px}
+.btn{border:0;cursor:pointer;color:#fff;font-weight:650;padding:11px 18px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .2s,filter .2s;box-shadow:0 6px 18px rgba(0,0,0,.25);position:relative;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn-primary{background:var(--g-primary);box-shadow:0 8px 20px rgba(236,72,153,.38)}
+.btn-info{background:var(--g-info);box-shadow:0 8px 20px rgba(59,130,246,.35)}
+.btn-success{background:var(--g-success);box-shadow:0 8px 20px rgba(16,185,129,.33)}
+.btn-danger{background:var(--g-danger);box-shadow:0 8px 20px rgba(239,68,68,.33)}
+.btn-warm{background:var(--g-warm);box-shadow:0 8px 20px rgba(245,158,11,.33)}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:none}
+.btn-ghost:hover{background:var(--hover)}
+.btn.sm{padding:8px 12px;border-radius:11px;font-size:13px}
+.btn.lg{padding:15px 26px;font-size:17px;border-radius:17px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+input[type=text],input[type=search],input[type=number],input[type=url],select,textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:13px;padding:11px 14px;outline:none;transition:border .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.25)}
+textarea{resize:vertical;min-height:90px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip-btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 14px;border-radius:20px;cursor:pointer;font-weight:600;font-size:13px;transition:all .2s}
+.chip-btn:hover{background:var(--hover)}
+.chip-btn.active{background:var(--g-info);color:#fff;border-color:transparent;box-shadow:0 5px 14px rgba(59,130,246,.35)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700;background:hsla(var(--h,260),80%,60%,.17);color:hsl(var(--h,260),75%,var(--chip-l));border:1px solid hsla(var(--h,260),80%,60%,.35)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;backdrop-filter:blur(14px);box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px)}
+.thumb{position:relative;height:150px;background:linear-gradient(135deg,hsl(var(--h,260),70%,46%),hsl(calc(var(--h,260) + 45),75%,56%));display:grid;place-items:center;overflow:hidden;cursor:pointer;flex-shrink:0}
+.thumb-emoji{font-size:54px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.thumb img,.thumb video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+.play-badge{position:absolute;right:10px;bottom:10px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-size:13px;z-index:2}
+.thumb.mini{width:54px;height:54px;border-radius:14px;flex-shrink:0}
+.thumb.mini .thumb-emoji{font-size:26px}
+.thumb.mini .play-badge{display:none}
+.card-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card-body h3{font-size:17px}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;margin:0}
+.meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.card-actions{display:flex;gap:6px;padding:0 14px 14px;flex-wrap:wrap}
+.card-actions .btn:first-child{flex:1}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);grid-column:1/-1}
+.empty .big{font-size:56px;margin-bottom:10px}
+.builder-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+.builder-pick{position:sticky;top:12px;max-height:calc(100vh - 40px);display:flex;flex-direction:column}
+.pick-list{display:flex;flex-direction:column;gap:8px;overflow:auto;margin-top:12px;padding-right:2px;min-height:80px}
+.pick-row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;border:1px solid var(--border);background:var(--input);transition:background .2s}
+.pick-row:hover{background:var(--hover)}
+.pick-row .info{flex:1;min-width:0}
+.pick-row .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.add-btn{width:40px;height:40px;border-radius:12px;border:0;cursor:pointer;background:var(--g-success);color:#fff;font-size:22px;font-weight:700;box-shadow:0 6px 14px rgba(16,185,129,.35);transition:transform .15s;flex-shrink:0}
+.add-btn:hover{transform:scale(1.1) rotate(8deg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0}
+.stat{background:var(--input);border:1px solid var(--border);border-radius:14px;padding:10px 12px;text-align:center}
+.stat b{display:block;font-size:22px;background:var(--g-primary);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:12px;color:var(--muted)}
+.plan-items{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.plan-item{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--input);transition:all .2s;animation:fade .25s}
+.plan-item.dragging{opacity:.4}
+.plan-item.over{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.25)}
+.pi-num{width:30px;height:30px;border-radius:10px;background:var(--g-primary);color:#fff;font-weight:700;display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.pi-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.pi-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pi-fields{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pi-fields label{font-size:11px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:3px}
+.pi-fields input,.pi-main>input{padding:7px 9px;border-radius:10px;font-size:14px}
+.pi-actions{display:flex;flex-direction:column;gap:4px}
+.mini-btn{width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:14px;display:grid;place-items:center;transition:all .15s}
+.mini-btn:hover{background:var(--hover);transform:scale(1.08)}
+.mini-btn.del:hover{background:var(--g-danger);border-color:transparent;color:#fff}
+.drag-handle{cursor:grab;color:var(--muted);font-size:18px;text-align:center;user-select:none;line-height:30px;width:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:flex-end}
+.row.center{justify-content:center}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.data-card{display:flex;flex-direction:column;gap:12px}
+.data-card h3{font-size:17px}
+.data-card p{margin:0;font-size:14px}
+.overlay{position:fixed;inset:0;z-index:100;background:rgba(5,6,18,.62);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .2s}
+.overlay.closing{opacity:0;transition:opacity .15s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--modal-bg);border:1px solid var(--border);border-radius:24px;padding:22px;width:100%;max-width:520px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:pop .25s cubic-bezier(.2,1.2,.4,1)}
+.modal.wide{max-width:760px}
+.modal.small{max-width:420px}
+.modal.lightbox{background:transparent;border:0;box-shadow:none;max-width:95vw;padding:0}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(12px)}to{opacity:1;transform:none}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.modal-head h2{font-size:21px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.form-grid.four{grid-template-columns:repeat(4,1fr)}
+.section-title{font-size:14px;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.media-tile{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:#000;border:1px solid var(--border)}
+.media-tile img,.media-tile video{width:100%;height:100%;object-fit:cover}
+.media-tile .rm{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:9px;border:0;background:var(--g-danger);color:#fff;cursor:pointer;font-size:13px;z-index:3}
+.media-tile .tag{position:absolute;left:6px;bottom:6px;font-size:11px;background:rgba(0,0,0,.6);color:#fff;border-radius:8px;padding:2px 7px;z-index:2}
+.link-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--input);border:1px solid var(--border);margin-bottom:6px}
+.link-row a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#60a5fa;text-decoration:none;font-weight:600}
+[data-theme="light"] .link-row a{color:#2563eb}
+.link-add{display:grid;grid-template-columns:1.4fr 1fr auto;gap:8px}
+.view-media{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:14px 0}
+.view-media img,.view-media video{width:100%;border-radius:14px;background:#000;max-height:300px;object-fit:cover;cursor:zoom-in}
+.view-media video{cursor:default;object-fit:contain}
+.desc{white-space:pre-wrap;margin:12px 0}
+.lb-img{max-width:95vw;max-height:90vh;border-radius:16px;display:block;margin:0 auto}
+.plan-view-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;background:var(--input);border:1px solid var(--border);margin-bottom:8px;cursor:pointer}
+.plan-view-item:hover{background:var(--hover)}
+.plan-view-item .info{flex:1;min-width:0}
+.plan-view-item .info small{color:var(--muted);display:block}
+.plan-chips{display:flex;flex-wrap:wrap;gap:6px}
+.toasts{position:fixed;left:0;right:0;bottom:24px;z-index:300;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.toast{padding:12px 20px;border-radius:14px;color:#fff;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);background:var(--g-success);animation:toastIn .3s;max-width:90vw;text-align:center}
+.toast.err{background:var(--g-danger)}
+.toast.info{background:var(--g-info)}
+.toast.out{opacity:0;transform:translateY(10px);transition:all .35s}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px) scale(.9)}to{opacity:1;transform:none}}
+.confirm h3{font-size:20px;margin-bottom:8px}
+.confirm p{margin:0 0 18px}
+textarea.code{min-height:220px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+.player{text-align:center}
+.pl-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.progress{height:8px;border-radius:6px;background:var(--input);overflow:hidden;margin-bottom:16px}
+.progress i{display:block;height:100%;background:var(--g-primary);border-radius:6px;transition:width .4s}
+.pl-phase{display:inline-block;padding:6px 18px;border-radius:20px;font-weight:700;background:var(--g-warm);color:#fff;margin-bottom:10px}
+.pl-phase.rest{background:var(--g-info)}
+.player h2{font-size:26px;margin-bottom:4px}
+.ring{--p:100;width:190px;height:190px;border-radius:50%;margin:18px auto;background:conic-gradient(#ec4899 calc(var(--p)*1%),var(--input) 0);display:grid;place-items:center;box-shadow:0 0 40px rgba(236,72,153,.25);transition:background .3s}
+.ring-in{width:158px;height:158px;border-radius:50%;background:var(--modal-bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-in b{font-size:44px;font-variant-numeric:tabular-nums;line-height:1}
+.ring-in small{color:var(--muted);margin-top:4px}
+.pl-media{width:100%;max-height:240px;border-radius:16px;object-fit:contain;background:#000;margin:6px 0}
+.pl-desc{font-size:14px;color:var(--muted);white-space:pre-wrap;margin:8px 0 14px;text-align:left}
+.done-emoji{font-size:80px;animation:bounce 1s infinite}
+@keyframes bounce{50%{transform:translateY(-14px)}}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:rgba(140,140,180,.4);border-radius:6px}
+@media (max-width:900px){
+  .builder-grid{grid-template-columns:1fr}
+  .builder-pick{position:static;max-height:none}
+  .pick-list{max-height:420px}
+}
+@media (max-width:720px){
+  .tabs{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));width:auto;max-width:none;margin:0;z-index:50;justify-content:space-around;gap:2px;padding:6px}
+  .tab{flex-direction:column;gap:2px;padding:7px 4px;font-size:11px;flex:1;position:relative}
+  .tab .ti{font-size:20px}
+  .tab .badge{position:absolute;top:2px;right:6px;min-width:18px;height:18px;font-size:10px}
+  .app{padding-bottom:110px}
+  .toasts{bottom:100px}
+  .pi-fields{grid-template-columns:repeat(2,1fr)}
+  .form-grid.four{grid-template-columns:1fr 1fr}
+  .link-add{grid-template-columns:1fr}
+  .modal{padding:18px;border-radius:20px}
+  .form-grid{grid-template-columns:1fr}
+  .brand small{display:none}
+}
+</style>
+</head>
+<body>
+<div class="orbs"><i></i><i></i><i></i></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">💪</div>
+    <div><b>FitBuilder</b><small>Конструктор фитнес занятий</small></div>
+  </div>
+  <button class="icon-btn" id="themeBtn" data-act="theme" title="Сменить тему">🌙</button>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-act="tab" data-tab="library"><span class="ti">📚</span><span class="tl">Элементы</span><span class="badge" id="bLib">0</span></button>
+  <button class="tab" data-act="tab" data-tab="builder"><span class="ti">🛠</span><span class="tl">Конструктор</span><span class="badge" id="bBuild">0</span></button>
+  <button class="tab" data-act="tab" data-tab="plans"><span class="ti">📋</span><span class="tl">Занятия</span><span class="badge" id="bPlans">0</span></button>
+  <button class="tab" data-act="tab" data-tab="data"><span class="ti">💾</span><span class="tl">Данные</span></button>
+</nav>
+
+<main class="app">
+  <!-- БИБЛИОТЕКА -->
+  <section class="view active" id="view-library">
+    <div class="toolbar">
+      <input type="search" id="libSearch" class="grow" placeholder="🔍 Поиск элементов...">
+      <button class="btn btn-primary" data-act="new-ex">＋ Новый элемент</button>
+    </div>
+    <div class="chips" id="libChips" style="margin-bottom:16px"></div>
+    <div class="grid" id="libGrid"></div>
+  </section>
+
+  <!-- КОНСТРУКТОР -->
+  <section class="view" id="view-builder">
+    <div class="builder-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2 id="builderTitle">🛠 Новое занятие</h2>
+          <div class="row">
+            <button class="btn btn-ghost sm" data-act="plan-new">🆕 Новое</button>
+            <button class="btn btn-ghost sm" data-act="plan-clear">🧹 Очистить</button>
+          </div>
+        </div>
+        <div class="form-grid">
+          <label class="f full">Название занятия
+            <input type="text" id="planName" placeholder="Например: Утренний заряд" maxlength="80">
+          </label>
+          <label class="f full">Заметки к занятию
+            <textarea id="planNotes" placeholder="Цель, инвентарь, особенности..." style="min-height:70px"></textarea>
+          </label>
+        </div>
+        <div class="stats" id="planSummary"></div>
+        <div class="plan-items" id="planItems"></div>
+        <div class="row">
+          <button class="btn btn-primary" data-act="plan-save">💾 Сохранить занятие</button>
+          <button class="btn btn-info" data-act="plan-save-new">📄 Сохранить как новое</button>
+          <button class="btn btn-success" data-act="plan-start">▶ Запустить</button>
+        </div>
+      </div>
+      <div class="panel builder-pick">
+        <div class="panel-head" style="margin-bottom:10px">
+          <h2>📚 Элементы</h2>
+          <button class="btn btn-ghost sm" data-act="new-ex">＋ Создать</button>
+        </div>
+        <input type="search" id="pickSearch" placeholder="🔍 Найти элемент...">
+        <div class="chips" id="pickChips" style="margin-top:10px"></div>
+        <div class="pick-list" id="pickList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЗАНЯТИЯ -->
+  <section class="view" id="view-plans">
+    <div class="toolbar">
+      <input type="search" id="planSearch" class="grow" placeholder="🔍 Поиск занятий...">
+      <button class="btn btn-primary" data-act="plan-new-go">＋ Новое занятие</button>
+    </div>
+    <div class="grid" id="plansGrid"></div>
+  </section>
+
+  <!-- ДАННЫЕ -->
+  <section class="view" id="view-data">
+    <div class="stats" id="dataStats" style="margin-top:0"></div>
+    <div class="data-grid">
+      <div class="panel data-card">
+        <h3>📤 Резервная копия</h3>
+        <p class="muted">Скачайте все элементы, занятия и прикреплённые фото/видео одним файлом.</p>
+        <div class="row">
+          <button class="btn btn-primary" data-act="export">💾 Скачать с файлами</button>
+          <button class="btn btn-info" data-act="export-nomedia">📄 Без файлов</button>
+        </div>
+      </div>
+      <div class="panel data-card">
+        <h3>📥 Восстановление</h3>
+        <p class="muted">Загрузите ранее сохранённую копию. Данные будут добавлены к текущим (совпадающие заменятся).</p>
+        <div class="row">
+          <button class="btn btn-success" data-act="import-pick">📂 Выбрать файл</button>
+          <button class="btn btn-ghost" data-act="text-backup">📋 Копия текстом</button>
+        </div>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+      <div class="panel data-card">
+        <h3>🎁 Примеры</h3>
+        <p class="muted">Добавить готовые упражнения и пример занятия, чтобы быстрее разобраться.</p>
+        <div class="row"><button class="btn btn-warm" data-act="demo">✨ Добавить примеры</button></div>
+      </div>
+      <div class="panel data-card">
+        <h3>🗑 Очистка</h3>
+        <p class="muted">Удаление данных необратимо. Сделайте резервную копию заранее.</p>
+        <div class="row">
+          <button class="btn btn-danger sm" data-act="wipe-plans">Удалить занятия</button>
+          <button class="btn btn-danger sm" data-act="wipe-ex">Удалить элементы</button>
+          <button class="btn btn-danger sm" data-act="wipe-all">Удалить всё</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Утилиты ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.prototype.slice.call(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const KEY='fitness-constructor-data-v1';
+const DEFAULT_CATS=['Разминка','Силовые','Кардио','Растяжка','Йога','Кор','Заминка'];
+const EMOJI={'разминка':'🔥','силовые':'🏋️','кардио':'🏃','растяжка':'🧘','йога':'🪷','кор':'🎯','заминка':'🌿'};
+
+function hue(str){let h=0;str=String(str||'Другое');for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))%360;return h}
+function catEmoji(c){return EMOJI[String(c||'').toLowerCase()]||'💪'}
+function fixUrl(u){u=String(u||'').trim();if(!u)return'';return /^https?:\/\//i.test(u)?u:'https://'+u}
+function fmtSec(s){s=+s||0;if(s<60)return s+' с';const m=Math.floor(s/60),r=s%60;return m+' мин'+(r?' '+r+' с':'')}
+function fmtTotal(s){if(s<60)return s+' с';return Math.max(1,Math.round(s/60))+' мин'}
+function fmtClock(s){s=Math.max(0,s|0);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function fmtDate(t){try{return new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'short',year:'numeric'})}catch(e){return''}}
+function fmtSize(b){if(b<1024)return b+' Б';if(b<1048576)return (b/1024).toFixed(1)+' КБ';if(b<1073741824)return (b/1048576).toFixed(1)+' МБ';return (b/1073741824).toFixed(2)+' ГБ'}
+function paramsText(p){const a=[];if(+p.sets)a.push(p.sets+' подх.');if(+p.reps)a.push(p.reps+' повт.');if(+p.duration)a.push(fmtSec(p.duration));if(+p.rest)a.push('отдых '+p.rest+' с');return a.join(' · ')||'без параметров'}
+function itemTime(it){const sets=Math.max(1,+it.sets||1);const work=+it.duration>0?+it.duration:(+it.reps||10)*3;const rest=+it.rest||0;return sets*work+(sets-1)*rest}
+function blobToDataURL(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b)})}
+function dataURLToBlob(d){const parts=d.split(',');const mime=(parts[0].match(/:(.*?);/)||[])[1]||'application/octet-stream';const bin=atob(parts[1]);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime})}
+function download(text,name){const b=new Blob([text],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+
+/* ---------- Хранилище (метаданные: localStorage, файлы: IndexedDB) ---------- */
+let memStore=null;
+function lsGet(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):memStore}catch(e){return memStore}}
+function lsSet(o){memStore=o;try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+
+const DB={
+  db:null,mem:new Map(),
+  open(){return new Promise(res=>{try{const r=indexedDB.open('fitness-constructor-media',1);r.onupgradeneeded=()=>{r.result.createObjectStore('media')};r.onsuccess=()=>{DB.db=r.result;res()};r.onerror=()=>res();r.onblocked=()=>res()}catch(e){res()}})},
+  tx(mode,fn){return new Promise(res=>{try{const t=DB.db.transaction('media',mode);const req=fn(t.objectStore('media'));t.oncomplete=()=>res(req?req.result:undefined);t.onerror=()=>res(undefined);t.onabort=()=>res(undefined)}catch(e){res(undefined)}})},
+  async put(id,blob){
+    if(DB.db){const ok=await new Promise(res=>{try{const t=DB.db.transaction('media','readwrite');t.objectStore('media').put(blob,id);t.oncomplete=()=>res(true);t.onerror=()=>res(false);t.onabort=()=>res(false)}catch(e){res(false)}});if(ok){DB.mem.delete(id);return}}
+    DB.mem.set(id,blob);
+  },
+  async get(id){if(DB.mem.has(id))return DB.mem.get(id);if(!DB.db)return null;const r=await DB.tx('readonly',s=>s.get(id));return r||null},
+  async del(id){DB.mem.delete(id);if(DB.db)await DB.tx('readwrite',s=>s.delete(id))},
+  async clear(){DB.mem.clear();if(DB.db)await DB.tx('readwrite',s=>s.clear())},
+  async stats(){
+    let count=0,size=0;const seen=new Set();
+    DB.mem.forEach((b,id)=>{count++;size+=b.size||0;seen.add(id)});
+    if(DB.db){const keys=await DB.tx('readonly',s=>s.getAllKeys())||[];const vals=await DB.tx('readonly',s=>s.getAll())||[];vals.forEach((b,i)=>{if(!seen.has(keys[i])){count++;size+=(b&&b.size)||0}})}
+    return{count,size};
+  }
+};
+
+const urlCache=new Map();
+async function mediaURL(id){
+  if(urlCache.has(id))return urlCache.get(id);
+  const b=await DB.get(id);if(!b)return null;
+  const u=URL.createObjectURL(b);urlCache.set(id,u);return u;
+}
+function revoke(id){const u=urlCache.get(id);if(u){URL.revokeObjectURL(u);urlCache.delete(id)}}
+async function hydrate(root){
+  const els=$$('[data-media]',root);
+  await Promise.all(els.map(async el=>{
+    const u=await mediaURL(el.dataset.media);
+    if(u){el.src=el.hasAttribute('data-poster')?u+'#t=0.3':u}else{el.style.display='none'}
+  }));
+}
+function compressImage(file){
+  return new Promise(res=>{
+    if(file.type==='image/gif'||file.type==='image/svg+xml'){res(file);return}
+    const u=URL.createObjectURL(file);const im=new Image();
+    im.onload=()=>{
+      try{
+        const max=1600;let w=im.width,h=im.height;const k=Math.min(1,max/Math.max(w,h));
+        w=Math.round(w*k);h=Math.round(h*k);
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(im,0,0,w,h);
+        c.toBlob(b=>{URL.revokeObjectURL(u);res(b&&b.size<file.size?b:file)},'image/jpeg',0.86);
+      }catch(e){URL.revokeObjectURL(u);res(file)}
+    };
+    im.onerror=()=>{URL.revokeObjectURL(u);res(file)};
+    im.src=u;
+  });
+}
+
+/* ---------- Состояние ---------- */
+function newDraft(){return{id:null,name:'',notes:'',items:[]}}
+let S={exercises:[],plans:[],draft:newDraft(),theme:null,seeded:false};
+let libSearch='',libCat='all',pickSearch='',pickCat='all',planSearch='';
+function save(){lsSet({exercises:S.exercises,plans:S.plans,draft:S.draft,theme:S.theme,seeded:S.seeded})}
+
+function cleanEx(e){
+  return{
+    id:String(e.id||uid()),name:String(e.name||'Без названия'),category:String(e.category||'Другое'),
+    description:String(e.description||''),sets:+e.sets||0,reps:+e.reps||0,duration:+e.duration||0,rest:+e.rest||0,
+    links:(Array.isArray(e.links)?e.links:[]).filter(l=>l&&l.url).map(l=>({url:fixUrl(l.url),title:String(l.title||'')})),
+    media:(Array.isArray(e.media)?e.media:[]).filter(m=>m&&m.id).map(m=>({id:String(m.id),type:m.type==='video'?'video':'image',name:String(m.name||''),mime:String(m.mime||'')})),
+    created:+e.created||Date.now()
+  };
+}
+function cleanItem(i){
+  return{uid:String(i.uid||uid()),exId:i.exId?String(i.exId):'',name:String(i.name||'Без названия'),category:String(i.category||'Другое'),
+    sets:+i.sets||0,reps:+i.reps||0,duration:+i.duration||0,rest:+i.rest||0,note:String(i.note||'')};
+}
+function cleanPlan(p){
+  return{id:String(p.id||uid()),name:String(p.name||'Без названия'),notes:String(p.notes||''),
+    items:(Array.isArray(p.items)?p.items:[]).map(cleanItem),created:+p.created||Date.now(),updated:+p.updated||Date.now()};
+}
+function makeItem(ex){
+  return{uid:uid(),exId:ex.id,name:ex.name,category:ex.category,sets:ex.sets||1,reps:ex.reps||0,duration:ex.duration||0,rest:ex.rest||0,note:''};
+}
+
+/* ---------- Модальные окна, подтверждения, тосты ---------- */
+const modalRoot=$('#modalRoot');const modalStack=[];
+function openModal(html,opts){
+  opts=opts||{};
+  const ov=document.createElement('div');ov.className='overlay';
+  ov.innerHTML='<div class="modal '+(opts.wide?'wide ':'')+(opts.cls||'')+'" role="dialog" aria-modal="true">'+html+'</div>';
+  modalRoot.appendChild(ov);
+  const api={el:ov.firstElementChild,overlay:ov,sticky:!!opts.sticky,
+    close(result){
+      if(!ov.isConnected||ov.classList.contains('closing'))return;
+      ov.classList.add('closing');setTimeout(()=>ov.remove(),160);
+      const i=modalStack.indexOf(api);if(i>=0)modalStack.splice(i,1);
+      document.body.classList.toggle('modal-open',modalStack.length>0);
+      if(opts.onClose)opts.onClose(result);
+    }};
+  ov.addEventListener('mousedown',e=>{if(e.target===ov&&!api.sticky)api.close()});
+  modalStack.push(api);document.body.classList.add('modal-open');
+  hydrate(ov);
+  return api;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&modalStack.length){const m=modalStack[modalStack.length-1];if(!m.sticky)m.close()}
+});
+function ask(o){
+  return new Promise(res=>{
+    let done=false;
+    const m=openModal('<div class="confirm"><h3>'+esc(o.title)+'</h3><p class="muted">'+esc(o.text||'')+'</p><div class="row end"><button class="btn btn-ghost" data-k="0">'+esc(o.cancel||'Отмена')+'</button><button class="btn '+(o.danger?'btn-danger':'btn-primary')+'" data-k="1">'+esc(o.ok||'Подтвердить')+'</button></div></div>',
+      {cls:'small',onClose:()=>{if(!done){done=true;res(false)}}});
+    m.el.addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;done=true;res(b.dataset.k==='1');m.close()});
+  });
+}
+function toast(msg,type){
+  const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;
+  $('#toasts').appendChild(t);
+  setTimeout(()=>t.classList.add('out'),2600);setTimeout(()=>t.remove(),3000);
+}
+
+/* ---------- Тема и вкладки ---------- */
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',S.theme);
+  $('#themeBtn').textContent=S.theme==='dark'?'🌙':'☀️';
+}
+let curTab='library';
+function setTab(t){
+  curTab=t;
+  $$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+t));
+  $$('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  if(t==='library')renderLibraryList();
+  if(t==='builder')renderBuilder();
+  if(t==='plans')renderPlans();
+  if(t==='data')renderData();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateBadges(){
+  $('#bLib').textContent=S.exercises.length;
+  $('#bBuild').textContent=S.draft.items.length;
+  $('#bPlans').textContent=S.plans.length;
+}
+
+/* ---------- Отрисовка: общие куски ---------- */
+function thumbHTML(ex,mini){
+  const h=hue(ex&&ex.category);
+  let inner='<span class="thumb-emoji">'+catEmoji(ex&&ex.category)+'</span>';
+  if(ex){
+    const img=(ex.media||[]).find(m=>m.type==='image');
+    const vid=(ex.media||[]).find(m=>m.type==='video');
+    if(img)inner+='<img data-media="'+esc(img.id)+'" alt="">';
+    else if(vid)inner+='<video data-media="'+esc(vid.id)+'" data-poster muted preload="metadata" playsinline></video><span class="play-badge">▶</span>';
+  }
+  return '<div class="thumb'+(mini?' mini':'')+'" style="--h:'+h+'">'+inner+'</div>';
+}
+function chip(cat){return '<span class="chip" style="--h:'+hue(cat)+'">'+esc(cat||'Другое')+'</span>'}
+function chipsHTML(active,act){
+  const cats=Array.from(new Set(S.exercises.map(e=>e.category||'Другое'))).sort();
+  if(!cats.length)return'';
+  return '<button class="chip-btn '+(active==='all'?'active':'')+'" data-act="'+act+'" data-cat="all">Все</button>'+
+    cats.map(c=>'<button class="chip-btn '+(active===c?'active':'')+'" data-act="'+act+'" data-cat="'+esc(c)+'">'+catEmoji(c)+' '+esc(c)+'</button>').join('');
+}
+function filterEx(q,cat){
+  q=q.toLowerCase().trim();
+  return S.exercises.filter(e=>(cat==='all'||(e.category||'Другое')===cat)&&(!q||(e.name+' '+e.description+' '+e.category).toLowerCase().includes(q)));
+}
+
+/* ---------- Библиотека ---------- */
+function renderLibraryList(){
+  $('#libChips').innerHTML=chipsHTML(libCat,'lib-cat');
+  const list=filterEx(libSearch,libCat);
+  const g=$('#libGrid');
+  if(!S.exercises.length){
+    g.innerHTML='<div class="empty"><div class="big">🏋️</div><h3>Пока нет ни одного элемента</h3><p>Создайте упражнение и прикрепите к нему фото, видео или ссылки.</p><button class="btn btn-primary" data-act="new-ex">＋ Создать первый элемент</button></div>';
+  }else if(!list.length){
+    g.innerHTML='<div class="empty"><div class="big">🔍</div><p>Ничего не найдено</p></div>';
+  }else{
+    g.innerHTML=list.map(e=>{
+      const ph=(e.media||[]).filter(m=>m.type==='image').length,vd=(e.media||[]).filter(m=>m.type==='video').length,lk=(e.links||[]).length;
+      return '<article class="card">'+
+        '<div data-act="view-ex" data-id="'+e.id+'">'+thumbHTML(e)+'</div>'+
+        '<div class="card-body">'+chip(e.category)+'<h3>'+esc(e.name)+'</h3>'+
+        '<p class="muted clamp">'+esc(e.description||'Без описания')+'</p>'+
+        '<div class="meta"><span>⚙️ '+esc(paramsText(e))+'</span></div>'+
+        '<div class="meta">'+(ph?'<span>🖼 '+ph+'</span>':'')+(vd?'<span>🎬 '+vd+'</span>':'')+(lk?'<span>🔗 '+lk+'</span>':'')+'</div></div>'+
+        '<div class="card-actions">'+
+        '<button class="btn btn-success sm" data-act="add-to-plan" data-id="'+e.id+'">➕ В занятие</button>'+
+        '<button class="btn btn-ghost sm" data-act="view-ex" data-id="'+e.id+'" title="Просмотр">👁</button>'+
+        '<button class="btn btn-ghost sm" data-act="edit-ex" data-id="'+e.id+'" title="Изменить">✏️</button>'+
+        '<button class="btn btn-ghost sm" data-act="del-ex" data-id="'+e.id+'" title="Удалить">🗑</button>'+
+        '</div></article>';
+    }).join('');
+  }
+  hydrate(g);updateBadges();
+}
+
+/* ---------- Редактор элемента ---------- */
+function openEditor(id){
+  const src=id?S.exercises.find(e=>e.id===id):null;
+  const ed={media:src?src.media.map(m=>({...m})):[],links:src?src.links.map(l=>({...l})):[],added:[],removed:[],saved:false};
+  const v=src||{name:'',category:'',description:'',sets:3,reps:12,duration:0,rest:30};
+  const cats=Array.from(new Set(DEFAULT_CATS.concat(S.exercises.map(e=>e.category))));
+  const html=
+  '<div class="modal-head"><h2>'+(src?'✏️ Изменить элемент':'✨ Новый элемент')+'</h2><button class="mini-btn" data-x="cancel">✕</button></div>'+
+  '<div class="form-grid">'+
+    '<label class="f">Название<input type="text" id="edName" maxlength="80" placeholder="Например: Приседания" value="'+esc(v.name)+'"></label>'+
+    '<label class="f">Категория<input type="text" id="edCat" list="catList" placeholder="Выберите или введите" value="'+esc(v.category)+'"><datalist id="catList">'+cats.map(c=>'<option value="'+esc(c)+'">').join('')+'</datalist></label>'+
+    '<label class="f full">Описание<textarea id="edDesc" placeholder="Техника выполнения, советы, ошибки...">'+esc(v.description)+'</textarea></label>'+
+  '</div>'+
+  '<div class="section-title">⚙️ Параметры по умолчанию</div>'+
+  '<div class="form-grid four">'+
+    '<label class="f">Подходы<input type="number" min="0" id="edSets" value="'+(+v.sets||0)+'"></label>'+
+    '<label class="f">Повторы<input type="number" min="0" id="edReps" value="'+(+v.reps||0)+'"></label>'+
+    '<label class="f">Время, сек<input type="number" min="0" id="edDur" value="'+(+v.duration||0)+'"></label>'+
+    '<label class="f">Отдых, сек<input type="number" min="0" id="edRest" value="'+(+v.rest||0)+'"></label>'+
+  '</div>'+
+  '<div class="section-title">🎞 Фото и видео'+
+    '<span class="row"><label class="btn btn-info sm">📷 Фото<input type="file" id="edPhoto" accept="image/*" multiple hidden></label>'+
+    '<label class="btn btn-primary sm">🎬 Видео<input type="file" id="edVideo" accept="video/*" multiple hidden></label></span></div>'+
+  '<div class="media-grid" id="edMedia"></div>'+
+  '<div class="section-title">🔗 Ссылки</div>'+
+  '<div class="link-add"><input type="url" id="edLinkUrl" placeholder="https://..."><input type="text" id="edLinkTitle" placeholder="Название (необязательно)"><button class="btn btn-success sm" data-x="addlink">＋ Добавить</button></div>'+
+  '<div id="edLinks" style="margin-top:10px"></div>'+
+  '<div class="row end" style="margin-top:20px"><button class="btn btn-ghost" data-x="cancel">Отмена</button><button class="btn btn-primary" data-x="save">💾 Сохранить элемент</button></div>';
+
+  const m=openModal(html,{wide:true,sticky:true,onClose:()=>{if(!ed.saved){ed.added.forEach(i=>{DB.del(i);revoke(i)})}}});
+  const root=m.el;
+  function renderMedia(){
+    const g=$('#edMedia',root);
+    g.innerHTML=ed.media.length?ed.media.map(x=>
+      '<div class="media-tile">'+(x.type==='video'?'<video data-media="'+esc(x.id)+'" data-poster muted preload="metadata" playsinline></video><span class="tag">🎬 видео</span>':'<img data-media="'+esc(x.id)+'" alt=""><span class="tag">🖼 фото</span>')+
+      '<button class="rm" data-rm="'+esc(x.id)+'" title="Убрать">✕</button></div>').join(''):'<p class="muted" style="grid-column:1/-1;margin:0">Файлы не прикреплены</p>';
+    hydrate(g);
+  }
+  function renderLinks(){
+    const g=$('#edLinks',root);
+    g.innerHTML=ed.links.map((l,i)=>'<div class="link-row">🔗<a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.title||l.url)+'</a><button class="mini-btn del" data-rl="'+i+'">✕</button></div>').join('');
+  }
+  renderMedia();renderLinks();
+
+  async function addFiles(files,kind){
+    for(const f of Array.prototype.slice.call(files)){
+      if(!f.type.startsWith(kind+'/')){toast('Неподходящий файл: '+f.name,'err');continue}
+      if(f.size>300*1048576){toast('Файл слишком большой (>300 МБ): '+f.name,'err');continue}
+      let blob=f;
+      if(kind==='image')blob=await compressImage(f);
+      const mid='m_'+uid();
+      await DB.put(mid,blob);
+      ed.media.push({id:mid,type:kind==='video'?'video':'image',name:f.name,mime:blob.type||f.type});
+      ed.added.push(mid);
+    }
+    renderMedia();
+  }
+  $('#edPhoto',root).addEventListener('change',e=>{addFiles(e.target.files,'image');e.target.value=''});
+  $('#edVideo',root).addEventListener('change',e=>{addFiles(e.target.files,'video');e.target.value=''});
+  function addLink(){
+    const u=fixUrl($('#edLinkUrl',root).value);
+    if(!u){toast('Введите ссылку','err');return}
+    ed.links.push({url:u,title:$('#edLinkTitle',root).value.trim()});
+    $('#edLinkUrl',root).value='';$('#edLinkTitle',root).value='';renderLinks();
+  }
+  root.addEventListener('click',e=>{
+    const rm=e.target.closest('[data-rm]');
+    if(rm){const i=rm.dataset.rm;ed.media=ed.media.filter(x=>x.id!==i);ed.removed.push(i);renderMedia();return}
+    const rl=e.target.closest('[data-rl]');
+    if(rl){ed.links.splice(+rl.dataset.rl,1);renderLinks();return}
+    const x=e.target.closest('[data-x]');if(!x)return;
+    if(x.dataset.x==='cancel')m.close();
+    if(x.dataset.x==='addlink')addLink();
+    if(x.dataset.x==='save'){
+      const name=$('#edName',root).value.trim();
+      if(!name){const n=$('#edName',root);n.classList.add('shake');setTimeout(()=>n.classList.remove('shake'),400);n.focus();toast('Введите название элемента','err');return}
+      const pending=$('#edLinkUrl',root).value.trim();
+      if(pending)addLink();
+      const obj={
+        id:src?src.id:uid(),name:name,category:$('#edCat',root).value.trim()||'Другое',description:$('#edDesc',root).value.trim(),
+        sets:Math.max(0,parseInt($('#edSets',root).value)||0),reps:Math.max(0,parseInt($('#edReps',root).value)||0),
+        duration:Math.max(0,parseInt($('#edDur',root).value)||0),rest:Math.max(0,parseInt($('#edRest',root).value)||0),
+        links:ed.links,media:ed.media,created:src?src.created:Date.now()
+      };
+      if(src){const i=S.exercises.findIndex(z=>z.id===src.id);S.exercises[i]=obj}else S.exercises.unshift(obj);
+      ed.removed.forEach(i=>{DB.del(i);revoke(i)});
+      const sync=it=>{if(it.exId===obj.id){it.name=obj.name;it.category=obj.category}};
+      S.draft.items.forEach(sync);S.plans.forEach(p=>p.items.forEach(sync));
+      ed.saved=true;save();m.close();
+      toast(src?'Элемент обновлён ✅':'Элемент создан 🎉');
+      renderAll();
+    }
+  });
+}
+
+/* ---------- Просмотр элемента ---------- */
+async function lightbox(mid){
+  const u=await mediaURL(mid);if(!u)return;
+  const lb=openModal('<img class="lb-img" src="'+u+'" alt="">',{cls:'lightbox'});
+  lb.el.addEventListener('click',()=>lb.close());
+}
+function viewExercise(id){
+  const e=S.exercises.find(x=>x.id===id);if(!e)return;
+  const imgs=e.media.filter(m=>m.type==='image'),vids=e.media.filter(m=>m.type==='video');
+  const html=
+  '<div class="modal-head"><div>'+chip(e.category)+'<h2 style="margin-top:6px">'+esc(e.name)+'</h2></div><button class="mini-btn" data-x="close">✕</button></div>'+
+  '<div class="muted">⚙️ '+esc(paramsText(e))+'</div>'+
+  (e.description?'<div class="desc">'+esc(e.description)+'</div>':'<p class="muted">Без описания</p>')+
+  (vids.length||imgs.length?'<div class="view-media">'+
+    vids.map(v=>'<video controls playsinline preload="metadata" data-media="'+esc(v.id)+'"></video>').join('')+
+    imgs.map(i=>'<img data-media="'+esc(i.id)+'" data-lb="'+esc(i.id)+'" alt="">').join('')+'</div>':'')+
+  (e.links.length?'<div class="section-title">🔗 Ссылки</div>'+e.links.map(l=>'<div class="link-row">🔗<a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.title||l.url)+'</a></div>').join(''):'')+
+  '<div class="row end" style="margin-top:18px"><button class="btn btn-ghost" data-x="edit">✏️ Изменить</button><button class="btn btn-success" data-x="add">➕ В занятие</button></div>';
+  const m=openModal(html,{wide:true});
+  m.el.addEventListener('click',ev=>{
+    const lb=ev.target.closest('[data-lb]');if(lb){lightbox(lb.dataset.lb);return}
+    const x=ev.target.closest('[data-x]');if(!x)return;
+    if(x.dataset.x==='close')m.close();
+    if(x.dataset.x==='edit'){m.close();openEditor(id)}
+    if(x.dataset.x==='add'){addToDraft(id)}
+  });
+}
+async function deleteExercise(id){
+  const e=S.exercises.find(x=>x.id===id);if(!e)return;
+  const used=S.plans.filter(p=>p.items.some(i=>i.exId===id)).length;
+  const ok=await ask({title:'Удалить элемент «'+e.name+'»?',text:(used?'Он используется в занятиях: '+used+'. В них останется запись с названием, но без описания и файлов. ':'')+'Действие необратимо.',ok:'Удалить',danger:true});
+  if(!ok)return;
+  e.media.forEach(m=>{DB.del(m.id);revoke(m.id)});
+  S.exercises=S.exercises.filter(x=>x.id!==id);
+  save();renderAll();toast('Элемент удалён','info');
+}
+
+/* ---------- Конструктор ---------- */
+function addToDraft(id){
+  const ex=S.exercises.find(e=>e.id===id);if(!ex)return;
+  S.draft.items.push(makeItem(ex));save();updateBadges();
+  if(curTab==='builder')renderPlanItems();
+  toast('«'+ex.name+'» добавлено в схему');
+}
+function renderBuilder(){
+  $('#planName').value=S.draft.name;
+  $('#planNotes').value=S.draft.notes;
+  $('#builderTitle').textContent=S.draft.id?'✏️ Редактирование занятия':'🛠 Новое занятие';
+  renderPlanItems();renderPicker();
+}
+function renderSummary(){
+  const it=S.draft.items;
+  const total=it.reduce((a,i)=>a+itemTime(i),0);
+  const sets=it.reduce((a,i)=>a+Math.max(1,+i.sets||1),0);
+  $('#planSummary').innerHTML=
+    '<div class="stat"><b>'+it.length+'</b><span>элементов</span></div>'+
+    '<div class="stat"><b>'+sets+'</b><span>подходов</span></div>'+
+    '<div class="stat"><b>~'+(it.length?fmtTotal(total):'0')+'</b><span>длительность</span></div>';
+}
+function renderPlanItems(){
+  renderSummary();updateBadges();
+  const box=$('#planItems');const items=S.draft.items;
+  if(!items.length){
+    box.innerHTML='<div class="empty" style="padding:30px 10px"><div class="big">🧩</div><p>Схема пуста. Добавляйте элементы из списка справа (кнопка ＋).</p></div>';return;
+  }
+  box.innerHTML=items.map((it,i)=>{
+    const ex=S.exercises.find(e=>e.id===it.exId);
+    return '<div class="plan-item" data-i="'+i+'">'+
+      '<span class="drag-handle" draggable="true" title="Перетащите">⋮⋮</span>'+
+      (ex?thumbHTML(ex,true):'<div class="thumb mini" style="--h:'+hue(it.category)+'"><span class="thumb-emoji">'+catEmoji(it.category)+'</span></div>')+
+      '<div class="pi-main">'+
+        '<div class="pi-title"><span class="pi-num" style="width:24px;height:24px;font-size:12px">'+(i+1)+'</span><b>'+esc(it.name)+'</b>'+chip(it.category)+(ex?'':'<span class="muted" style="font-size:12px">(элемент удалён)</span>')+'</div>'+
+        '<div class="pi-fields">'+
+          '<label>Подходы<input type="number" min="0" data-f="sets" value="'+(+it.sets||0)+'"></label>'+
+          '<label>Повторы<input type="number" min="0" data-f="reps" value="'+(+it.reps||0)+'"></label>'+
+          '<label>Время, сек<input type="number" min="0" data-f="duration" value="'+(+it.duration||0)+'"></label>'+
+          '<label>Отдых, сек<input type="number" min="0" data-f="rest" value="'+(+it.rest||0)+'"></label>'+
+        '</div>'+
+        '<input type="text" data-f="note" placeholder="Заметка к элементу..." value="'+esc(it.note)+'">'+
+      '</div>'+
+      '<div class="pi-actions">'+
+        '<button class="mini-btn" data-act="pi-up" data-i="'+i+'" title="Выше">↑</button>'+
+        '<button class="mini-btn" data-act="pi-down" data-i="'+i+'" title="Ниже">↓</button>'+
+        (ex?'<button class="mini-btn" data-act="pi-view" data-id="'+ex.id+'" title="Открыть">👁</button>':'')+
+        '<button class="mini-btn del" data-act="pi-del" data-i="'+i+'" title="Убрать">✕</button>'+
+      '</div></div>';
+  }).join('');
+  hydrate(box);
+}
+function renderPicker(){
+  $('#pickChips').innerHTML=chipsHTML(pickCat,'pick-cat');
+  const list=filterEx(pickSearch,pickCat);
+  const box=$('#pickList');
+  if(!S.exercises.length){box.innerHTML='<div class="empty" style="padding:20px"><p>Нет элементов. Создайте первый!</p></div>';return}
+  if(!list.length){box.innerHTML='<div class="empty" style="padding:20px"><p>Ничего не найдено</p></div>';return}
+  box.innerHTML=list.map(e=>'<div class="pick-row">'+thumbHTML(e,true)+
+    '<div class="info"><b>'+esc(e.name)+'</b><span class="muted" style="font-size:12px">'+esc(e.category)+' · '+esc(paramsText(e))+'</span></div>'+
+    '<button class="mini-btn" data-act="view-ex" data-id="'+e.id+'" title="Просмотр">👁</button>'+
+    '<button class="add-btn" data-act="add-to-plan" data-id="'+e.id+'" title="Добавить">＋</button></div>').join('');
+  hydrate(box);
+}
+function isDirty(){
+  const d=S.draft;
+  if(!d.id)return !!(d.name.trim()||d.notes.trim()||d.items.length);
+  const p=S.plans.find(x=>x.id===d.id);if(!p)return d.items.length>0;
+  return JSON.stringify({n:d.name,o:d.notes,i:d.items})!==JSON.stringify({n:p.name,o:p.notes,i:p.items});
+}
+async function resetDraft(go){
+  if(isDirty()){
+    const ok=await ask({title:'Есть несохранённые изменения',text:'Текущая схема занятия не сохранена и будет потеряна. Продолжить?',ok:'Продолжить',danger:true});
+    if(!ok)return false;
+  }
+  S.draft=newDraft();save();
+  if(go)setTab('builder');else renderBuilder();
+  return true;
+}
+function savePlan(asNew){
+  const d=S.draft;d.name=d.name.trim();
+  if(!d.name){const n=$('#planName');n.classList.add('shake');setTimeout(()=>n.classList.remove('shake'),400);n.focus();toast('Введите название занятия','err');return}
+  if(!d.items.length){toast('Добавьте хотя бы один элемент','err');return}
+  const copy=JSON.parse(JSON.stringify(d));const now=Date.now();
+  const idx=(d.id&&!asNew)?S.plans.findIndex(p=>p.id===d.id):-1;
+  if(idx>=0){S.plans[idx]=Object.assign({},S.plans[idx],copy,{updated:now});toast('Занятие обновлено ✅')}
+  else{
+    const p=Object.assign({},copy,{id:uid(),created:now,updated:now});
+    if(asNew){p.items=p.items.map(i=>Object.assign({},i,{uid:uid()}))}
+    S.plans.unshift(p);d.id=p.id;toast('Занятие сохранено 🎉');
+  }
+  save();renderBuilder();updateBadges();
+}
+
+/* ---------- Список занятий ---------- */
+function planTime(p){return p.items.reduce((a,i)=>a+itemTime(i),0)}
+function renderPlans(){
+  const q=planSearch.toLowerCase().trim();
+  const list=S.plans.filter(p=>!q||(p.name+' '+p.notes+' '+p.items.map(i=>i.name).join(' ')).toLowerCase().includes(q));
+  const g=$('#plansGrid');
+  if(!S.plans.length){
+    g.innerHTML='<div class="empty"><div class="big">📋</div><h3>Сохранённых занятий нет</h3><p>Соберите схему в конструкторе и сохраните её.</p><button class="btn btn-primary" data-act="plan-new-go">🛠 Открыть конструктор</button></div>';
+  }else if(!list.length){
+    g.innerHTML='<div class="empty"><div class="big">🔍</div><p>Ничего не найдено</p></div>';
+  }else{
+    g.innerHTML=list.map(p=>{
+      const names=p.items.slice(0,4).map(i=>'<span class="chip" style="--h:'+hue(i.category)+'">'+esc(i.name)+'</span>').join('');
+      const more=p.items.length>4?'<span class="chip" style="--h:200">+'+(p.items.length-4)+'</span>':'';
+      return '<article class="card"><div class="card-body" style="padding-top:18px">'+
+        '<h3>'+esc(p.name)+'</h3>'+
+        '<div class="meta"><span>🧩 '+p.items.length+' эл.</span><span>⏱ ~'+fmtTotal(planTime(p))+'</span><span>📅 '+fmtDate(p.updated)+'</span></div>'+
+        (p.notes?'<p class="muted clamp">'+esc(p.notes)+'</p>':'')+
+        '<div class="plan-chips">'+names+more+'</div></div>'+
+        '<div class="card-actions">'+
+        '<button class="btn btn-success sm" data-act="start-plan" data-id="'+p.id+'">▶ Запустить</button>'+
+        '<button class="btn btn-info sm" data-act="open-plan" data-id="'+p.id+'" title="Редактировать">✏️</button>'+
+        '<button class="btn btn-ghost sm" data-act="view-plan" data-id="'+p.id+'" title="Просмотр">👁</button>'+
+        '<button class="btn btn-ghost sm" data-act="dup-plan" data-id="'+p.id+'" title="Дублировать">📄</button>'+
+        '<button class="btn btn-ghost sm" data-act="del-plan" data-id="'+p.id+'" title="Удалить">🗑</button>'+
+        '</div></article>';
+    }).join('');
+  }
+  updateBadges();
+}
+function viewPlan(id){
+  const p=S.plans.find(x=>x.id===id);if(!p)return;
+  const html=
+  '<div class="modal-head"><div><h2>'+esc(p.name)+'</h2><div class="muted" style="font-size:13px">🧩 '+p.items.length+' эл. · ⏱ ~'+fmtTotal(planTime(p))+'</div></div><button class="mini-btn" data-x="close">✕</button></div>'+
+  (p.notes?'<div class="desc muted">'+esc(p.notes)+'</div>':'')+
+  p.items.map((it,i)=>{
+    const ex=S.exercises.find(e=>e.id===it.exId);
+    return '<div class="plan-view-item" '+(ex?'data-ex="'+ex.id+'"':'')+'>'+
+      (ex?thumbHTML(ex,true):'<div class="thumb mini" style="--h:'+hue(it.category)+'"><span class="thumb-emoji">'+catEmoji(it.category)+'</span></div>')+
+      '<div class="info"><b>'+(i+1)+'. '+esc(it.name)+'</b><small>'+esc(paramsText(it))+'</small>'+(it.note?'<small>📝 '+esc(it.note)+'</small>':'')+'</div></div>';
+  }).join('')+
+  '<div class="row end" style="margin-top:16px"><button class="btn btn-ghost" data-x="edit">✏️ Редактировать</button><button class="btn btn-success" data-x="start">▶ Запустить</button></div>';
+  const m=openModal(html,{wide:true});
+  m.el.addEventListener('click',e=>{
+    const x=e.target.closest('[data-x]');
+    if(x){
+      if(x.dataset.x==='close')m.close();
+      if(x.dataset.x==='edit'){m.close();openPlan(id)}
+      if(x.dataset.x==='start'){m.close();startPlayer(p)}
+      return;
+    }
+    const r=e.target.closest('[data-ex]');if(r)viewExercise(r.dataset.ex);
+  });
+}
+async function openPlan(id){
+  const p=S.plans.find(x=>x.id===id);if(!p)return;
+  if(S.draft.id!==id&&isDirty()){
+    const ok=await ask({title:'Заменить текущую схему?',text:'В конструкторе есть несохранённые изменения. Они будут потеряны.',ok:'Заменить',danger:true});
+    if(!ok)return;
+  }
+  S.draft=JSON.parse(JSON.stringify(p));save();setTab('builder');
+}
+function dupPlan(id){
+  const p=S.plans.find(x=>x.id===id);if(!p)return;
+  const c=JSON.parse(JSON.stringify(p));c.id=uid();c.name=p.name+' (копия)';c.created=c.updated=Date.now();
+  c.items.forEach(i=>i.uid=uid());S.plans.unshift(c);save();renderPlans();toast('Занятие продублировано');
+}
+async function delPlan(id){
+  const p=S.plans.find(x=>x.id===id);if(!p)return;
+  const ok=await ask({title:'Удалить занятие «'+p.name+'»?',text:'Элементы в библиотеке останутся нетронутыми.',ok:'Удалить',danger:true});
+  if(!ok)return;
+  S.plans=S.plans.filter(x=>x.id!==id);if(S.draft.id===id)S.draft.id=null;
+  save();renderPlans();toast('Занятие удалено','info');
+}
+
+/* ---------- Плеер занятия ---------- */
+function startPlayer(plan){
+  const steps=[];
+  plan.items.forEach((it,ii)=>{
+    const sets=Math.max(1,+it.sets||1);
+    for(let s=1;s<=sets;s++){
+      steps.push({t:'work',ii:ii,s:s,sets:sets,dur:+it.duration>0?+it.duration:0,reps:+it.reps||0});
+      const last=(ii===plan.items.length-1&&s===sets);
+      if(+it.rest>0&&!last)steps.push({t:'rest',ii:ii,s:s,sets:sets,dur:+it.rest});
+    }
+  });
+  if(!steps.length){toast('В занятии нет элементов','err');return}
+  let idx=0,rem=steps[0].dur,running=false,timer=null;
+  const m=openModal('<div id="plBody"></div>',{wide:true,sticky:true,onClose:()=>stopTimer()});
+  const body=$('#plBody',m.el);
+  function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+  function startTimer(){stopTimer();timer=setInterval(()=>{rem--;if(rem<=0)next(true);else tick()},1000)}
+  function sync(){stopTimer();if(running&&steps[idx].dur>0)startTimer()}
+  function next(auto){
+    if(idx>=steps.length-1){finish();return}
+    idx++;rem=steps[idx].dur;draw();sync();
+    if(auto){try{if(navigator.vibrate)navigator.vibrate(220)}catch(e){}}
+  }
+  function prev(){if(idx>0){idx--;rem=steps[idx].dur;draw();sync()}}
+  function finish(){
+    stopTimer();
+    body.innerHTML='<div class="player"><div class="done-emoji">🎉</div><h2>Занятие завершено!</h2><p class="muted">«'+esc(plan.name)+'» · '+plan.items.length+' эл. Отличная работа!</p><div class="row center" style="margin-top:20px"><button class="btn btn-ghost" data-pl="restart">🔄 Заново</button><button class="btn btn-primary" data-pl="close">Закрыть</button></div></div>';
+  }
+  function tick(){
+    const st=steps[idx];const t=$('#plTime',body),r=$('#plRing',body),tg=$('#plToggle',body);if(!t)return;
+    if(st.dur>0){t.textContent=fmtClock(rem);r.style.setProperty('--p',String(rem/st.dur*100));if(tg)tg.textContent=running?'⏸ Пауза':'▶ Старт'}
+    else{t.textContent=st.reps?st.reps+'×':'✓';r.style.setProperty('--p','100')}
+  }
+  function draw(){
+    const st=steps[idx];const isRest=st.t==='rest';
+    const showIi=isRest&&steps[idx+1]?steps[idx+1].ii:st.ii;
+    const it=plan.items[showIi];const ex=S.exercises.find(e=>e.id===it.exId);
+    const vid=ex&&ex.media.find(x=>x.type==='video'),img=ex&&ex.media.find(x=>x.type==='image');
+    const media=vid?'<video class="pl-media" controls playsinline loop muted data-media="'+esc(vid.id)+'"></video>':(img?'<img class="pl-media" data-media="'+esc(img.id)+'" alt="">':'');
+    const timed=st.dur>0;
+    body.innerHTML='<div class="player">'+
+      '<div class="pl-top"><span class="chip" style="--h:'+hue(it.category)+'">Элемент '+(showIi+1)+' из '+plan.items.length+'</span><button class="mini-btn" data-pl="close">✕</button></div>'+
+      '<div class="progress"><i style="width:'+Math.round(idx/steps.length*100)+'%"></i></div>'+
+      '<div class="pl-phase '+(isRest?'rest':'')+'">'+(isRest?'Отдых 😮‍💨':'Работа 🔥')+'</div>'+
+      '<h2>'+(isRest?'Далее: ':'')+esc(it.name)+'</h2>'+
+      '<div class="muted">Подход '+st.s+' из '+st.sets+(it.note?' · 📝 '+esc(it.note):'')+'</div>'+
+      '<div class="ring" id="plRing"><div class="ring-in"><b id="plTime">00:00</b><small>'+(timed?'осталось':(st.reps?'повторений':'выполните'))+'</small></div></div>'+
+      media+
+      (!isRest&&ex&&ex.description?'<div class="pl-desc">'+esc(ex.description)+'</div>':'')+
+      '<div class="row center">'+
+        '<button class="btn btn-ghost" data-pl="prev"'+(idx===0?' disabled':'')+'>⏮</button>'+
+        (timed?'<button class="btn btn-success lg" id="plToggle" data-pl="toggle">▶ Старт</button>':'')+
+        '<button class="btn '+(timed?'btn-info':'btn-success lg')+'" data-pl="next">'+(timed?'⏭':'Готово ✓')+'</button>'+
+      '</div></div>';
+    hydrate(body);tick();
+  }
+  m.el.addEventListener('click',e=>{
+    const b=e.target.closest('[data-pl]');if(!b)return;const a=b.dataset.pl;
+    if(a==='close')m.close();
+    if(a==='prev')prev();
+    if(a==='next')next(false);
+    if(a==='toggle'){running=!running;sync();tick()}
+    if(a==='restart'){idx=0;rem=steps[0].dur;running=false;draw()}
+  });
+  draw();
+}
+
+/* ---------- Данные ---------- */
+async function renderData(){
+  const st=await DB.stats();
+  $('#dataStats').innerHTML=
+    '<div class="stat"><b>'+S.exercises.length+'</b><span>элементов</span></div>'+
+    '<div class="stat"><b>'+S.plans.length+'</b><span>занятий</span></div>'+
+    '<div class="stat"><b>'+st.count+'</b><span>файлов</span></div>'+
+    '<div class="stat"><b>'+fmtSize(st.size)+'</b><span>размер файлов</span></div>';
+}
+async function exportData(withMedia){
+  toast('Готовим файл...','info');
+  const media={};
+  if(withMedia){
+    const ids=new Set();S.exercises.forEach(e=>e.media.forEach(m=>ids.add(m.id)));
+    for(const id of ids){const b=await DB.get(id);if(b)media[id]=await blobToDataURL(b)}
+  }
+  const payload={app:'fitness-constructor',version:1,exportedAt:new Date().toISOString(),exercises:S.exercises,plans:S.plans,media:media};
+  download(JSON.stringify(payload),'fitness-backup-'+new Date().toISOString().slice(0,10)+'.json');
+  toast('Резервная копия создана ✅');
+}
+async function importPayload(obj){
+  if(!obj||obj.app!=='fitness-constructor'||!Array.isArray(obj.exercises))throw new Error('format');
+  const media=obj.media||{};
+  for(const id in media){await DB.put(id,dataURLToBlob(media[id]));revoke(id)}
+  let ne=0,np=0;
+  obj.exercises.map(cleanEx).forEach(e=>{const i=S.exercises.findIndex(x=>x.id===e.id);if(i>=0)S.exercises[i]=e;else S.exercises.push(e);ne++});
+  (Array.isArray(obj.plans)?obj.plans:[]).map(cleanPlan).forEach(p=>{const i=S.plans.findIndex(x=>x.id===p.id);if(i>=0)S.plans[i]=p;else S.plans.push(p);np++});
+  save();renderAll();
+  toast('Импортировано: элементов '+ne+', занятий '+np);
+}
+function textBackup(){
+  const payload={app:'fitness-constructor',version:1,exportedAt:new Date().toISOString(),exercises:S.exercises,plans:S.plans,media:{}};
+  const m=openModal('<div class="modal-head"><h2>📋 Копия текстом</h2><button class="mini-btn" data-x="close">✕</button></div>'+
+    '<p class="muted" style="margin-top:0">Без фото и видео. Скопируйте текст для сохранения или вставьте ранее сохранённый и нажмите «Импортировать».</p>'+
+    '<textarea class="code" id="tbText"></textarea>'+
+    '<div class="row end" style="margin-top:14px"><button class="btn btn-info" data-x="copy">📋 Копировать</button><button class="btn btn-success" data-x="imp">📥 Импортировать</button></div>',{wide:true});
+  const ta=$('#tbText',m.el);ta.value=JSON.stringify(payload,null,1);
+  m.el.addEventListener('click',async e=>{
+    const x=e.target.closest('[data-x]');if(!x)return;
+    if(x.dataset.x==='close')m.close();
+    if(x.dataset.x==='copy'){
+      try{await navigator.clipboard.writeText(ta.value);toast('Скопировано 📋')}
+      catch(err){ta.select();try{document.execCommand('copy');toast('Скопировано 📋')}catch(e2){toast('Выделите и скопируйте вручную','info')}}
+    }
+    if(x.dataset.x==='imp'){
+      try{await importPayload(JSON.parse(ta.value));m.close()}catch(err){toast('Некорректные данные','err')}
+    }
+  });
+}
+function addDemo(silent){
+  const defs=[
+    ['Разминка суставов','Разминка','Круговые движения шеей, плечами, локтями, кистями и тазом по 10 раз в каждую сторону.',1,0,120,0],
+    ['Прыжки «звёздочка»','Кардио','Встаньте прямо, прыжком разведите ноги и руки в стороны, затем вернитесь в исходное положение. Дышите ровно.',3,0,40,20],
+    ['Приседания','Силовые','Ноги на ширине плеч, спина прямая. Опускайтесь до параллели бёдер с полом, колени смотрят в сторону носков.',3,15,0,30],
+    ['Отжимания','Силовые','Руки чуть шире плеч, корпус — прямая линия. Опускайтесь до угла 90° в локтях. Можно выполнять с колен.',3,10,0,40],
+    ['Выпады','Силовые','Шагните вперёд, опустите заднее колено к полу, вернитесь. Корпус держите вертикально.',3,12,0,30],
+    ['Планка','Кор','Упор на предплечья, тело — прямая линия, живот напряжён. Не прогибайте поясницу.',3,0,45,30],
+    ['Скручивания','Кор','Лёжа на спине, колени согнуты. Поднимайте плечи к тазу, не тяните шею руками.',3,20,0,30],
+    ['Бабочка','Растяжка','Сидя, стопы соедините, колени разведите в стороны и мягко наклоняйтесь вперёд.',1,0,60,0],
+    ['Поза ребёнка','Йога','Сядьте на пятки, вытяните руки вперёд, лоб на пол. Расслабьте спину и дышите глубоко.',1,0,60,0]
+  ];
+  const byName={};let added=0;
+  defs.forEach(d=>{
+    let ex=S.exercises.find(e=>e.name===d[0]);
+    if(!ex){ex=cleanEx({id:uid(),name:d[0],category:d[1],description:d[2],sets:d[3],reps:d[4],duration:d[5],rest:d[6]});S.exercises.push(ex);added++}
+    byName[d[0]]=ex;
+  });
+  if(!S.plans.some(p=>p.name==='Тренировка на всё тело')){
+    const names=['Разминка суставов','Прыжки «звёздочка»','Приседания','Отжимания','Выпады','Планка','Бабочка'];
+    S.plans.push(cleanPlan({id:uid(),name:'Тренировка на всё тело',notes:'Пример занятия: разминка, силовая часть и растяжка. Измените под себя!',items:names.map(n=>makeItem(byName[n]))}));
+  }
+  save();
+  if(!silent){renderAll();toast('Примеры добавлены ✨')}
+}
+async function wipe(kind){
+  const map={plans:['Удалить все занятия?','Будут удалены все сохранённые занятия. Элементы останутся.'],ex:['Удалить все элементы?','Будут удалены все элементы вместе с фото и видео. Занятия сохранятся, но без описаний и файлов.'],all:['Удалить все данные?','Будут удалены элементы, занятия, текущая схема и все прикреплённые файлы.']};
+  const ok=await ask({title:map[kind][0],text:map[kind][1],ok:'Удалить',danger:true});if(!ok)return;
+  if(kind==='plans'||kind==='all'){S.plans=[];if(kind==='plans')S.draft.id=null}
+  if(kind==='ex'||kind==='all'){
+    S.exercises.forEach(e=>e.media.forEach(m=>revoke(m.id)));
+    await DB.clear();S.exercises=[];
+  }
+  if(kind==='all'){S.draft=newDraft()}
+  S.seeded=true;save();renderAll();toast('Данные удалены','info');
+}
+
+function renderAll(){
+  updateBadges();
+  if(curTab==='library')renderLibraryList();
+  if(curTab==='builder')renderBuilder();
+  if(curTab==='plans')renderPlans();
+  if(curTab==='data')renderData();
+}
+
+/* ---------- События ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const a=t.dataset.act,id=t.dataset.id;
+  switch(a){
+    case'tab':setTab(t.dataset.tab);break;
+    case'theme':S.theme=S.theme==='dark'?'light':'dark';applyTheme();save();break;
+    case'new-ex':openEditor();break;
+    case'edit-ex':openEditor(id);break;
+    case'view-ex':viewExercise(id);break;
+    case'del-ex':deleteExercise(id);break;
+    case'add-to-plan':addToDraft(id);break;
+    case'lib-cat':libCat=t.dataset.cat;renderLibraryList();break;
+    case'pick-cat':pickCat=t.dataset.cat;renderPicker();break;
+    case'pi-up':{const i=+t.dataset.i;if(i>0){const a2=S.draft.items;[a2[i-1],a2[i]]=[a2[i],a2[i-1]];save();renderPlanItems()}break}
+    case'pi-down':{const i=+t.dataset.i,a2=S.draft.items;if(i<a2.length-1){[a2[i+1],a2[i]]=[a2[i],a2[i+1]];save();renderPlanItems()}break}
+    case'pi-del':S.draft.items.splice(+t.dataset.i,1);save();renderPlanItems();break;
+    case'pi-view':viewExercise(id);break;
+    case'plan-save':savePlan(false);break;
+    case'plan-save-new':savePlan(true);break;
+    case'plan-new':resetDraft(false);break;
+    case'plan-new-go':resetDraft(true);break;
+    case'plan-clear':
+      if(!S.draft.items.length){toast('Схема уже пуста','info');break}
+      ask({title:'Очистить схему?',text:'Все элементы будут убраны из текущей схемы (сохранённое занятие не изменится, пока вы не нажмёте «Сохранить»).',ok:'Очистить',danger:true}).then(ok=>{if(ok){S.draft.items=[];save();renderPlanItems()}});
+      break;
+    case'plan-start':
+      if(!S.draft.items.length){toast('Добавьте элементы в схему','err');break}
+      startPlayer({name:S.draft.name||'Без названия',items:S.draft.items});break;
+    case'start-plan':{const p=S.plans.find(x=>x.id===id);if(p)startPlayer(p);break}
+    case'open-plan':openPlan(id);break;
+    case'view-plan':viewPlan(id);break;
+    case'dup-plan':dupPlan(id);break;
+    case'del-plan':delPlan(id);break;
+    case'export':exportData(true);break;
+    case'export-nomedia':exportData(false);break;
+    case'import-pick':$('#importFile').click();break;
+    case'text-backup':textBackup();break;
+    case'demo':addDemo(false);break;
+    case'wipe-plans':wipe('plans');break;
+    case'wipe-ex':wipe('ex');break;
+    case'wipe-all':wipe('all');break;
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='planName'){S.draft.name=t.value;save();return}
+  if(t.id==='planNotes'){S.draft.notes=t.value;save();return}
+  if(t.id==='libSearch'){libSearch=t.value;renderLibraryList();return}
+  if(t.id==='pickSearch'){pickSearch=t.value;renderPicker();return}
+  if(t.id==='planSearch'){planSearch=t.value;renderPlans();return}
+  const row=t.closest&&t.closest('.plan-item');
+  if(row&&t.dataset.f){
+    const it=S.draft.items[+row.dataset.i];if(!it)return;
+    const f=t.dataset.f;
+    it[f]=f==='note'?t.value:Math.max(0,parseInt(t.value)||0);
+    save();renderSummary();
+  }
+});
+$('#importFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{await importPayload(JSON.parse(await f.text()))}catch(err){toast('Не удалось прочитать файл','err')}
+});
+let dragIdx=null;
+const planBox=$('#planItems');
+planBox.addEventListener('dragstart',e=>{
+  const h=e.target.closest('.drag-handle');if(!h)return;
+  const it=h.closest('.plan-item');dragIdx=+it.dataset.i;it.classList.add('dragging');
+  try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(dragIdx));e.dataTransfer.setDragImage(it,20,20)}catch(_){}
+});
+planBox.addEventListener('dragover',e=>{
+  if(dragIdx===null)return;e.preventDefault();
+  const it=e.target.closest('.plan-item');
+  $$('.plan-item',planBox).forEach(x=>x.classList.toggle('over',x===it));
+});
+planBox.addEventListener('drop',e=>{
+  if(dragIdx===null)return;e.preventDefault();
+  const it=e.target.closest('.plan-item');
+  if(it){const to=+it.dataset.i;if(to!==dragIdx){const a=S.draft.items;const mv=a.splice(dragIdx,1)[0];a.splice(to,0,mv);save()}}
+  dragIdx=null;renderPlanItems();
+});
+planBox.addEventListener('dragend',()=>{dragIdx=null;renderPlanItems()});
+
+/* ---------- Запуск ---------- */
+async function init(){
+  await DB.open();
+  const d=lsGet();
+  if(d){
+    S.exercises=(d.exercises||[]).map(cleanEx);
+    S.plans=(d.plans||[]).map(cleanPlan);
+    const dr=d.draft||newDraft();
+    S.draft={id:dr.id||null,name:String(dr.name||''),notes:String(dr.notes||''),items:(dr.items||[]).map(cleanItem)};
+    S.theme=d.theme||null;S.seeded=!!d.seeded;
+  }
+  if(!S.theme)S.theme=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+  if(!S.seeded&&!S.exercises.length&&!S.plans.length){addDemo(true);S.seeded=true}
+  save();applyTheme();updateBadges();renderLibraryList();
+}
+init();
+})();
+</script>
+</body>
+</html>
